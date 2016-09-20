@@ -1,0 +1,23 @@
+#
+# generated on 2016/09/19 11:08:19
+#
+# --table-start--
+dataClass=com.musicocracy.fpgk.model.dal.Note
+tableName=Note
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=title
+# --field-end--
+# --field-start--
+fieldName=description
+# --field-end--
+# --field-start--
+fieldName=dateCreated
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
