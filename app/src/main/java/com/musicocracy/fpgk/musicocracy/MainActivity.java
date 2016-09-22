@@ -1,7 +1,9 @@
 package com.musicocracy.fpgk.musicocracy;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
@@ -38,5 +40,10 @@ public class MainActivity extends AppCompatActivity {
         noteDao.create(new Note("note Example 3", "note Example 3 Description", created));
 
         List<Note> notes = noteDao.queryForAll();
+    }
+
+    public void launchDbActivity(View view) {
+        //Intent databaseIntent = new Intent(MainActivity.this, DatabaseActivity.class);
+        //MainActivity.this.startActivity(databaseIntent);
     }
 }
