@@ -11,19 +11,21 @@ import com.musicocracy.fpgk.musicocracy.R;
 
 import java.sql.SQLException;
 
-public class NoteTable extends OrmLiteSqliteOpenHelper {
-    private static final String DATABASE_NAME = "TestDatabase";
-    private static final int DATABASE_VERSION = 1;
-    private Dao<Note, Long> noteDao;
+public class PlayRequestTable extends OrmLiteSqliteOpenHelper {
+    private Dao<PlayRequest, Long> dao;
 
-    public NoteTable(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION, R.raw.ormlite_config);
+    public PlayRequestTable(Context context) {
+        super(context,
+              context.getResources().getString(R.string.database_name),
+              null,
+              context.getResources().getInteger(R.integer.database_version),
+              R.raw.ormlite_config);
     }
 
     @Override
     public void onCreate(SQLiteDatabase database, ConnectionSource connectionSource) {
         try {
-            TableUtils.createTable(connectionSource, Note.class);
+            TableUtils.createTable(connectionSource, PlayRequest.class);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -32,17 +34,17 @@ public class NoteTable extends OrmLiteSqliteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
         try {
-            TableUtils.dropTable(connectionSource, Note.class, false);
+            TableUtils.dropTable(connectionSource, PlayRequest.class, false);
             onCreate(database, connectionSource);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public Dao<Note, Long> getDao() throws SQLException {
-        if (noteDao == null) {
-            noteDao = getDao(Note.class);
+    public Dao<PlayRequest, Long> getDao() throws SQLException {
+        if (dao == null) {
+            dao = getDao(PlayRequest.class);
         }
-        return noteDao;
+        return dao;
     }
 }
