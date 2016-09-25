@@ -3,13 +3,13 @@ package com.musicocracy.fpgk.model.dal;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 @DatabaseTable(tableName = "PlayRequest")
 public class PlayRequest {
     public PlayRequest() {} // OrmLite requires a default constructor
 
-    public PlayRequest(MusicService service, String songId, int requesterId, Date requestTime) {
+    public PlayRequest(MusicService service, String songId, int requesterId, Timestamp requestTime) {
         this.service = service;
         this.songId = songId;
         this.requesterId = requesterId;
@@ -32,8 +32,13 @@ public class PlayRequest {
         return requesterId;
     }
 
-    public Date getRequestTime() {
+    public Timestamp getRequestTime() {
         return requestTime;
+    }
+
+    @Override
+    public String toString() {
+        return getId() + ": " + getService().toString() + " - " + getSongId() + " from "  + getRequesterId() + " at " + getRequestTime().toString();
     }
 
     @DatabaseField(allowGeneratedIdInsert = true, generatedId = true)
@@ -45,5 +50,5 @@ public class PlayRequest {
     @DatabaseField(defaultValue = "0")
     private int requesterId;
     @DatabaseField
-    private Date requestTime;
+    private Timestamp requestTime;
 }
