@@ -1,22 +1,38 @@
 #
-# generated on 2016/09/19 11:08:19
+# generated on 2016/09/25 12:12:50
 #
 # --table-start--
-dataClass=com.musicocracy.fpgk.model.dal.Note
-tableName=Note
+dataClass=com.musicocracy.fpgk.model.dal.MusicService
+tableName=musicservice
+# --table-fields-start--
+# --field-start--
+fieldName=UNKNOWN
+unknownEnumValue=com.musicocracy.fpgk.model.dal.MusicService#UNKNOWN
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.musicocracy.fpgk.model.dal.PlayRequest
+tableName=PlayRequest
 # --table-fields-start--
 # --field-start--
 fieldName=id
 generatedId=true
+allowGeneratedIdInsert=true
 # --field-end--
 # --field-start--
-fieldName=title
+fieldName=service
 # --field-end--
 # --field-start--
-fieldName=description
+fieldName=songId
 # --field-end--
 # --field-start--
-fieldName=dateCreated
+fieldName=requesterId
+defaultValue=0
+# --field-end--
+# --field-start--
+fieldName=requestTime
 # --field-end--
 # --table-fields-end--
 # --table-end--
