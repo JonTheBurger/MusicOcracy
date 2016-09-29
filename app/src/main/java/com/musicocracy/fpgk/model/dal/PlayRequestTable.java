@@ -15,11 +15,19 @@ public class PlayRequestTable extends OrmLiteSqliteOpenHelper {
     private Dao<PlayRequest, Long> dao;
 
     public PlayRequestTable(Context context) {
-        super(context,
+        this(context,
               context.getResources().getString(R.string.database_name),
               null,
               context.getResources().getInteger(R.integer.database_version),
               R.raw.ormlite_config);
+    }
+
+    public PlayRequestTable(Context context, String databaseName, SQLiteDatabase.CursorFactory factory, int databaseVersion, int configFileId) {
+        super(context, databaseName, factory, databaseVersion, configFileId);
+    }
+
+    public static PlayRequestTable InMemory(Context context) {
+        return new PlayRequestTable(context, null, null, context.getResources().getInteger(R.integer.database_version), R.raw.ormlite_config);
     }
 
     @Override
