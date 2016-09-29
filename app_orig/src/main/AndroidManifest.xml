@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="fpgk.phonetophonewificomm">
-
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    package="com.musicocracy.fpgk.musicocracy">
 
     <application
         android:allowBackup="true"
@@ -18,8 +15,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BroadcastReceiverActivity" />
-        <activity android:name=".BroadcastSenderActivity"></activity>
     </application>
 
 </manifest>
