@@ -22,6 +22,12 @@ android {
 
 apply plugin: 'com.neenbedankt.android-apt'
 
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
@@ -34,4 +40,10 @@ dependencies {
     // OrmLite
     compile 'com.j256.ormlite:ormlite-core:5.0'
     compile 'com.j256.ormlite:ormlite-android:5.0'
+
+    // This library handles authentication and authorization
+    compile 'com.spotify.sdk:spotify-auth:beta22-noconnect-2.20b@aar'
+
+    // This library handles music playback
+    compile 'com.spotify.sdk:spotify-player:beta22-noconnect-2.20b@aar'
 }
