@@ -46,4 +46,8 @@ public class MainActivity extends AppCompatActivity {
         //Intent databaseIntent = new Intent(MainActivity.this, DatabaseActivity.class);
         //MainActivity.this.startActivity(databaseIntent);
     }
+
+    public void launchBrowseActivity(View view) {
+        
+    }
 }

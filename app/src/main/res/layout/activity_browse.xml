@@ -10,4 +10,34 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.musicocracy.fpgk.musicocracy.Browse">
 
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text="@string/track_name"
+        android:ems="10"
+        android:id="@+id/editText2"
+        android:layout_marginTop="13dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:layout_marginTop="36dp"
+        android:layout_below="@+id/button5"
+        android:layout_alignEnd="@+id/editText2"
+        android:layout_alignStart="@+id/editText2" />
+
+    <Button
+        android:text="@string/browse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button5"
+        android:layout_marginTop="24dp"
+        android:layout_below="@+id/editText2"
+        android:layout_centerHorizontal="true"
+        android:onClick="browse" />
 </RelativeLayout>
