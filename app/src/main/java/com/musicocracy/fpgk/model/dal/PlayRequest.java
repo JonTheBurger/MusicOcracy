@@ -46,7 +46,7 @@ public class PlayRequest {
         return getId() + ": " + getService().toString() + " - " + getSongId() + " from "  + getRequester().getId() + " at " + getRequestTime().toString();
     }
 
-    @DatabaseField(id = true) private int id;
+    @DatabaseField(generatedId = true) private int id;
     @DatabaseField(foreign = true) private Party party;
     @DatabaseField(foreign = true) private Guest requester;
     @DatabaseField private MusicService service;

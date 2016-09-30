@@ -46,7 +46,7 @@ public class Party {
         return isHosting;
     }
 
-    @DatabaseField(id = true) private int id;
+    @DatabaseField(generatedId = true) private int id;
     @DatabaseField private String name;
     @DatabaseField private String password;
     @DatabaseField private Timestamp startTime;

@@ -12,6 +12,9 @@ import com.musicocracy.fpgk.musicocracy.R;
 import java.sql.SQLException;
 
 public class Database extends OrmLiteSqliteOpenHelper {
+    private static final String DATABASE_NAME = "MusicOcracy.sqlite";
+    private static final int DATABASE_VERSION = 2;
+
     private Dao<Party, Integer> partyDao;
     private Dao<Guest, Integer> guestDao;
     private Dao<PlayRequest, Integer> playRequestDao;
@@ -19,9 +22,9 @@ public class Database extends OrmLiteSqliteOpenHelper {
 
     public Database(Context context) {
         this(context,
-             context.getResources().getString(R.string.database_name),
+             DATABASE_NAME,
              null,
-             context.getResources().getInteger(R.integer.database_version),
+             DATABASE_VERSION,
              R.raw.ormlite_config);
     }
 
@@ -30,7 +33,7 @@ public class Database extends OrmLiteSqliteOpenHelper {
     }
 
     public static Database InMemory(Context context) {
-        return new Database(context, null, null, context.getResources().getInteger(R.integer.database_version), R.raw.ormlite_config);
+        return new Database(context, null, null, DATABASE_VERSION, R.raw.ormlite_config);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class Guest {
         return isBanned;
     }
 
-    @DatabaseField(id = true) private int id;
+    @DatabaseField(generatedId = true) private int id;
     @DatabaseField(foreign = true) private Party party;
     @DatabaseField private String name;
     @DatabaseField private String uniqueId;
