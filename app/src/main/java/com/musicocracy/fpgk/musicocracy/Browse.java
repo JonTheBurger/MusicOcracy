@@ -4,8 +4,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
 
 // Spotify Imports
+import com.musicocracy.fpgk.model.dal.PlayRequest;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
@@ -28,14 +30,14 @@ public class Browse extends AppCompatActivity implements
 
     private Player mPlayer;
 
-    public void browse() {
+    public void browse(View view) {
         mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_browse);
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
                 AuthenticationResponse.Type.TOKEN,
@@ -68,6 +70,10 @@ public class Browse extends AppCompatActivity implements
                         Log.e("Browse", "Could not initialize player: " + throwable.getMessage());
                     }
                 });
+            }
+            else {
+                //Auth flow returned returned an error
+                Log.e("Browse", "Auth flow was cancelled or returned an error.");
             }
         }
     }

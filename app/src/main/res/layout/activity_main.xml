@@ -13,20 +13,10 @@
         android:text="Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="31dp"
-        android:id="@+id/button4"
-        android:layout_below="@+id/button3"
-        android:layout_alignStart="@+id/button3" />
-
-    <Button
-        android:text="Launch Database Activity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:id="@+id/database_button"
-        android:layout_below="@+id/button4"
-        android:layout_centerHorizontal="true"
-        android:onClick="launchDbActivity"/>
+        android:id="@+id/button"
+        android:layout_marginTop="55dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:text="Button"
@@ -47,11 +37,23 @@
         android:layout_alignStart="@+id/button2" />
 
     <Button
-        android:text="Button"
+        android:text="@string/browse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/button"
-        android:layout_marginTop="55dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_marginTop="31dp"
+        android:id="@+id/button4"
+        android:layout_below="@+id/button3"
+        android:layout_alignStart="@+id/button3"
+        android:onClick="launchBrowseActivity" />
+
+    <Button
+        android:text="Launch Database Activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:id="@+id/database_button"
+        android:layout_below="@+id/button4"
+        android:layout_centerHorizontal="true"
+        android:onClick="launchDbActivity"/>
+
 </RelativeLayout>

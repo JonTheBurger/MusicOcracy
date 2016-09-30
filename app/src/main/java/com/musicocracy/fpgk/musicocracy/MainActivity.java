@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void launchBrowseActivity(View view) {
-        
+        Intent browseIntent = new Intent(MainActivity.this, Browse.class);
+        MainActivity.this.startActivity(browseIntent);
     }
 }
