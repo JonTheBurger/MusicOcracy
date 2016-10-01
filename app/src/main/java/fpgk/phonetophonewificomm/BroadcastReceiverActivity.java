@@ -1,5 +1,7 @@
 package fpgk.phonetophonewificomm;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,42 +19,62 @@ public class BroadcastReceiverActivity extends AppCompatActivity {
     private static final String TAG = "BroadcastReceiver";
     private static final int PORT = 2562;
 
+    private DatagramSocket socket;
+    private TextView tViewRequests;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_broadcast_receiver);
+        initSocks();
+    }
+
+    public void initSocks() {
+        try {
+            tViewRequests = (TextView) findViewById(R.id.tViewRequests);
+            socket = new DatagramSocket(PORT, InetAddress.getByName("0.0.0.0"));
+            socket.setBroadcast(true);
+        } catch (IOException e) {
+            Log.i(TAG, e.toString());
+        }
     }
 
     public void receiveBroadcast(View view) {
-        try {
-            ToggleButton tB = (ToggleButton) findViewById(R.id.togDiscovery);
-            boolean done = !tB.isChecked();
-            DatagramSocket socket = new DatagramSocket(PORT, InetAddress.getByName("0.0.0.0"));
-            socket.setBroadcast(true);
-            TextView tViewRequests = (TextView)findViewById(R.id.tViewRequests);
+        new Thread() {
+            public void run() {
+                int i = 0;
+                while (i++ < 1000) {
+                    try {
+                        runOnUiThread(new Runnable() {
 
-            while (!done) {
-                done = !tB.isChecked();
-                Log.i(TAG,"Ready to receive broadcast packets!");
+                            @Override
+                            public void run() {
+                                ToggleButton togDiscovery = (ToggleButton) findViewById(R.id.togDiscovery);
+                                try {
+                                    if (togDiscovery.isChecked()) {
+                                        Log.i(TAG, "Ready to receive broadcast packets!");
 
-                byte[] buf = new byte[15000];
-                DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                socket.receive(packet);
+                                        byte[] buf = new byte[15000];
+                                        DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                                        socket.receive(packet);
+                                        Log.i(TAG, "Packet received from: " + packet.getAddress().getHostAddress());
+                                        String data = new String(packet.getData()).trim();
+                                        Log.i(TAG, "Packet data: " + data);
+                                        //String tViewData = tViewRequests.getText().toString();
+                                        tViewRequests.setText(data);
 
-                Log.i(TAG, "Packet received from: " + packet.getAddress().getHostAddress());
-                String data = new String(packet.getData()).trim();
-                Log.i(TAG, "Packet data: " + data);
-
-                if(data.length() > 0) {
-                    tViewRequests.setText(data);
-                } else {
-                    tViewRequests.setText("");
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-
-
             }
-        } catch (IOException e) {
-            Log.e(TAG, "IOException: " + e.getMessage());
-        }
+        }.start();
     }
 }

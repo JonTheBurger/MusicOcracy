@@ -34,7 +34,6 @@ public class BroadcastSenderActivity extends AppCompatActivity {
     }
 
     public void sendBroadcast(String messageStr) {
-        // Hack Prevent crash (sending should be done using an async task)
         StrictMode.ThreadPolicy policy = new   StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -46,6 +45,7 @@ public class BroadcastSenderActivity extends AppCompatActivity {
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, getBroadcastAddress(), PORT);
             socket.send(sendPacket);
             System.out.println(getClass().getName() + "Broadcast packet sent to: " + getBroadcastAddress().getHostAddress());
+            System.out.println(getClass().getName() + "Broadcast data sent : " + messageStr);
         } catch (IOException e) {
             Log.e(TAG, "IOException: " + e.getMessage());
         }
