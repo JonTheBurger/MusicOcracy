@@ -20,10 +20,10 @@ import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
-import kaaes.spotify.webapi.android.SpotifyCallback;
-import kaaes.spotify.webapi.android.SpotifyError;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Album;
+import kaaes.spotify.webapi.android.models.Track;
+import kaaes.spotify.webapi.android.models.TracksPager;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -37,10 +37,43 @@ public class Browse extends AppCompatActivity implements
     // Can be any integer
     private static final int REQUEST_CODE = 1337;
 
+    private static String token;
+
+    SpotifyService spotify;
+
     private Player mPlayer;
 
     public void browse(View view) {
-        mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
+        //mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
+
+        spotify.getAlbum("2dIGnmEIy1WZIcZCFSj6i8", new Callback<Album>() {
+            @Override
+            public void success(Album album, Response response) {
+                Log.d("Browse", "Get Album success");
+                Log.d("Album success", album.name);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("Browse", "Get Album failure");
+                Log.d("Album failure", error.toString());
+            }
+        });
+
+        spotify.searchTracks("Take on Me", new Callback<TracksPager>() {
+            @Override
+            public void success(TracksPager tp, Response response) {
+                Log.d("Browse", "Get TracksPager success");
+                Log.d("TracksPager success", tp.tracks.items.get(1).uri);
+                mPlayer.playUri(null, tp.tracks.items.get(1).uri, 0, 0);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("Browse", "Get TracksPager failure");
+                Log.d("TracksPager failure", error.toString());
+            }
+        });
     }
 
     @Override
@@ -67,23 +100,11 @@ public class Browse extends AppCompatActivity implements
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
                 SpotifyApi api = new SpotifyApi();
 
-                api.setAccessToken(response.getAccessToken());
+                token = response.getAccessToken();
 
-                SpotifyService spotify = api.getService();
+                api.setAccessToken(token);
 
-                spotify.getAlbum("2dIGnmEIy1WZIcZCFSj6i8", new SpotifyCallback<Album>() {
-                    @Override
-                    public void success(Album album, Response response) {
-                        Log.d("Browse", "Get Album success");
-                        Log.d("Album success", album.name);
-                    }
-
-                    @Override
-                    public void failure(SpotifyError error) {
-                        Log.d("Browse", "Get Album failure");
-                        Log.d("Album failure", error.toString());
-                    }
-                });
+                spotify = api.getService();
 
                 Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
                 Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {

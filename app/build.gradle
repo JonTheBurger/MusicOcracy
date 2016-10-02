@@ -49,5 +49,6 @@ dependencies {
     // This library handles music playback
     compile 'com.spotify.sdk:spotify-player:beta22-noconnect-2.20b@aar'
 
+    // Spotify web API wrapper
     compile 'com.github.kaaes:spotify-web-api-android:0.4.1'
 }
