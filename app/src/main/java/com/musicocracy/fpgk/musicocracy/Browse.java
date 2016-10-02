@@ -66,7 +66,7 @@ public class Browse extends AppCompatActivity implements
             public void success(TracksPager tp, Response response) {
                 Log.d("Browse", "Get TracksPager success");
                 Log.d("TracksPager success", tp.tracks.items.get(1).uri);
-                mPlayer.playUri(null, tp.tracks.items.get(1).uri, 0, 0);
+                mPlayer.playUri(null, tp.tracks.items.get(0).uri, 0, 0);
             }
 
             @Override
