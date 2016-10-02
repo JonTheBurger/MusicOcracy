@@ -19,6 +19,15 @@ import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
+import kaaes.spotify.webapi.android.SpotifyApi;
+import kaaes.spotify.webapi.android.SpotifyCallback;
+import kaaes.spotify.webapi.android.SpotifyError;
+import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.Album;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
 public class Browse extends AppCompatActivity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
 {
@@ -56,6 +65,26 @@ public class Browse extends AppCompatActivity implements
         if (requestCode == REQUEST_CODE) {
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
+                SpotifyApi api = new SpotifyApi();
+
+                api.setAccessToken(response.getAccessToken());
+
+                SpotifyService spotify = api.getService();
+
+                spotify.getAlbum("2dIGnmEIy1WZIcZCFSj6i8", new SpotifyCallback<Album>() {
+                    @Override
+                    public void success(Album album, Response response) {
+                        Log.d("Browse", "Get Album success");
+                        Log.d("Album success", album.name);
+                    }
+
+                    @Override
+                    public void failure(SpotifyError error) {
+                        Log.d("Browse", "Get Album failure");
+                        Log.d("Album failure", error.toString());
+                    }
+                });
+
                 Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
                 Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
                     @Override

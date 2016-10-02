@@ -26,6 +26,8 @@ repositories {
     flatDir {
         dirs 'libs'
     }
+    mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
@@ -46,4 +48,6 @@ dependencies {
 
     // This library handles music playback
     compile 'com.spotify.sdk:spotify-player:beta22-noconnect-2.20b@aar'
+
+    compile 'com.github.kaaes:spotify-web-api-android:0.4.1'
 }
