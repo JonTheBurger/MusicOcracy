@@ -46,3 +46,6 @@ captures/
 
 ### Android Patch ###
 gen-external-apklibs
+
+# db download
+scripts/musicOcracy.sqlite

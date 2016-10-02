@@ -1,6 +1,44 @@
 #
-# generated on 2016/09/25 12:12:50
+# generated on 2016/09/30 04:40:52
 #
+# --table-start--
+dataClass=com.musicocracy.fpgk.model.dal.FilterMode
+tableName=filtermode
+# --table-fields-start--
+# --field-start--
+fieldName=NONE
+unknownEnumValue=com.musicocracy.fpgk.model.dal.FilterMode#NONE
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.musicocracy.fpgk.model.dal.Guest
+tableName=Guest
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=party
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=name
+# --field-end--
+# --field-start--
+fieldName=uniqueId
+# --field-end--
+# --field-start--
+fieldName=joinTime
+# --field-end--
+# --field-start--
+fieldName=isBanned
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
 # --table-start--
 dataClass=com.musicocracy.fpgk.model.dal.MusicService
 tableName=musicservice
@@ -13,13 +51,49 @@ unknownEnumValue=com.musicocracy.fpgk.model.dal.MusicService#UNKNOWN
 # --table-end--
 #################################
 # --table-start--
+dataClass=com.musicocracy.fpgk.model.dal.Party
+tableName=Party
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=name
+# --field-end--
+# --field-start--
+fieldName=password
+# --field-end--
+# --field-start--
+fieldName=startTime
+# --field-end--
+# --field-start--
+fieldName=endTime
+# --field-end--
+# --field-start--
+fieldName=filterMode
+# --field-end--
+# --field-start--
+fieldName=isHosting
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
 dataClass=com.musicocracy.fpgk.model.dal.PlayRequest
 tableName=PlayRequest
 # --table-fields-start--
 # --field-start--
 fieldName=id
 generatedId=true
-allowGeneratedIdInsert=true
+# --field-end--
+# --field-start--
+fieldName=party
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=requester
+foreign=true
 # --field-end--
 # --field-start--
 fieldName=service
@@ -28,11 +102,27 @@ fieldName=service
 fieldName=songId
 # --field-end--
 # --field-start--
-fieldName=requesterId
-defaultValue=0
+fieldName=requestTime
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.musicocracy.fpgk.model.dal.SongFilter
+tableName=SongFilter
+# --table-fields-start--
+# --field-start--
+fieldName=service
 # --field-end--
 # --field-start--
-fieldName=requestTime
+fieldName=songId
+# --field-end--
+# --field-start--
+fieldName=party
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=filterMode
 # --field-end--
 # --table-fields-end--
 # --table-end--
