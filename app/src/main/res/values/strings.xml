@@ -1,7 +1,10 @@
 <resources>
-    <string name="app_name">PhoneToPhoneWifiComm</string>
+    <string name="app_name">MusicOcracy</string>
     <string name="title_activity_receiver">ReceiverActivity</string>
     <string name="title_activity_sender">SenderActivity</string>
     <string name="edit_message">Enter message</string>
     <string name="button_send">Send</string>
+    <string name="track_name">Track Name</string>
+    <string name="browse">Browse</string>
+    <string name="receive">Receive</string>
 </resources>

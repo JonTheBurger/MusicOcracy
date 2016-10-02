@@ -1,10 +1,11 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.2"
     defaultConfig {
-        applicationId "fpgk.phonetophonewificomm"
+        applicationId "com.musicocracy.fpgk.musicocracy"
         minSdkVersion 15
         targetSdkVersion 24
         versionCode 1
@@ -19,6 +20,16 @@ android {
     }
 }
 
+apply plugin: 'com.neenbedankt.android-apt'
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -27,4 +38,22 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
     testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:24.2.0'
+
+    // Dagger 2 and Compiler
+    compile 'com.google.dagger:dagger:2.6.1'
+    apt "com.google.dagger:dagger-compiler:2.6.1"
+
+    // OrmLite
+    compile 'com.j256.ormlite:ormlite-core:5.0'
+    compile 'com.j256.ormlite:ormlite-android:5.0'
+
+    // This library handles authentication and authorization
+    compile 'com.spotify.sdk:spotify-auth:beta22-noconnect-2.20b@aar'
+
+    // This library handles music playback
+    compile 'com.spotify.sdk:spotify-player:beta22-noconnect-2.20b@aar'
+
+    // Spotify web API wrapper
+    compile 'com.github.kaaes:spotify-web-api-android:0.4.1'
 }
