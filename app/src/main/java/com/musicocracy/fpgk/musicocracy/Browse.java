@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 // Spotify Imports
 import com.musicocracy.fpgk.model.dal.PlayRequest;
@@ -44,8 +45,6 @@ public class Browse extends AppCompatActivity implements
     private Player mPlayer;
 
     public void browse(View view) {
-        //mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
-
         spotify.getAlbum("2dIGnmEIy1WZIcZCFSj6i8", new Callback<Album>() {
             @Override
             public void success(Album album, Response response) {
@@ -60,7 +59,9 @@ public class Browse extends AppCompatActivity implements
             }
         });
 
-        spotify.searchTracks("Take on Me", new Callback<TracksPager>() {
+        TextView searchTrack = (TextView)findViewById(R.id.editText2);
+
+        spotify.searchTracks(searchTrack.getText().toString(), new Callback<TracksPager>() {
             @Override
             public void success(TracksPager tp, Response response) {
                 Log.d("Browse", "Get TracksPager success");
