@@ -16,7 +16,6 @@ import com.musicocracy.fpgk.model.dal.MusicService;
 import com.musicocracy.fpgk.model.dal.Party;
 import com.musicocracy.fpgk.model.dal.PlayRequest;
 
-import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -85,7 +84,7 @@ public class DatabaseActivity extends AppCompatActivity {
 
         try {
             Dao<Party, Integer> partyDao = database.getPartyDao();
-            partyDao.create(party);
+            partyDao.createOrUpdate(party);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -95,7 +94,7 @@ public class DatabaseActivity extends AppCompatActivity {
         guest = new Guest(party, "Bob", "74:29:20:05:12", new Timestamp((int)System.currentTimeMillis() - 10000), false);
         try {
             Dao<Guest, Integer> guestDao = database.getGuestDao();
-            guestDao.create(guest);
+            guestDao.createOrUpdate(guest);
         } catch (SQLException e) {
             e.printStackTrace();
         }

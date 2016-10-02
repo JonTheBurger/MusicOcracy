@@ -11,7 +11,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        this.deleteDatabase("/data/data/com.musicocracy.fpgk.musicocracy/databases/MusicOcracy.sqlite");
     }
 
     public void launchDbActivity(View view) {
