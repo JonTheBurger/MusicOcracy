@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'com.google.protobuf'
 
 android {
     compileSdkVersion 24
@@ -30,6 +31,28 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+protobuf {
+    protoc {
+        // Download protobuf compiler
+        artifact = 'com.google.protobuf:protoc:3.0.0'
+    }
+    plugins {
+        javalite {
+            artifact = 'com.google.protobuf:protoc-gen-javalite:3.0.0'
+        }
+    }
+    generateProtoTasks {
+        // all() returns the collection of all protoc tasks
+        all().each { task ->
+            task.plugins {
+                javalite {
+                    outputSubDir = 'main'
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -47,6 +70,9 @@ dependencies {
     // OrmLite
     compile 'com.j256.ormlite:ormlite-core:5.0'
     compile 'com.j256.ormlite:ormlite-android:5.0'
+
+    // Google Protocol Buffers
+    compile 'com.google.protobuf:protobuf-lite:3.0.0'
 
     // This library handles authentication and authorization
     compile 'com.spotify.sdk:spotify-auth:beta22-noconnect-2.20b@aar'

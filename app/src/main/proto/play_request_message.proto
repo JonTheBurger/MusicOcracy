@@ -1,0 +1,11 @@
+syntax = "proto3";
+package net.proto;
+
+import "message_type.proto";
+
+option java_package = "com.musicocracy.fpgk.net.proto";
+option java_outer_classname = "PlayRequestMessageProto";
+
+message PlayRequestMessage {
+    MessageType type = 1;
+}
