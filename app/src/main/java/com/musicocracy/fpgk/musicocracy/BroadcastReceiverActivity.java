@@ -77,20 +77,23 @@ public class BroadcastReceiverActivity extends AppCompatActivity {
 
                 Callable<String> callable = new ReceiveThread(TAG, token, socket, togDiscovery.isChecked());
 
-                Future<String> future = executor.submit(callable);
+                final Future<String> future = executor.submit(callable);
 
-                //while(togDiscovery.isChecked()) {
-                    try {
-                        String returnedString = future.get(1, TimeUnit.SECONDS);
-                        tViewRequests.setText(returnedString);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    } catch (TimeoutException e) {
-                        e.printStackTrace();
-                    }
-                //}
+                while(togDiscovery.isChecked()) {
+                    runOnUiThread(new Runnable(){
+                        public void run() {
+                            String returnedString = null;
+                            try {
+                                returnedString = future.get(1, TimeUnit.SECONDS);
+                                ((TextView)findViewById(R.id.tViewRequests)).setText(returnedString);
+                            } catch (InterruptedException | ExecutionException e) {
+                                e.printStackTrace();
+                            } catch (TimeoutException e) {
+                                // No Data Received
+                            }
+                        }
+                    });
+                }
 
                 //Thread receiveThread = new Thread(new ReceiveThread(TAG, token, socket, togDiscovery.isChecked()));
 
