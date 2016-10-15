@@ -28,6 +28,7 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
     private TextView tViewRequests;
     private String token;
     private ReceiveThread rt;
+    private Browser browser = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,13 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
         if (togDiscovery.isChecked()) {
             // Get an access token
             Intent authIntent = new Intent(this, AuthenticationActivity.class);
-            startActivityForResult(authIntent, AUTHENTICATION_REQUEST_CODE);
+            if (browser == null) {
+                startActivityForResult(authIntent, AUTHENTICATION_REQUEST_CODE);
+            } else { //already have a token
+                rt = new ReceiveThread(token, socket, this);
+                rt.execute();
+            }
+
         }
     }
 
@@ -68,6 +75,8 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
                 Bundle authBundle = intent.getExtras();
                 token = authBundle.getString(getString(R.string.result_string));
 
+                browser = new Browser(token, this);
+
                 rt = new ReceiveThread(token, socket, this);
                 rt.execute();
 
@@ -79,6 +88,8 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
     @Override
     public void onResultsSucceeded(String result) {
         Log.i(TAG, "Message Received: " + result);
+
+        browser.browseTracks(result);
 
         ToggleButton togDiscovery = (ToggleButton) findViewById(R.id.togDiscovery);
 

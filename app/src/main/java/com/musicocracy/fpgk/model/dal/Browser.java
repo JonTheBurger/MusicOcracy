@@ -1,7 +1,9 @@
 package com.musicocracy.fpgk.model.dal;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.musicocracy.fpgk.musicocracy.Browse;
 import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.Spotify;
@@ -21,10 +23,22 @@ public class Browser {
     private static String token;
     private Player mPlayer;
 
-    public Browser(String token) {
+    public Browser(String token, Context context) {
         api = new SpotifyApi();
         api.setAccessToken(token);
         spotify = api.getService();
+        Config playerConfig = new Config(context, token, CLIENT_ID);
+        Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
+            @Override
+            public void onInitialized(SpotifyPlayer spotifyPlayer) {
+                mPlayer = spotifyPlayer;
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                Log.e("Browse", "Could not initialize player: " + throwable.getMessage());
+            }
+        });
     }
 
     public void browseTracks(String trackName) {
@@ -32,8 +46,8 @@ public class Browser {
             @Override
             public void success(TracksPager tp, Response response) {
                 Log.d("Browser", "Get TracksPager success");
-                Log.d("TracksPager success", tp.tracks.items.get(1).uri);
-                mPlayer.playUri(null, tp.tracks.items.get(1).uri, 0, 0);
+                Log.d("TracksPager success", tp.tracks.items.get(0).uri);
+                mPlayer.playUri(null, tp.tracks.items.get(0).uri, 0, 0);
             }
 
             @Override
