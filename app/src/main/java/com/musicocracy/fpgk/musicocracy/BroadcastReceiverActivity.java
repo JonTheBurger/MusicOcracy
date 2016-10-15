@@ -88,7 +88,7 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
     @Override
     public void onResultsSucceeded(String result) {
         Log.i(TAG, "Message Received: " + result);
-
+        tViewRequests.setText(result);
         browser.browseTracks(result);
 
         ToggleButton togDiscovery = (ToggleButton) findViewById(R.id.togDiscovery);
