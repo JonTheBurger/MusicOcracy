@@ -3,6 +3,7 @@ package com.musicocracy.fpgk.musicocracy;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,20 +12,13 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.musicocracy.fpgk.model.dal.Browser;
+import com.musicocracy.fpgk.model.dal.ResultsListener;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-public class BroadcastReceiverActivity extends AppCompatActivity {
+public class BroadcastReceiverActivity extends AppCompatActivity implements ResultsListener{
 
     private static final String TAG = "BroadcastReceiver";
     private static final int PORT = 2562;
@@ -32,6 +26,7 @@ public class BroadcastReceiverActivity extends AppCompatActivity {
 
     private DatagramSocket socket;
     private TextView tViewRequests;
+    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,80 +65,22 @@ public class BroadcastReceiverActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 //Use Data to get string
                 Bundle authBundle = intent.getExtras();
-                String token = authBundle.getString(getString(R.string.result_string));
-                ToggleButton togDiscovery = (ToggleButton) findViewById(R.id.togDiscovery);
+                token = authBundle.getString(getString(R.string.result_string));
 
-                ExecutorService executor = Executors.newSingleThreadExecutor();
-
-                Callable<String> callable = new ReceiveThread(TAG, token, socket, togDiscovery.isChecked());
-
-                final Future<String> future = executor.submit(callable);
-
-                while(togDiscovery.isChecked()) {
-                    runOnUiThread(new Runnable(){
-                        public void run() {
-                            String returnedString = null;
-                            try {
-                                returnedString = future.get(1, TimeUnit.SECONDS);
-                                ((TextView)findViewById(R.id.tViewRequests)).setText(returnedString);
-                            } catch (InterruptedException | ExecutionException e) {
-                                e.printStackTrace();
-                            } catch (TimeoutException e) {
-                                // No Data Received
-                            }
-                        }
-                    });
-                }
-
-                //Thread receiveThread = new Thread(new ReceiveThread(TAG, token, socket, togDiscovery.isChecked()));
-
-                // Need to destroy to prevent leaking a thread
-                //receiveThread.start();
-
-
-//                    public void run() {
-//                        int i = 0;
-//                        while (i++ < 1000) {
-//                            try {
-//                                runOnUiThread(new Runnable() {
-//
-//                                    @Override
-//                                    public void run() {
-//                                        ToggleButton togDiscovery = (ToggleButton) findViewById(R.id.togDiscovery);
-//                                        try {
-//                                            if (togDiscovery.isChecked()) {
-//                                                Log.i(TAG, "Ready to receive broadcast packets!");
-//
-//                                                byte[] buf = new byte[15000];
-//                                                DatagramPacket packet = new DatagramPacket(buf, buf.length);
-//                                                socket.receive(packet);
-//                                                Log.i(TAG, "Packet received from: " + packet.getAddress().getHostAddress());
-//                                                String data = new String(packet.getData()).trim();
-//                                                Log.i(TAG, "Packet data: " + data);
-//                                                //String tViewData = tViewRequests.getText().toString();
-//                                                tViewRequests.setText(data);
-//
-//                                                if (token != null) {
-//                                                    //browser.browseTracks(data);
-//                                                    Log.d(TAG, "Token: " + token);
-//                                                }
-//
-//                                            }
-//                                        } catch (Exception e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                    }
-//                                });
-//                                Thread.sleep(300);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//                    }
-//                }.start();
+                ReceiveThread rt = new ReceiveThread(token, socket, this);
+                rt.execute();
 
                 //final Browser browser = new Browser(token);
             }
         }
+    }
+
+    @Override
+    public void onResultsSucceeded(String result) {
+        Log.i(TAG, "Message Received: " + result);
+
+        ToggleButton togDiscovery = (ToggleButton) findViewById(R.id.togDiscovery);
+        ReceiveThread rt = new ReceiveThread(token, socket, this);
+        rt.execute();
     }
 }
