@@ -27,6 +27,7 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
     private DatagramSocket socket;
     private TextView tViewRequests;
     private String token;
+    private ReceiveThread rt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +68,7 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
                 Bundle authBundle = intent.getExtras();
                 token = authBundle.getString(getString(R.string.result_string));
 
-                ReceiveThread rt = new ReceiveThread(token, socket, this);
+                rt = new ReceiveThread(token, socket, this);
                 rt.execute();
 
                 //final Browser browser = new Browser(token);
@@ -80,7 +81,10 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
         Log.i(TAG, "Message Received: " + result);
 
         ToggleButton togDiscovery = (ToggleButton) findViewById(R.id.togDiscovery);
-        ReceiveThread rt = new ReceiveThread(token, socket, this);
-        rt.execute();
+
+        // Kill AsyncTask if receive broadcast is no longer toggled
+        if (!togDiscovery.isChecked()) {
+            rt.cancel(true);
+        }
     }
 }
