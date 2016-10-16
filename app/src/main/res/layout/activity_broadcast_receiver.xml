@@ -23,7 +23,7 @@
         android:onClick="receiveBroadcast"/>
 
     <TextView
-        android:text="Toggle  Broadcast Discovery"
+        android:text="Toggle Broadcast Discovery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -41,4 +41,13 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/togDiscovery"
         android:layout_alignParentBottom="true" />
+
+    <Button
+        android:text="Play Last Received"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/play_received"
+        android:layout_below="@+id/togDiscovery"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="46dp" />
 </RelativeLayout>
