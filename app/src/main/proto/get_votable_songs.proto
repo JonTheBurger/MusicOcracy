@@ -3,9 +3,10 @@ package net.proto;
 
 import "message_type.proto";
 
+option java_multiple_files = true;
 option java_package = "com.musicocracy.fpgk.net.proto";
-option java_outer_classname = "PlayRequestMessageProto";
+option java_outer_classname = "GetVotableSongsMsgProto";
 
-message PlayRequestMessage {
+message GetVotableSongsMsg {
     MessageType type = 1;
 }

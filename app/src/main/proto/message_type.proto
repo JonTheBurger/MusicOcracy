@@ -1,10 +1,25 @@
 syntax = "proto3";
 package net.proto;
 
+option java_multiple_files = true;
 option java_package = "com.musicocracy.fpgk.net.proto";
 option java_outer_classname = "MessageTypeProto";
 
 enum MessageType {
     UNKNOWN = 0;
-    PLAY_REQUEST = 1;
+
+    // Connection
+    CONNECT_REQUEST = 1;
+    CONNECT_REQUEST_ACK = 2;
+
+    // Play Request
+    PLAY_REQUEST = 11;
+    PLAY_REQUEST_ACK = 12;
+
+    // Voting
+    SEND_VOTE = 21;
+
+    // Get Current Songs
+    GET_VOTABLE_SONGS = 31;
+    SEND_VOTABLE_SONGS = 32;
 }

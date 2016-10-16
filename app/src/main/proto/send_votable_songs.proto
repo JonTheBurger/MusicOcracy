@@ -1,0 +1,19 @@
+syntax = "proto3";
+package net.proto;
+
+import "message_type.proto";
+
+option java_multiple_files = true;
+option java_package = "com.musicocracy.fpgk.net.proto";
+option java_outer_classname = "SendVotableSongsMsgProto";
+
+message SendVotableSongsMsg {
+    message VotableSong {
+        int32 choice_id = 1;
+        string name = 2;
+        string artist = 3;
+    }
+
+    MessageType type = 1;
+    repeated VotableSong songs = 2;
+}
