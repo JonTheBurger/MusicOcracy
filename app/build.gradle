@@ -15,8 +15,9 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -67,9 +68,16 @@ dependencies {
     compile 'com.google.dagger:dagger:2.6.1'
     apt "com.google.dagger:dagger-compiler:2.6.1"
 
+    // RX Java
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'io.reactivex:rxjava:1.1.6'
+
     // OrmLite
     compile 'com.j256.ormlite:ormlite-core:5.0'
     compile 'com.j256.ormlite:ormlite-android:5.0'
+
+    // Google Guava
+    compile 'com.google.guava:guava:19.0'
 
     // Google Protocol Buffers
     compile 'com.google.protobuf:protobuf-lite:3.0.0'
