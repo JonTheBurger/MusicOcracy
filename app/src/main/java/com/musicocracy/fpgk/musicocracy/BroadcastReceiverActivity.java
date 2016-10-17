@@ -1,9 +1,6 @@
 package com.musicocracy.fpgk.musicocracy;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -79,8 +76,6 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
 
                 rt = new ReceiveThread(token, socket, this);
                 rt.execute();
-
-                //final Browser browser = new Browser(token);
             }
         }
     }

@@ -1,23 +1,17 @@
 package com.musicocracy.fpgk.musicocracy;
 
-import android.app.Activity;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
-import android.widget.ToggleButton;
 
 import com.musicocracy.fpgk.model.dal.ResultsListener;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.util.concurrent.Callable;
 
 public class ReceiveThread extends AsyncTask<Void, String, String> {
     private String TAG = "Receive Thread";
     private String token;
     private DatagramSocket socket;
-    private boolean toggleStatus;
     private ResultsListener listener;
 
     public ReceiveThread(String newToken, DatagramSocket newSocket, ResultsListener parentListener){
@@ -60,7 +54,5 @@ public class ReceiveThread extends AsyncTask<Void, String, String> {
     @Override
     protected void onPostExecute(String result) {
         listener.onResultsSucceeded(result);
-
-
     }
 }
