@@ -1,13 +1,11 @@
 syntax = "proto3";
 package net.proto;
 
-import "message_type.proto";
-
 option java_multiple_files = true;
+option java_generate_equals_and_hash = true;
 option java_package = "com.musicocracy.fpgk.net.proto";
 option java_outer_classname = "ConnectRequestMsgProto";
 
 message ConnectRequestMsg {
-    MessageType type = 1;
-    string requester_id = 2;
+    string requester_id = 1;
 }

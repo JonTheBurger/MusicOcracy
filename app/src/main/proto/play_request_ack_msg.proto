@@ -1,15 +1,14 @@
 syntax = "proto3";
 package net.proto;
 
-import "message_type.proto";
 import "base_ack.proto";
 
 option java_multiple_files = true;
+option java_generate_equals_and_hash = true;
 option java_package = "com.musicocracy.fpgk.net.proto";
 option java_outer_classname = "PlayRequestAckMsgProto";
 
 message PlayRequestAckMsg {
-    MessageType type = 1;
-    BaseAckMsg result = 2;
-    int32 remaining_coins = 3;
+    BaseAckMsg result = 1;
+    int32 remaining_coins = 2;
 }

@@ -22,8 +22,6 @@ android {
     }
 }
 
-apply plugin: 'com.neenbedankt.android-apt'
-
 repositories {
     flatDir {
         dirs 'libs'
@@ -62,6 +60,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
     testCompile 'junit:junit:4.12'
+    testCompile "org.mockito:mockito-core:1.+"
     compile 'com.android.support:appcompat-v7:24.2.0'
 
     // Dagger 2 and Compiler
@@ -81,6 +80,7 @@ dependencies {
 
     // Google Protocol Buffers
     compile 'com.google.protobuf:protobuf-lite:3.0.0'
+    compile 'com.google.protobuf:protobuf-java-util:3.0.0'
 
     // This library handles authentication and authorization
     compile 'com.spotify.sdk:spotify-auth:beta22-noconnect-2.20b@aar'
