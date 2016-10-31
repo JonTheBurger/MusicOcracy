@@ -3,7 +3,7 @@ package com.musicocracy.fpgk.musicocracy;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.musicocracy.fpgk.model.dal.ResultsListener;
+import com.musicocracy.fpgk.model.spotify.ResultsListener;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

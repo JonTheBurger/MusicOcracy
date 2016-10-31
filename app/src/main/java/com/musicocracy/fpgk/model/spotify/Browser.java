@@ -1,9 +1,8 @@
-package com.musicocracy.fpgk.model.dal;
+package com.musicocracy.fpgk.model.spotify;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.musicocracy.fpgk.musicocracy.Browse;
 import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.Spotify;
@@ -36,7 +35,7 @@ public class Browser {
 
             @Override
             public void onError(Throwable throwable) {
-                Log.e("Browse", "Could not initialize player: " + throwable.getMessage());
+                Log.e("BrowseActivity", "Could not initialize player: " + throwable.getMessage());
             }
         });
     }

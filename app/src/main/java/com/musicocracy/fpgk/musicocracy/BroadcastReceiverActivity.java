@@ -8,8 +8,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.musicocracy.fpgk.model.dal.Browser;
-import com.musicocracy.fpgk.model.dal.ResultsListener;
+import com.musicocracy.fpgk.model.spotify.Browser;
+import com.musicocracy.fpgk.model.spotify.ResultsListener;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
