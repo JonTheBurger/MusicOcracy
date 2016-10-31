@@ -1,9 +1,12 @@
 package com.musicocracy.fpgk.model.net;
 
+import android.util.Base64;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import com.google.protobuf.Any;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.MessageLite;
 import com.musicocracy.fpgk.net.proto.ConnectRequestAckMsg;
 import com.musicocracy.fpgk.net.proto.ConnectRequestMsg;
@@ -16,6 +19,13 @@ import com.musicocracy.fpgk.net.proto.PlayRequestAckMsg;
 import com.musicocracy.fpgk.net.proto.PlayRequestMsg;
 import com.musicocracy.fpgk.net.proto.SendVotableSongsMsg;
 import com.musicocracy.fpgk.net.proto.SendVoteMsg;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import rx.Observable;
+import rx.functions.Func1;
 
 public class ProtoEnvelopeFactory {
     static final BiMap<MessageType, Class> messageTypeMap;
@@ -60,5 +70,37 @@ public class ProtoEnvelopeFactory {
                 .setFooter(footerBuilder);
 
         return envelopeBuilder.build();
+    }
+
+    public BiMap<MessageType, Class> getMessageTypeMap() {
+        return messageTypeMap;
+    }
+
+    public EnvelopeMsg envelopeFromBase64(String base64) {
+        try {
+            byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
+            return EnvelopeMsg.parseFrom(bytes);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+            return EnvelopeMsg.getDefaultInstance();
+        }
+    }
+
+    public String envelopeToBase64(EnvelopeMsg message) {
+        return Base64.encodeToString(message.toByteArray(), Base64.DEFAULT);    // messages are newline delimited
+    }
+
+    public Map<MessageType, Observable<EnvelopeMsg>> createMessageBus(Observable<EnvelopeMsg> source) {
+        Map<MessageType, Observable<EnvelopeMsg>> map = new HashMap<>(MessageType.values().length);
+        for (final MessageType type : MessageType.values()) {
+            map.put(type, source.filter(new Func1<EnvelopeMsg, Boolean>() {
+                @Override
+                public Boolean call(EnvelopeMsg message) {
+                    return message.getHeader().getType() == type;
+                }
+            }));
+        }
+
+        return Collections.unmodifiableMap(map);
     }
 }
