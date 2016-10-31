@@ -8,6 +8,8 @@ import com.google.common.collect.Maps;
 import com.google.protobuf.Any;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.MessageLite;
+import com.musicocracy.fpgk.net.proto.BrowseSongsAckMsg;
+import com.musicocracy.fpgk.net.proto.BrowseSongsMsg;
 import com.musicocracy.fpgk.net.proto.ConnectRequestAckMsg;
 import com.musicocracy.fpgk.net.proto.ConnectRequestMsg;
 import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
@@ -40,6 +42,8 @@ public class ProtoEnvelopeFactory {
         map.put(MessageType.SEND_VOTE, SendVoteMsg.class);
         map.put(MessageType.GET_VOTABLE_SONGS, GetVotableSongsMsg.class);
         map.put(MessageType.SEND_VOTABLE_SONGS, SendVotableSongsMsg.class);
+        map.put(MessageType.BROWSE_SONGS, BrowseSongsMsg.class);
+        map.put(MessageType.BROWSE_SONGS_ACK, BrowseSongsAckMsg.class);
 
         messageTypeMap = Maps.unmodifiableBiMap(map);
     }
@@ -90,7 +94,7 @@ public class ProtoEnvelopeFactory {
         return Base64.encodeToString(message.toByteArray(), Base64.DEFAULT);    // messages are newline delimited
     }
 
-    public Map<MessageType, Observable<EnvelopeMsg>> createMessageBus(Observable<EnvelopeMsg> source) {
+    public Map<MessageType, Observable<EnvelopeMsg>> createMessageBus(Observable<EnvelopeMsg> source) { // TODO: Create Server/Client message bus? E.g. Client will never broadcast PlayRequestAckMsg
         Map<MessageType, Observable<EnvelopeMsg>> map = new HashMap<>(MessageType.values().length);
         for (final MessageType type : MessageType.values()) {
             map.put(type, source.filter(new Func1<EnvelopeMsg, Boolean>() {

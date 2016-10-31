@@ -63,7 +63,7 @@ public class TcpClientEventBus implements ClientEventBus {
         driver = client.connect().flatMap(new Func1<ObservableConnection<String, String>, Observable<EnvelopeMsg>>() {
             @Override
             public Observable<EnvelopeMsg> call(final ObservableConnection<String, String> serverConnection) {
-                Observable<EnvelopeMsg> receiver = serverConnection
+                Observable<EnvelopeMsg> receiver = serverConnection // TODO: Can this be Observable<Void>?
                         .getInput()
                         .share()
                         .flatMap(new Func1<String, Observable<EnvelopeMsg>>() {

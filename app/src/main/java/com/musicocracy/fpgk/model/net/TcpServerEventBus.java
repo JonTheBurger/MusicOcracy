@@ -22,8 +22,6 @@ import android.util.Log;
 import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
 import com.musicocracy.fpgk.net.proto.MessageType;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.netty.RxNetty;
