@@ -9,8 +9,12 @@ import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
+import java.util.List;
+
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.ArtistSimple;
+import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.TracksPager;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -41,20 +45,22 @@ public class Browser {
         });
     }
 
-    public void browseTracks(String trackName) {
-        spotify.searchTracks(trackName, new Callback<TracksPager>() {
-            @Override
-            public void success(TracksPager tp, Response response) {
-                Log.d("Browser", "Get TracksPager success");
-                Log.d("TracksPager success", tp.tracks.items.get(0).uri);
-                mPlayer.playUri(null, tp.tracks.items.get(0).uri, 0, 0);
-            }
+    public List<Track> browseTracks(String trackName) {
 
-            @Override
-            public void failure(RetrofitError error) {
-                Log.d("Browser", "Get TracksPager failure");
-                Log.d("TracksPager failure", error.toString());
+        List<Track> resultTracks = spotify.searchTracks(trackName).tracks.items;
+
+        //If result tracks are found
+        if (resultTracks.size() != 0) {
+            //Get the top 5 result tracks
+            resultTracks = resultTracks.subList(0, 5);
+
+            //Display the top 5 results
+            for (int i = 0; i < resultTracks.size() && i < 5; i++) {
+                Log.d("Browser", "Result: " + i + ", Album: " + resultTracks.get(i).album.name +
+                        ", Artist: " + resultTracks.get(i).artists.get(0).name);
             }
-        });
+        }
+
+        return resultTracks;
     }
 }
