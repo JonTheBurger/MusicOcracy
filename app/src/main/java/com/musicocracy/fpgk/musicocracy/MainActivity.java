@@ -36,4 +36,9 @@ public class MainActivity extends AppCompatActivity {
         Intent browseIntent = new Intent(MainActivity.this, BrowseActivity.class);
         MainActivity.this.startActivity(browseIntent);
     }
+
+    public void launchNetworkTestActivity(View view) {
+        Intent intent = new Intent(MainActivity.this, NetworkTestActivity.class);
+        MainActivity.this.startActivity(intent);
+    }
 }

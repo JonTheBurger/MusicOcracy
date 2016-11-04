@@ -76,7 +76,7 @@ public class TcpServerEventBus implements ServerEventBus {
                                 return !notification.isOnError();
                             }
                         })
-                        .doAfterTerminate(new Action0() {
+                        .doOnCompleted(new Action0() {
                             @Override
                             public void call() {
                                 Log.i(TAG, " --> Closing connection and stream");

@@ -43,7 +43,7 @@
         android:layout_alignStart="@+id/button_receive" />
 
     <Button
-        android:text="Launch Database Activity"
+        android:text="Database"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/database_button"
@@ -51,5 +51,13 @@
         android:layout_marginTop="20dp"
         android:layout_below="@+id/browse_button"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:text="Network Test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:onClick="launchNetworkTestActivity"
+        android:id="@+id/button2" />
 
 </LinearLayout>
