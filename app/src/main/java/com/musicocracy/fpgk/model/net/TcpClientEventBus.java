@@ -1,125 +1,117 @@
-/*
- * Copyright 2014 Netflix, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * This is a heavily modified version of https://github.com/allenxwang/RxNetty-1/blob/master/rx-netty-examples/src/main/java/io/reactivex/netty/examples/tcp/event/TcpEventStreamClient.java
- */
 package com.musicocracy.fpgk.model.net;
-
-import android.util.Log;
-
-import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
-import com.musicocracy.fpgk.net.proto.MessageType;
-
-import java.util.Map;
 
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.channel.ObservableConnection;
 import io.reactivex.netty.client.RxClient;
 import io.reactivex.netty.pipeline.PipelineConfigurators;
-import rx.Notification;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscription;
-import rx.functions.Action0;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
-public class TcpClientEventBus implements ClientEventBus {
-    private static final String TAG = TcpClientEventBus.class.getSimpleName();
-    private final WritableEventStream<EnvelopeMsg> outputEventStream;
-    private final WritableEventStream<EnvelopeMsg> inputEventStream;
-    private final ProtoEnvelopeFactory factory;
-    private final Map<MessageType, Observable<EnvelopeMsg>> messageBus;
-    private RxClient<String, String> client;
-    private Subscription driver;  // We need a subscription to make Tx/Rx callbacks run.
+public class TcpClientEventBus {
+    private final SharedSubject<String> clientLog = SharedSubject.create();
+    private final SharedSubject<String> clientInput = SharedSubject.create();
+    private final SharedSubject<String> clientOutput = SharedSubject.create();
+    private ObservableConnection<String, String> clientConnection;
+    private RxClient<String, String> client = null;
+    private Subscription clientSubscription;
 
-    public TcpClientEventBus(ProtoEnvelopeFactory factory) {
-        this.outputEventStream = new WritableEventStream<>();
-        this.inputEventStream = new WritableEventStream<>();
-        this.factory = factory;
-        this.messageBus = factory.createMessageBus(inputEventStream.getObservable());
-    }
+    public void startClient(String host, int port) {
+        if (client == null) {
+            clientLog.onNext("Attempting to connect...");
+            client = RxNetty.createTcpClient(host, port, PipelineConfigurators.textOnlyConfigurator());
+            clientSubscription = client.connect()
+                    .flatMap(new Func1<ObservableConnection<String, String>, Observable<String>>() {
+                        @Override
+                        public Observable<String> call(final ObservableConnection<String, String> serverConnection) {
+                            clientConnection = serverConnection;
 
-    private void unsubscribeDriver() {
-        if (driver != null && !driver.isUnsubscribed()) {
-            driver.unsubscribe();
+                            // Receive
+                            Observable<String> rx = serverConnection
+                                    .getInput()
+                                    .map(new Func1<String, String>() {
+                                        @Override
+                                        public String call(String s) {
+                                            return s.trim();
+                                        }
+                                    });
+
+                            // Transmit
+                            Observable<String> tx = clientOutput.getObservable()
+                                    .flatMap(new Func1<String, Observable<String>>() {
+                                        @Override
+                                        public Observable<String> call(String s) {
+                                            serverConnection.writeAndFlush(s);
+                                            return Observable.just("");
+                                        }
+                                    });
+
+                            return Observable.merge(rx, tx);
+                        }
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<String>() {
+                        @Override
+                        public void onCompleted() {
+                            clientLog.onNext("Client completed");
+                            clientInput.onCompleted();
+                            stopClient();
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            clientLog.onNext("Client error: " + e);
+                            clientInput.onError(e);
+                            stopClient();
+                        }
+
+                        @Override
+                        public void onNext(String s) {
+                            if (!s.isEmpty()) {
+                                clientLog.onNext("Client receive: " + s);
+                                clientInput.onNext(s);
+                            }
+                        }
+                    });
+
+            clientLog.onNext("Client connected.");
+        } else {
+            clientLog.onNext("Ignoring redundant connect request.");
         }
     }
 
-    @Override
-    public void connect(String host, int port) {
-        this.client = RxNetty.createTcpClient(host, port, PipelineConfigurators.stringMessageConfigurator());
-        unsubscribeDriver();
-        driver = client.connect().flatMap(new Func1<ObservableConnection<String, String>, Observable<EnvelopeMsg>>() {
-            @Override
-            public Observable<EnvelopeMsg> call(final ObservableConnection<String, String> serverConnection) {
-                Observable<EnvelopeMsg> receiver = serverConnection // TODO: Can this be Observable<Void>?
-                        .getInput()
-                        .share()
-                        .flatMap(new Func1<String, Observable<EnvelopeMsg>>() {
-                            @Override
-                            public Observable<EnvelopeMsg> call(String string) {
-                                inputEventStream.broadcast(factory.envelopeFromBase64(string));
-                                return Observable.empty();
-                            }
-                        });
+    public void clientSend(String s) {
+        clientOutput.onNext(s);
+    }
 
-                Observable<EnvelopeMsg> transmitter = outputEventStream.getObservable()
-                        .flatMap(new Func1<EnvelopeMsg, Observable<Notification<Void>>>() {
-                            @Override
-                            public Observable<Notification<Void>> call(EnvelopeMsg message) {
-                                String raw = factory.envelopeToBase64(message);
-                                Log.i(TAG, "Sent: " + raw);
-                                return serverConnection.writeAndFlush(raw).materialize();
-                            }
-                        })
-                        .takeWhile(new Func1<Notification<Void>, Boolean>() {
-                            @Override
-                            public Boolean call(Notification<Void> notification) {
-                                return !notification.isOnError();
-                            }
-                        })
-                        .doOnCompleted(new Action0() {
-                            @Override
-                            public void call() {
-                                Log.i(TAG, " --> Closing connection and stream");
-                            }
-                        })
-                        .map(new Func1<Notification<Void>, EnvelopeMsg>() {
-                            @Override
-                            public EnvelopeMsg call(Notification<Void> notification) {
-                                return EnvelopeMsg.getDefaultInstance();
-                            }
-                        });
-
-                return Observable.merge(transmitter, receiver);
+    public void stopClient() {
+        if (client != null) {
+            clientLog.onNext("Disconnecting client...");
+            clientSubscription.unsubscribe();
+            if (clientConnection != null) {
+                clientConnection.getChannel().close();
+                clientConnection.close();
             }
-        }).subscribe();
+            RxClient<String, String> temp = client;
+            client = null;
+            temp.shutdown();
+            clientLog.onNext("Client disconnected.");
+        }
     }
 
-    @Override
-    public void broadcast(EnvelopeMsg message) {
-        this.outputEventStream.broadcast(message);
+    public Observable<String> getObservable() {
+        return clientInput.getObservable();
     }
 
-    @Override
-    public void disconnect() {
-        unsubscribeDriver();
-        client.shutdown();
+    public Observable<String> getClientLogObservable() {
+        return clientLog.getObservable();
     }
 
-    @Override
-    public Map<MessageType, Observable<EnvelopeMsg>> getMessageBus() {
-        return messageBus;
+    public boolean isClientConnected() {
+        return client != null;
     }
 }

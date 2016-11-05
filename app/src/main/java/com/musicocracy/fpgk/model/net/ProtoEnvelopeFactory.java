@@ -94,7 +94,7 @@ public class ProtoEnvelopeFactory {
         return Base64.encodeToString(message.toByteArray(), Base64.DEFAULT);    // messages are newline delimited
     }
 
-    public Map<MessageType, Observable<EnvelopeMsg>> createMessageBus(Observable<EnvelopeMsg> source) { // TODO: Create Server/Client message bus? E.g. Client will never broadcast PlayRequestAckMsg
+    public Map<MessageType, Observable<EnvelopeMsg>> createMessageBus(Observable<EnvelopeMsg> source) { // TODO: Create Server/Client message bus? E.g. Client will never onNext PlayRequestAckMsg
         Map<MessageType, Observable<EnvelopeMsg>> map = new HashMap<>(MessageType.values().length);
         for (final MessageType type : MessageType.values()) {
             map.put(type, source.filter(new Func1<EnvelopeMsg, Boolean>() {

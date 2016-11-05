@@ -88,7 +88,7 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
 
         ToggleButton togDiscovery = (ToggleButton) findViewById(R.id.togDiscovery);
 
-        // Kill AsyncTask if receive broadcast is no longer toggled
+        // Kill AsyncTask if receive onNext is no longer toggled
         if (!togDiscovery.isChecked()) {
             rt.cancel(true);
         }

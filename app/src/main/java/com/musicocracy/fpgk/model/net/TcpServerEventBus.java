@@ -1,116 +1,99 @@
-/*
- * Copyright 2014 Netflix, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * This is a heavily modified version of https://github.com/allenxwang/RxNetty-1/blob/master/rx-netty-examples/src/main/java/io/reactivex/netty/examples/tcp/event/TcpEventStreamServer.java
- */
 package com.musicocracy.fpgk.model.net;
-
-import android.util.Log;
-
-import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
-import com.musicocracy.fpgk.net.proto.MessageType;
-
-import java.util.Map;
 
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.channel.ConnectionHandler;
 import io.reactivex.netty.channel.ObservableConnection;
 import io.reactivex.netty.pipeline.PipelineConfigurators;
 import io.reactivex.netty.server.RxServer;
-import rx.Notification;
 import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Func1;
 
-public class TcpServerEventBus implements ServerEventBus {
-    private static final String TAG = TcpServerEventBus.class.getSimpleName();
-    private final RxServer<String, String> server;
-    private final WritableEventStream<EnvelopeMsg> outputEventStream;
-    private final WritableEventStream<EnvelopeMsg> inputEventStream;
-    private final Map<MessageType, Observable<EnvelopeMsg>> messageBus; // TODO: Tuple<Observable<EnvelopeMsg>, CONNECTION>
-    public final int port;
+public class TcpServerEventBus {
+    private final SharedSubject<String> serverLog = SharedSubject.create();
+    private final SharedSubject<String> serverOutput = SharedSubject.create();
+    private final SharedSubject<MessageBySender> serverInput = SharedSubject.create();
+    private RxServer<String, String> server = null;
 
-    public TcpServerEventBus(int port, final ProtoEnvelopeFactory factory) {
-        this.port = port;
-        this.outputEventStream = new WritableEventStream<>();
-        this.inputEventStream = new WritableEventStream<>();
-        this.messageBus = factory.createMessageBus(inputEventStream.getObservable());
-        this.server = RxNetty.createTcpServer(this.port, PipelineConfigurators.textOnlyConfigurator(), new ConnectionHandler<String, String>() {
-            @Override
-            public Observable<Void> handle(final ObservableConnection<String, String> newConnection) {
-                Observable<Void> receiver = newConnection
-                        .getInput()
-                        .share()
-                        .flatMap(new Func1<String, Observable<Void>>() {
-                            @Override
-                            public Observable<Void> call(String string) {
-                                inputEventStream.broadcast(factory.envelopeFromBase64(string));
-                                return Observable.empty();
-                            }
-                        });
+    public void startServer(int port) {
+        if (server == null) {
+            serverLog.onNext("Starting server...");
+            server = RxNetty.createTcpServer(port, PipelineConfigurators.textOnlyConfigurator(), new ConnectionHandler<String, String>() {
+                @Override
+                public Observable<Void> handle(final ObservableConnection<String, String> newConnection) {
+                    serverLog.onNext("New connection established...");
+                    // Receiver
+                    Observable<Void> rx = newConnection.getInput()
+                            .flatMap(new Func1<String, Observable<? extends Void>>() {
+                                @Override
+                                public Observable<? extends Void> call(String msg) {    // called when connection sends something
+                                    if (server != null) {
+                                        serverLog.onNext("Received: " + msg);
+                                        msg = msg.trim();
+                                        if (!msg.isEmpty()) {
+                                            serverInput.onNext(new MessageBySender(msg, newConnection));
+                                        }
+                                    }
+                                    return Observable.empty();
+                                }
+                            })
+                            .doAfterTerminate(new Action0() {
+                                @Override
+                                public void call() {
+                                    serverLog.onNext("Terminating connection...");
+                                    if (newConnection != null) {
+                                        newConnection.getChannel().close();
+                                        newConnection.close();
+                                    }
+                                }
+                            });
 
-                Observable<Void> transmitter = outputEventStream.getObservable()
-                        .flatMap(new Func1<EnvelopeMsg, Observable<Notification<Void>>>() {
-                            @Override
-                            public Observable<Notification<Void>> call(EnvelopeMsg message) {
-                                String raw = factory.envelopeToBase64(message);
-                                Log.i(TAG, "Sent: " + raw);
-                                return newConnection.writeAndFlush(raw).materialize();
-                            }
-                        })
-                        .takeWhile(new Func1<Notification<Void>, Boolean>() {
-                            @Override
-                            public Boolean call(Notification<Void> notification) {
-                                return !notification.isOnError();
-                            }
-                        })
-                        .doOnCompleted(new Action0() {
-                            @Override
-                            public void call() {
-                                Log.i(TAG, " --> Closing connection and stream");
-                            }
-                        })
-                        .map(new Func1<Notification<Void>, Void>() {
-                            @Override
-                            public Void call(Notification<Void> notification) {
-                                return null;
-                            }
-                        });
+                    // Transmitter
+                    Observable<Void> tx = serverOutput.getObservable()
+                            .flatMap(new Func1<String, Observable<? extends Void>>() {
+                                @Override
+                                public Observable<? extends Void> call(String s) {
+                                    return newConnection.writeAndFlush(s);
+                                }
+                            });
 
-                return Observable.merge(transmitter, receiver);
-            }
-        });
+                    return Observable.merge(rx, tx);
+                }
+            });
+            server.start();
+            serverLog.onNext("Server started.");
+        } else {
+            serverLog.onNext("Ignoring redundant start request.");
+        }
     }
 
-    @Override
-    public void start() {
-        server.start();
+    public void broadcast(String msg) {
+        serverOutput.onNext(msg);
     }
 
-    @Override
-    public void broadcast(EnvelopeMsg message) {
-        this.outputEventStream.broadcast(message);
+    public Observable<MessageBySender> getObservable() {
+        return serverInput.getObservable();
     }
 
-    @Override
-    public void shutdown() throws InterruptedException {
-        server.shutdown();
+    public void serverSend(String s) {
+        serverOutput.onNext(s);
     }
 
-    @Override
-    public Map<MessageType, Observable<EnvelopeMsg>> getMessageBus() {
-        return messageBus;
+    public void stopServer() throws InterruptedException {
+        if (server != null) {
+            serverLog.onNext("Stopping server...");
+            RxServer<String, String> temp = server;
+            server = null;
+            temp.shutdown();
+            serverLog.onNext("Server stopped.");
+        }
+    }
+
+    public Observable<String> getServerLogObservable() {
+        return serverLog.getObservable();
+    }
+
+    public boolean isServerRunning() {
+        return server != null;
     }
 }

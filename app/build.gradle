@@ -76,7 +76,6 @@ dependencies {
     compile 'io.reactivex:rxjava:1.1.6'
 
     // RX Netty
-    //compile 'com.netflix.rxnetty:rx-netty:0.3.18'
     compile 'io.reactivex:rxnetty:0.4.19'
 
     // OrmLite

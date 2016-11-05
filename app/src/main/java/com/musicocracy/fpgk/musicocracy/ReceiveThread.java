@@ -24,7 +24,7 @@ public class ReceiveThread extends AsyncTask<Void, String, String> {
     protected String doInBackground(Void... params) {
         String returnString = null;
         try {
-            Log.i(TAG, "Ready to receive broadcast packets!");
+            Log.i(TAG, "Ready to receive onNext packets!");
 
             byte[] buf = new byte[15000];
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
