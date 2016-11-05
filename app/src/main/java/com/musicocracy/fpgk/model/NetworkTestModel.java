@@ -11,15 +11,27 @@ import io.reactivex.netty.server.RxServer;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
 public class NetworkTestModel {
+    private static class MessageBySender {
+        public final String message;
+        public final ObservableConnection<String, String> sender;
+
+        public MessageBySender(String message, ObservableConnection<String, String> sender) {
+            this.message = message;
+            this.sender = sender;
+        }
+    }
+
     private final Subject<String, String> serverEvents = PublishSubject.create();
     private final Observable<String> serverEventObservable = serverEvents.asObservable().share();
     private final WritableEventStream<String> serverOutput = new WritableEventStream<>();
+    private final WritableEventStream<MessageBySender> serverInput = new WritableEventStream<>();
     private RxServer<String, String> server = null;
 
     private final Subject<String, String> clientEvents = PublishSubject.create();
@@ -28,6 +40,12 @@ public class NetworkTestModel {
     private RxClient<String, String> client = null;
 
     public NetworkTestModel() {
+        serverInput.getObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<MessageBySender>() {
+            @Override
+            public void call(MessageBySender messageBySender) {
+                messageBySender.sender.writeAndFlush("echo -> " + messageBySender.message + '\n');
+            }
+        });
     }
 
     public void startServer(int port) {
@@ -43,10 +61,9 @@ public class NetworkTestModel {
                             serverEvents.onNext("Received: " + msg);
                             msg = msg.trim();
                             if (!msg.isEmpty()) {
-                                return newConnection.writeAndFlush("echo -> " + msg + '\n');
-                            } else {
-                                return Observable.empty();
+                                serverInput.broadcast(new MessageBySender(msg, newConnection));
                             }
+                            return Observable.empty();
                         }
                     });
                 }
@@ -107,18 +124,18 @@ public class NetworkTestModel {
 
                         // Transmit
                         Observable<String> tx = clientOutput.getObservable()
-                                .flatMap(new Func1<String, Observable<Void>>() {
-                                    @Override
-                                    public Observable<Void> call(String s) {
-                                        return serverConnection.writeAndFlush(s);
-                                    }
-                                })
-                                .map(new Func1<Void, String>() {
-                                    @Override
-                                    public String call(Void aVoid) {
-                                        return "";
-                                    }
-                                });
+                            .flatMap(new Func1<String, Observable<Void>>() {
+                                @Override
+                                public Observable<Void> call(String s) {
+                                    return serverConnection.writeAndFlush(s);
+                                }
+                            })
+                            .map(new Func1<Void, String>() {
+                                @Override
+                                public String call(Void aVoid) {
+                                    return "";
+                                }
+                            });
 
                         return Observable.merge(rx, tx);
                     }
