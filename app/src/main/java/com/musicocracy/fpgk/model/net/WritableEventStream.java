@@ -6,7 +6,7 @@ import rx.subjects.Subject;
 
 public class WritableEventStream<T> {
     private final Subject<T, T> subject = PublishSubject.create();
-    private final Observable<T> stream = subject.share();
+    private final Observable<T> stream = subject.asObservable().share();
 
     public void broadcast(T message) {
         subject.onNext(message);

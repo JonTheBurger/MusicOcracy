@@ -31,6 +31,8 @@ public class NetworkTestPresenter {
                 view.logServerEvent(s);
             }
         });
+        view.setClientConnected(model.isClientConnected());
+        view.setServerConnected(model.isServerRunning());
     }
 
     public void serverToggle() throws InterruptedException {
