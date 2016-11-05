@@ -51,7 +51,7 @@ public class NetworkTestActivity extends AppCompatActivity implements NetworkTes
         clientListView =    (ListView)findViewById(R.id.client_listview);
         serverListView =    (ListView)findViewById(R.id.server_listview);
 
-        ipEditText.setText("192.168.0.104");
+        ipEditText.setText("192.168.0.101");
         portEditText.setText("2025");
     }
 
@@ -108,7 +108,7 @@ public class NetworkTestActivity extends AppCompatActivity implements NetworkTes
 
     @Override
     public boolean getServerToggle() {
-        return serverSwitch.isChecked();    // checked when false->true
+        return serverSwitch.isChecked();
     }
 
     @Override
@@ -125,6 +125,7 @@ public class NetworkTestActivity extends AppCompatActivity implements NetworkTes
     public void setServerConnected(boolean isConnected) {
         serverSwitch.setChecked(isConnected);
         serverSendBtn.setEnabled(isConnected);
+        setClientLocal(isConnected);
     }
 
     @Override

@@ -4,7 +4,7 @@ import rx.Observable;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
-class WritableEventStream<T> {
+public class WritableEventStream<T> {
     private final Subject<T, T> subject = PublishSubject.create();
     private final Observable<T> stream = subject.share();
 

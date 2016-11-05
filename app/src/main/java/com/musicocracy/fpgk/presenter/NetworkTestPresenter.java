@@ -13,6 +13,8 @@ public class NetworkTestPresenter {
     private final NetworkTestModel model;
     private Subscription clientSub;
     private Subscription serverSub;
+    private int clientMsg = 1;
+    private int serverMsg = 1;
 
     public NetworkTestPresenter(final NetworkTestView view, final NetworkTestModel model) {
         this.view = view;
@@ -61,11 +63,11 @@ public class NetworkTestPresenter {
     }
 
     public void serverSend() {
-
+        model.serverSend(String.valueOf(serverMsg++));
     }
 
     public void clientSend() {
-
+        model.clientSend(String.valueOf(clientMsg++));
     }
 
     public void destroy() throws InterruptedException {

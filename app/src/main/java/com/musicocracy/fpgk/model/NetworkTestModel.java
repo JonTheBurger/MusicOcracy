@@ -1,6 +1,6 @@
 package com.musicocracy.fpgk.model;
 
-import java.util.concurrent.TimeUnit;
+import com.musicocracy.fpgk.model.net.WritableEventStream;
 
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.channel.ConnectionHandler;
@@ -19,10 +19,12 @@ import rx.subjects.Subject;
 public class NetworkTestModel {
     private final Subject<String, String> serverEvents = PublishSubject.create();
     private final Observable<String> serverEventObservable = serverEvents.asObservable().share();
+    private final WritableEventStream<String> serverOutput = new WritableEventStream<>();
     private RxServer<String, String> server = null;
 
     private final Subject<String, String> clientEvents = PublishSubject.create();
     private final Observable<String> clientEventObservable = clientEvents.asObservable().share();
+    private final WritableEventStream<String> clientOutput = new WritableEventStream<>();
     private RxClient<String, String> client = null;
 
     public NetworkTestModel() {
@@ -56,6 +58,10 @@ public class NetworkTestModel {
         }
     }
 
+    public void serverSend(String s) {
+        serverOutput.broadcast(s);
+    }
+
     public void stopServer() throws InterruptedException {
         if (server != null) {
             serverEvents.onNext("Stopping Server...");
@@ -79,8 +85,7 @@ public class NetworkTestModel {
         if (client == null) {
             clientEvents.onNext("Attempting to connect...");
             client = RxNetty.createTcpClient(host, port, PipelineConfigurators.textOnlyConfigurator());
-            client
-                .connect()
+            client.connect()
                 .flatMap(new Func1<ObservableConnection<String, String>, Observable<String>>() {
                     @Override
                     public Observable<String> call(final ObservableConnection<String, String> serverConnection) {
@@ -101,52 +106,57 @@ public class NetworkTestModel {
                             });
 
                         // Transmit
-                        Observable<String> tx = Observable.interval(500, TimeUnit.MILLISECONDS)
-                                .flatMap(new Func1<Long, Observable<String>>() {
+                        Observable<String> tx = clientOutput.getObservable()
+                                .flatMap(new Func1<String, Observable<Void>>() {
                                     @Override
-                                    public Observable<String> call(Long aLong) {
-                                        return serverConnection.writeAndFlush(String.valueOf(aLong + 1))
-                                                .map(new Func1<Void, String>() {
-                                                    @Override
-                                                    public String call(Void aVoid) {
-                                                        return "";
-                                                    }
-                                                });
+                                    public Observable<Void> call(String s) {
+                                        return serverConnection.writeAndFlush(s);
+                                    }
+                                })
+                                .map(new Func1<Void, String>() {
+                                    @Override
+                                    public String call(Void aVoid) {
+                                        return "";
                                     }
                                 });
 
                         return Observable.merge(rx, tx);
                     }
                 })
-            .takeWhile(new Func1<String, Boolean>() {
-                @Override
-                public Boolean call(String s) {
-                    return !s.equals("END");
-                }
-            })
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Observer<String>() {
-                @Override
-                public void onCompleted() {
-                    clientEvents.onNext("OnCompleted");
-                }
+                .takeWhile(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String s) {
+                        return !s.equals("END");
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onCompleted() {
+                        clientEvents.onNext("OnCompleted");
+                    }
 
-                @Override
-                public void onError(Throwable e) {
-                    clientEvents.onNext("OnError: " + e);
-                }
+                    @Override
+                    public void onError(Throwable e) {
+                        clientEvents.onNext("OnError: " + e);
+                        stopClient();
+                    }
 
-                @Override
-                public void onNext(String s) {
-                    clientEvents.onNext("OnNext: " + s);
-                }
-            });
+                    @Override
+                    public void onNext(String s) {
+                        clientEvents.onNext("OnNext: " + s);
+                    }
+                });
 
             clientEvents.onNext("Client connected.");
         } else {
             clientEvents.onNext("Ignoring redundant connect request.");
         }
+    }
+
+    public void clientSend(String s) {
+        clientOutput.broadcast(s);
     }
 
     public void stopClient() {
