@@ -8,6 +8,7 @@ import rx.subjects.Subject;
 public class SharedSubject<T> extends Subject<T, T> {
     private final Subject<T, T> subject;
     private final Observable<T> stream;
+    private T last;
 
     public static <T> SharedSubject<T> create() {
         final Subject subject = PublishSubject.create();
@@ -29,12 +30,17 @@ public class SharedSubject<T> extends Subject<T, T> {
     }
 
     public void onNext(T message) {
+        last = message;
         subject.onNext(message);
     }
 
-    public void onError(Throwable t) { subject.onError(t); }
+    public void onError(Throwable t) {
+        subject.onError(t);
+    }
 
-    public void onCompleted() { subject.onCompleted(); }
+    public void onCompleted() {
+        subject.onCompleted();
+    }
 
     public Observable<T> getObservable() {
         return stream;
@@ -43,5 +49,9 @@ public class SharedSubject<T> extends Subject<T, T> {
     @Override
     public boolean hasObservers() {
         return subject.hasObservers();
+    }
+
+    public T getLast() {
+        return last;
     }
 }

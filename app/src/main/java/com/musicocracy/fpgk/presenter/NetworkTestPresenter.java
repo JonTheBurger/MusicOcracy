@@ -13,6 +13,8 @@ public class NetworkTestPresenter {
     private final NetworkTestModel model;
     private Subscription clientSub;
     private Subscription serverSub;
+    private Subscription clientConnectedSub;
+    private Subscription serverRunningSub;
     private int clientMsg = 1;
     private int serverMsg = 1;
 
@@ -31,6 +33,18 @@ public class NetworkTestPresenter {
                 view.logServerEvent(s);
             }
         });
+        clientConnectedSub = model.getClientIsConnectedObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() {
+            @Override
+            public void call(Boolean isConnected) {
+                view.setClientConnected(isConnected);
+            }
+        });
+        serverRunningSub = model.getServerIsRunningObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() {
+            @Override
+            public void call(Boolean isRunning) {
+                view.setServerConnected(isRunning);
+            }
+        });
         view.setClientConnected(model.isClientConnected());
         view.setServerConnected(model.isServerRunning());
     }
@@ -41,7 +55,6 @@ public class NetworkTestPresenter {
         } else {
             model.stopServer();
         }
-        view.setServerConnected(model.isServerRunning());
     }
 
     public void clientToggle() {
@@ -57,7 +70,6 @@ public class NetworkTestPresenter {
         } else {
             model.stopClient();
         }
-        view.setClientConnected(model.isClientConnected());
     }
 
     public void clientLocalToggle() {
@@ -75,6 +87,8 @@ public class NetworkTestPresenter {
     public void destroy() throws InterruptedException {
         clientSub.unsubscribe();
         serverSub.unsubscribe();
+        clientConnectedSub.unsubscribe();
+        serverRunningSub.unsubscribe();
         model.stopClient();
         model.stopServer();
     }

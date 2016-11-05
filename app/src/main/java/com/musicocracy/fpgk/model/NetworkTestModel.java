@@ -1,8 +1,8 @@
 package com.musicocracy.fpgk.model;
 
 import com.musicocracy.fpgk.model.net.MessageBySender;
-import com.musicocracy.fpgk.model.net.TcpClientEventBus;
-import com.musicocracy.fpgk.model.net.TcpServerEventBus;
+import com.musicocracy.fpgk.model.net.RxTcpClient;
+import com.musicocracy.fpgk.model.net.RxTcpServer;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -10,8 +10,8 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class NetworkTestModel {
-    private final TcpClientEventBus client = new TcpClientEventBus();
-    private final TcpServerEventBus server = new TcpServerEventBus();
+    private final RxTcpClient client = new RxTcpClient();
+    private final RxTcpServer server = new RxTcpServer();
 
     public NetworkTestModel() {
         server.getObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<MessageBySender>() {
@@ -22,43 +22,51 @@ public class NetworkTestModel {
         });
     }
 
-    public Observable getClientEventObservable() {
-        return client.getClientLogObservable();
+    public Observable<Boolean> getClientIsConnectedObservable() {
+        return client.getIsRunningStream();
     }
 
-    public Observable getServerEventObservable() {
-        return server.getServerLogObservable();
+    public Observable<Boolean> getServerIsRunningObservable() {
+        return server.getIsRunningObservable();
+    }
+
+    public Observable<String> getClientEventObservable() {
+        return client.getObservableLog();
+    }
+
+    public Observable<String> getServerEventObservable() {
+        return server.getObservableLog();
     }
 
     public boolean isClientConnected() {
-        return client.isClientConnected();
+        return client.isConnected();
     }
 
     public boolean isServerRunning() {
-        return server.isServerRunning();
+        return server.isRunning();
     }
 
     public void startServer(int i) {
-        server.startServer(i);
+        server.start(i);
     }
 
     public void stopServer() throws InterruptedException {
-        server.stopServer();
+        server.stop();
     }
 
     public void startClient(String host, int i) {
-        client.startClient(host, i);
+        client.start(host, i);
     }
 
     public void stopClient() {
-        client.stopClient();
+        client.stop();
     }
 
     public void serverSend(String s) {
-        server.serverSend(s);
+        server.sendToAll(s);
     }
 
     public void clientSend(String s) {
-        client.clientSend(s);
+        client.send(s);
     }
 }

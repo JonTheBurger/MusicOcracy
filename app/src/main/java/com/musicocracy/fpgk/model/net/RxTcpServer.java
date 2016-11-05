@@ -9,29 +9,34 @@ import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Func1;
 
-public class TcpServerEventBus {
-    private final SharedSubject<String> serverLog = SharedSubject.create();
-    private final SharedSubject<String> serverOutput = SharedSubject.create();
-    private final SharedSubject<MessageBySender> serverInput = SharedSubject.create();
+public class RxTcpServer {
+    private final SharedSubject<Boolean> isRunningStream = SharedSubject.create();
+    private final SharedSubject<String> logStream = SharedSubject.create();
+    private final SharedSubject<String> transmitStream = SharedSubject.create();
+    private final SharedSubject<MessageBySender> receiveStream = SharedSubject.create();
     private RxServer<String, String> server = null;
 
-    public void startServer(int port) {
+    public RxTcpServer() {
+        isRunningStream.onNext(false);
+    }
+
+    public void start(int port) {
         if (server == null) {
-            serverLog.onNext("Starting server...");
+            logStream.onNext("Starting server...");
             server = RxNetty.createTcpServer(port, PipelineConfigurators.textOnlyConfigurator(), new ConnectionHandler<String, String>() {
                 @Override
                 public Observable<Void> handle(final ObservableConnection<String, String> newConnection) {
-                    serverLog.onNext("New connection established...");
+                    logStream.onNext("New connection established...");
                     // Receiver
                     Observable<Void> rx = newConnection.getInput()
                             .flatMap(new Func1<String, Observable<? extends Void>>() {
                                 @Override
                                 public Observable<? extends Void> call(String msg) {    // called when connection sends something
                                     if (server != null) {
-                                        serverLog.onNext("Received: " + msg);
+                                        logStream.onNext("Received: " + msg);
                                         msg = msg.trim();
                                         if (!msg.isEmpty()) {
-                                            serverInput.onNext(new MessageBySender(msg, newConnection));
+                                            receiveStream.onNext(new MessageBySender(msg, newConnection));
                                         }
                                     }
                                     return Observable.empty();
@@ -40,7 +45,7 @@ public class TcpServerEventBus {
                             .doAfterTerminate(new Action0() {
                                 @Override
                                 public void call() {
-                                    serverLog.onNext("Terminating connection...");
+                                    logStream.onNext("Terminating connection...");
                                     if (newConnection != null) {
                                         newConnection.getChannel().close();
                                         newConnection.close();
@@ -49,7 +54,7 @@ public class TcpServerEventBus {
                             });
 
                     // Transmitter
-                    Observable<Void> tx = serverOutput.getObservable()
+                    Observable<Void> tx = transmitStream.getObservable()
                             .flatMap(new Func1<String, Observable<? extends Void>>() {
                                 @Override
                                 public Observable<? extends Void> call(String s) {
@@ -61,39 +66,41 @@ public class TcpServerEventBus {
                 }
             });
             server.start();
-            serverLog.onNext("Server started.");
+            isRunningStream.onNext(true);
+            logStream.onNext("Server started.");
         } else {
-            serverLog.onNext("Ignoring redundant start request.");
+            logStream.onNext("Ignoring redundant start request.");
         }
-    }
-
-    public void broadcast(String msg) {
-        serverOutput.onNext(msg);
     }
 
     public Observable<MessageBySender> getObservable() {
-        return serverInput.getObservable();
+        return receiveStream.getObservable();
     }
 
-    public void serverSend(String s) {
-        serverOutput.onNext(s);
+    public Observable<Boolean> getIsRunningObservable() {
+        return isRunningStream.getObservable();
     }
 
-    public void stopServer() throws InterruptedException {
+    public void sendToAll(String s) {
+        transmitStream.onNext(s);
+    }
+
+    public void stop() throws InterruptedException {
         if (server != null) {
-            serverLog.onNext("Stopping server...");
+            logStream.onNext("Stopping server...");
+            isRunningStream.onNext(false);
             RxServer<String, String> temp = server;
             server = null;
             temp.shutdown();
-            serverLog.onNext("Server stopped.");
+            logStream.onNext("Server stopped.");
         }
     }
 
-    public Observable<String> getServerLogObservable() {
-        return serverLog.getObservable();
+    public Observable<String> getObservableLog() {
+        return logStream.getObservable();
     }
 
-    public boolean isServerRunning() {
-        return server != null;
+    public boolean isRunning() {
+        return isRunningStream.getLast();
     }
 }
