@@ -55,7 +55,8 @@ public class NetworkTestModel {
                 @Override
                 public Observable<Void> handle(final ObservableConnection<String, String> newConnection) {
                     serverEvents.onNext("New Connection Established...");
-                    return newConnection.getInput().flatMap(new Func1<String, Observable<? extends Void>>() {
+                    // Receiver
+                    Observable<Void> rx = newConnection.getInput().flatMap(new Func1<String, Observable<? extends Void>>() {
                         @Override
                         public Observable<? extends Void> call(String msg) {    // called when connection sends something
                             serverEvents.onNext("Received: " + msg);
@@ -66,6 +67,18 @@ public class NetworkTestModel {
                             return Observable.empty();
                         }
                     });
+
+                    // Transmitter
+                    Observable<Void> tx = serverOutput.getObservable()
+                            .flatMap(new Func1<String, Observable<? extends Void>>() {
+                                @Override
+                                public Observable<? extends Void> call(String s) {
+                                    return newConnection.writeAndFlush(s);
+                                }
+                            });
+
+
+                    return Observable.merge(rx, tx);
                 }
             });
             server.start();
