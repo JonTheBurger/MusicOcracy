@@ -11,7 +11,7 @@ public class SharedSubject<T> extends Subject<T, T> {
     private T last;
 
     public static <T> SharedSubject<T> create() {
-        final Subject subject = PublishSubject.create();
+        final Subject<T, T> subject = PublishSubject.create();
 
         OnSubscribe<T> onSubscribe = new OnSubscribe<T>() {
             @Override

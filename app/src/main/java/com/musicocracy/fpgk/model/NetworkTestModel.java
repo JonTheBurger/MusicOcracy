@@ -23,7 +23,7 @@ public class NetworkTestModel {
     }
 
     public Observable<Boolean> getClientIsConnectedObservable() {
-        return client.getIsRunningStream();
+        return client.getIsRunningObservable();
     }
 
     public Observable<Boolean> getServerIsRunningObservable() {
@@ -39,7 +39,7 @@ public class NetworkTestModel {
     }
 
     public boolean isClientConnected() {
-        return client.isConnected();
+        return client.isRunning();
     }
 
     public boolean isServerRunning() {
