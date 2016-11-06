@@ -3,7 +3,7 @@
     package="com.musicocracy.fpgk.musicocracy">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -18,17 +18,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Browse"></activity>
-        <activity android:name=".DatabaseActivity"></activity>
-		<activity android:name=".BroadcastReceiverActivity"
-                  android:launchMode="standard"/>
-        <activity android:name=".BroadcastSenderActivity"></activity>
-        <activity android:name=".AuthenticationActivity"></activity>
+        <activity android:name=".BrowseActivity" />
+        <activity android:name=".DatabaseActivity" />
+        <activity
+            android:name=".BroadcastReceiverActivity"
+            android:launchMode="standard" />
+        <activity android:name=".BroadcastSenderActivity" />
+        <activity android:name=".AuthenticationActivity" />
 
         <!-- Needed for LoginActivity to work -->
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity android:name=".NetworkTestActivity"></activity>
     </application>
+
 </manifest>

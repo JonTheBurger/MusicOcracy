@@ -1,4 +1,4 @@
-package com.musicocracy.fpgk.model.dal;
+package com.musicocracy.fpgk.model.spotify;
 
 /**
  * Activites that wish to be notified about results

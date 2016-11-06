@@ -20,6 +20,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/io.netty.versions.properties'
+        exclude 'META-INF/INDEX.LIST'
+    }
 }
 
 repositories {
@@ -70,6 +74,9 @@ dependencies {
     // RX Java
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.6'
+
+    // RX Netty
+    compile 'io.reactivex:rxnetty:0.4.19'
 
     // OrmLite
     compile 'com.j256.ormlite:ormlite-core:5.0'

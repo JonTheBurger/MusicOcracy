@@ -1,9 +1,6 @@
 package com.musicocracy.fpgk.musicocracy;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,8 +8,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.musicocracy.fpgk.model.dal.Browser;
-import com.musicocracy.fpgk.model.dal.ResultsListener;
+import com.musicocracy.fpgk.model.spotify.Browser;
+import com.musicocracy.fpgk.model.spotify.ResultsListener;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -79,8 +76,6 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
 
                 rt = new ReceiveThread(token, socket, this);
                 rt.execute();
-
-                //final Browser browser = new Browser(token);
             }
         }
     }
@@ -93,7 +88,7 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
 
         ToggleButton togDiscovery = (ToggleButton) findViewById(R.id.togDiscovery);
 
-        // Kill AsyncTask if receive broadcast is no longer toggled
+        // Kill AsyncTask if receive onNext is no longer toggled
         if (!togDiscovery.isChecked()) {
             rt.cancel(true);
         }

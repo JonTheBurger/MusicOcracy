@@ -3,12 +3,15 @@ package com.musicocracy.fpgk.model.net;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
-import com.google.protobuf.Any;
+import com.google.common.io.BaseEncoding;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.MessageLite;
+import com.musicocracy.fpgk.net.proto.BrowseSongsAckMsg;
+import com.musicocracy.fpgk.net.proto.BrowseSongsMsg;
 import com.musicocracy.fpgk.net.proto.ConnectRequestAckMsg;
 import com.musicocracy.fpgk.net.proto.ConnectRequestMsg;
 import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
-import com.musicocracy.fpgk.net.proto.FooterMsg;
 import com.musicocracy.fpgk.net.proto.GetVotableSongsMsg;
 import com.musicocracy.fpgk.net.proto.HeaderMsg;
 import com.musicocracy.fpgk.net.proto.MessageType;
@@ -18,7 +21,8 @@ import com.musicocracy.fpgk.net.proto.SendVotableSongsMsg;
 import com.musicocracy.fpgk.net.proto.SendVoteMsg;
 
 public class ProtoEnvelopeFactory {
-    static final BiMap<MessageType, Class> messageTypeMap;
+    private static final int CURRENT_VERSION = 0;
+    private static final BiMap<MessageType, Class> messageTypeMap;
     static {
         BiMap<MessageType, Class> map = HashBiMap.create(MessageType.values().length);
 
@@ -30,12 +34,18 @@ public class ProtoEnvelopeFactory {
         map.put(MessageType.SEND_VOTE, SendVoteMsg.class);
         map.put(MessageType.GET_VOTABLE_SONGS, GetVotableSongsMsg.class);
         map.put(MessageType.SEND_VOTABLE_SONGS, SendVotableSongsMsg.class);
+        map.put(MessageType.BROWSE_SONGS, BrowseSongsMsg.class);
+        map.put(MessageType.BROWSE_SONGS_ACK, BrowseSongsAckMsg.class);
 
         messageTypeMap = Maps.unmodifiableBiMap(map);
     }
 
+    public BiMap<MessageType, Class> getMessageTypeMap() {
+        return messageTypeMap;
+    }
+
     public EnvelopeMsg createEnvelopeFor(MessageLite body) {
-        return createEnvelopeVersion0(body);
+        return createEnvelopeFor(body, CURRENT_VERSION);
     }
 
     public EnvelopeMsg createEnvelopeFor(MessageLite body, int version) {
@@ -48,17 +58,29 @@ public class ProtoEnvelopeFactory {
     }
 
     public EnvelopeMsg createEnvelopeVersion0(MessageLite body) {
-        HeaderMsg.Builder headerBuilder = HeaderMsg.newBuilder()
-                .setType(messageTypeMap.inverse().get(body.getClass()));
-        FooterMsg.Builder footerBuilder = FooterMsg.newBuilder();
-        EnvelopeMsg.Builder envelopeBuilder = EnvelopeMsg.newBuilder()
-                .setHeader(headerBuilder)
-                .setBody(
-                        Any.newBuilder()
-                                .setValue(body.toByteString())
-                )
-                .setFooter(footerBuilder);
+        HeaderMsg header = HeaderMsg.newBuilder()
+                .setType(messageTypeMap.inverse().get(body.getClass()))
+                .setVersion(0)
+                .build();
+        EnvelopeMsg envelope = EnvelopeMsg.newBuilder()
+                .setHeader(header)
+                .setBody(body.toByteString())
+                .build();
 
-        return envelopeBuilder.build();
+        return envelope;
+    }
+
+    public EnvelopeMsg envelopeFromBase64(String base64) {
+        try {
+            byte[] bytes = BaseEncoding.base64().decode(base64.trim());
+            return EnvelopeMsg.parseFrom(bytes);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+            return EnvelopeMsg.getDefaultInstance();
+        }
+    }
+
+    public String envelopeToBase64(EnvelopeMsg message) {
+        return BaseEncoding.base64().encode(message.toByteArray()) + '\n';
     }
 }

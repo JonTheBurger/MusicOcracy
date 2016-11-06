@@ -23,4 +23,8 @@ enum MessageType {
     // Get Current Songs
     GET_VOTABLE_SONGS = 31;
     SEND_VOTABLE_SONGS = 32;
+
+    // Browse
+    BROWSE_SONGS = 41;
+    BROWSE_SONGS_ACK = 42;
 }
