@@ -30,7 +30,8 @@ import rx.Observable;
 import rx.functions.Func1;
 
 public class ProtoEnvelopeFactory {
-    static final BiMap<MessageType, Class> messageTypeMap;
+    private static final int CURRENT_VERSION = 0;
+    private static final BiMap<MessageType, Class> messageTypeMap;
     static {
         BiMap<MessageType, Class> map = HashBiMap.create(MessageType.values().length);
 
@@ -48,8 +49,12 @@ public class ProtoEnvelopeFactory {
         messageTypeMap = Maps.unmodifiableBiMap(map);
     }
 
+    public BiMap<MessageType, Class> getMessageTypeMap() {
+        return messageTypeMap;
+    }
+
     public EnvelopeMsg createEnvelopeFor(MessageLite body) {
-        return createEnvelopeVersion0(body);
+        return createEnvelopeFor(body, CURRENT_VERSION);
     }
 
     public EnvelopeMsg createEnvelopeFor(MessageLite body, int version) {
@@ -76,10 +81,6 @@ public class ProtoEnvelopeFactory {
         return envelopeBuilder.build();
     }
 
-    public BiMap<MessageType, Class> getMessageTypeMap() {
-        return messageTypeMap;
-    }
-
     public EnvelopeMsg envelopeFromBase64(String base64) {
         try {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
@@ -92,19 +93,5 @@ public class ProtoEnvelopeFactory {
 
     public String envelopeToBase64(EnvelopeMsg message) {
         return Base64.encodeToString(message.toByteArray(), Base64.DEFAULT);    // messages are newline delimited
-    }
-
-    public Map<MessageType, Observable<EnvelopeMsg>> createMessageBus(Observable<EnvelopeMsg> source) { // TODO: Create Server/Client message bus? E.g. Client will never onNext PlayRequestAckMsg
-        Map<MessageType, Observable<EnvelopeMsg>> map = new HashMap<>(MessageType.values().length);
-        for (final MessageType type : MessageType.values()) {
-            map.put(type, source.filter(new Func1<EnvelopeMsg, Boolean>() {
-                @Override
-                public Boolean call(EnvelopeMsg message) {
-                    return message.getHeader().getType() == type;
-                }
-            }));
-        }
-
-        return Collections.unmodifiableMap(map);
     }
 }

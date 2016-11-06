@@ -1,6 +1,6 @@
 package com.musicocracy.fpgk.model;
 
-import com.musicocracy.fpgk.model.net.MessageBySender;
+import com.musicocracy.fpgk.model.net.StringMessageBySender;
 import com.musicocracy.fpgk.model.net.RxTcpClient;
 import com.musicocracy.fpgk.model.net.RxTcpServer;
 
@@ -14,9 +14,9 @@ public class NetworkTestModel {
     private final RxTcpServer server = new RxTcpServer();
 
     public NetworkTestModel() {
-        server.getObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<MessageBySender>() {
+        server.getObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<StringMessageBySender>() {
             @Override
-            public void call(MessageBySender messageBySender) {
+            public void call(StringMessageBySender messageBySender) {
                 messageBySender.sender.writeAndFlush("echo -> " + messageBySender.message + '\n');
             }
         });

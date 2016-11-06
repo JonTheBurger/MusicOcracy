@@ -56,7 +56,7 @@ public class RxTcpClient {
     }
 
     /**
-     * Starts the server. The server will automatically attempt to connect to servers on the
+     * Starts the client. The client will automatically attempt to connect to servers on the
      * specified host/port, and automatically attempt reconnection if the server goes down.
      * @param host IPv4 address
      * @param port Port number

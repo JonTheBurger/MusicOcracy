@@ -17,7 +17,7 @@ public class RxTcpServer {
     private final SharedSubject<Boolean> isRunningStream;
     private final SharedSubject<String> logStream;
     private final SharedSubject<String> transmitStream;
-    private final SharedSubject<MessageBySender> receiveStream;
+    private final SharedSubject<StringMessageBySender> receiveStream;
     private RxServer<String, String> server = null;
 
     /**
@@ -27,7 +27,7 @@ public class RxTcpServer {
         this(SharedSubject.<Boolean>create(),
                 SharedSubject.<String>create(),
                 SharedSubject.<String>create(),
-                SharedSubject.<MessageBySender>create());
+                SharedSubject.<StringMessageBySender>create());
     }
 
     /**
@@ -40,7 +40,7 @@ public class RxTcpServer {
     public RxTcpServer(SharedSubject<Boolean> isRunningStream,
                        SharedSubject<String> logStream,
                        SharedSubject<String> transmitStream,
-                       SharedSubject<MessageBySender> receiveStream) {
+                       SharedSubject<StringMessageBySender> receiveStream) {
         this.isRunningStream = isRunningStream;
         this.logStream = logStream;
         this.transmitStream = transmitStream;
@@ -73,7 +73,7 @@ public class RxTcpServer {
                                         logStream.onNext("Received: " + msg);
                                         msg = msg.trim();
                                         if (!msg.isEmpty()) {
-                                            receiveStream.onNext(new MessageBySender(msg, newConnection));
+                                            receiveStream.onNext(new StringMessageBySender(msg, newConnection));
                                         }
                                     }
                                     return Observable.empty();
@@ -148,9 +148,9 @@ public class RxTcpServer {
      * An observable stream of newline delimited messages received from a client. Messages are
      * provided with the accompanied sender connection, enabling users to reply to client messages
      * should they choose to.
-     * @return An observable stream of newline delimited messages by client sender.
+     * @return An observable stream of messages by client sender. Separated on newline boundaries.
      */
-    public Observable<MessageBySender> getObservable() {
+    public Observable<StringMessageBySender> getObservable() {
         return receiveStream.getObservable();
     }
 
