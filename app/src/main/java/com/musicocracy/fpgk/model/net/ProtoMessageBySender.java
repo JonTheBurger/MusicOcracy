@@ -1,5 +1,6 @@
 package com.musicocracy.fpgk.model.net;
 
+import com.google.protobuf.MessageLite;
 import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
 
 public class ProtoMessageBySender {
@@ -13,7 +14,10 @@ public class ProtoMessageBySender {
         this.message = factory.envelopeFromBase64(raw.message);
     }
 
-    public void replyWith(EnvelopeMsg message) {
-        raw.sender.writeAndFlush(factory.envelopeToBase64(message));
+    public void replyWith(MessageLite message) {
+        if (!(message instanceof EnvelopeMsg)) {
+            message = factory.createEnvelopeFor(message);
+        }
+        raw.sender.writeAndFlush(factory.envelopeToBase64((EnvelopeMsg)message));
     }
 }

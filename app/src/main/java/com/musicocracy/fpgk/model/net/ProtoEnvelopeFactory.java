@@ -1,11 +1,10 @@
 package com.musicocracy.fpgk.model.net;
 
-import android.util.Base64;
-
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
-import com.google.protobuf.Any;
+import com.google.common.io.BaseEncoding;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.MessageLite;
 import com.musicocracy.fpgk.net.proto.BrowseSongsAckMsg;
@@ -13,7 +12,6 @@ import com.musicocracy.fpgk.net.proto.BrowseSongsMsg;
 import com.musicocracy.fpgk.net.proto.ConnectRequestAckMsg;
 import com.musicocracy.fpgk.net.proto.ConnectRequestMsg;
 import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
-import com.musicocracy.fpgk.net.proto.FooterMsg;
 import com.musicocracy.fpgk.net.proto.GetVotableSongsMsg;
 import com.musicocracy.fpgk.net.proto.HeaderMsg;
 import com.musicocracy.fpgk.net.proto.MessageType;
@@ -21,13 +19,6 @@ import com.musicocracy.fpgk.net.proto.PlayRequestAckMsg;
 import com.musicocracy.fpgk.net.proto.PlayRequestMsg;
 import com.musicocracy.fpgk.net.proto.SendVotableSongsMsg;
 import com.musicocracy.fpgk.net.proto.SendVoteMsg;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import rx.Observable;
-import rx.functions.Func1;
 
 public class ProtoEnvelopeFactory {
     private static final int CURRENT_VERSION = 0;
@@ -67,23 +58,21 @@ public class ProtoEnvelopeFactory {
     }
 
     public EnvelopeMsg createEnvelopeVersion0(MessageLite body) {
-        HeaderMsg.Builder headerBuilder = HeaderMsg.newBuilder()
-                .setType(messageTypeMap.inverse().get(body.getClass()));
-        FooterMsg.Builder footerBuilder = FooterMsg.newBuilder();
-        EnvelopeMsg.Builder envelopeBuilder = EnvelopeMsg.newBuilder()
-                .setHeader(headerBuilder)
-                .setBody(
-                        Any.newBuilder()
-                                .setValue(body.toByteString())
-                )
-                .setFooter(footerBuilder);
+        HeaderMsg header = HeaderMsg.newBuilder()
+                .setType(messageTypeMap.inverse().get(body.getClass()))
+                .setVersion(0)
+                .build();
+        EnvelopeMsg envelope = EnvelopeMsg.newBuilder()
+                .setHeader(header)
+                .setBody(body.toByteString())
+                .build();
 
-        return envelopeBuilder.build();
+        return envelope;
     }
 
     public EnvelopeMsg envelopeFromBase64(String base64) {
         try {
-            byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
+            byte[] bytes = BaseEncoding.base64().decode(base64.trim());
             return EnvelopeMsg.parseFrom(bytes);
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
@@ -92,6 +81,6 @@ public class ProtoEnvelopeFactory {
     }
 
     public String envelopeToBase64(EnvelopeMsg message) {
-        return Base64.encodeToString(message.toByteArray(), Base64.DEFAULT);    // messages are newline delimited
+        return BaseEncoding.base64().encode(message.toByteArray()) + '\n';
     }
 }

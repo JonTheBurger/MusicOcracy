@@ -1,6 +1,14 @@
 package com.musicocracy.fpgk.presenter;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.model.NetworkTestModel;
+import com.musicocracy.fpgk.model.net.ProtoEnvelopeFactory;
+import com.musicocracy.fpgk.model.net.ProtoMessageBySender;
+import com.musicocracy.fpgk.net.proto.BrowseSongsAckMsg;
+import com.musicocracy.fpgk.net.proto.BrowseSongsMsg;
+import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
+import com.musicocracy.fpgk.net.proto.MessageType;
+import com.musicocracy.fpgk.net.proto.SendVotableSongsMsg;
 import com.musicocracy.fpgk.view.NetworkTestView;
 
 import rx.Subscription;
@@ -11,8 +19,11 @@ import rx.schedulers.Schedulers;
 public class NetworkTestPresenter {
     private final NetworkTestView view;
     private final NetworkTestModel model;
+    private final ProtoEnvelopeFactory factory = new ProtoEnvelopeFactory();
     private Subscription clientSub;
     private Subscription serverSub;
+    private Subscription clientLogSub;
+    private Subscription serverLogSub;
     private Subscription clientConnectedSub;
     private Subscription serverRunningSub;
     private int clientMsg = 1;
@@ -21,32 +32,69 @@ public class NetworkTestPresenter {
     public NetworkTestPresenter(final NetworkTestView view, final NetworkTestModel model) {
         this.view = view;
         this.model = model;
-        clientSub = model.getClientEventObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+        clientSub = model.getClientReceiver().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<EnvelopeMsg>() {
+            @Override
+            public void call(EnvelopeMsg message) {
+                String parsed = "ERROR: Unrecognized message";
+
+                try {
+                    if (message.getHeader().getType() == MessageType.BROWSE_SONGS_ACK) {
+                        parsed = BrowseSongsAckMsg.parseFrom(message.getBody()).toString();
+                    } else if (message.getHeader().getType() == MessageType.SEND_VOTABLE_SONGS) {
+                        parsed = SendVotableSongsMsg.parseFrom(message.getBody()).toString();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                view.logClientEvent(parsed);
+            }
+        });
+        serverSub = model.getServerReceiver().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ProtoMessageBySender>() {
+            @Override
+            public void call(ProtoMessageBySender messageBySender) {
+                BrowseSongsMsg received = BrowseSongsMsg.getDefaultInstance();
+                try {
+                    received = BrowseSongsMsg.parseFrom(messageBySender.message.getBody());
+                    view.logServerEvent(received.toString());
+                } catch (InvalidProtocolBufferException e) {
+                    e.printStackTrace();
+                }
+                BrowseSongsAckMsg response = BrowseSongsAckMsg.newBuilder()
+                        .setMusicService("Spotify")
+                        .setUri("URI")
+                        .setArtist(received.getArtist())
+                        .setSongTitle(received.getSongTitle())
+                        .build();
+                messageBySender.replyWith(response);
+            }
+        });
+        clientLogSub = model.getClientLog().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
             @Override
             public void call(String s) {
                 view.logClientEvent(s);
             }
         });
-        serverSub = model.getServerEventObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+        serverLogSub = model.getServerLog().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
             @Override
             public void call(String s) {
                 view.logServerEvent(s);
             }
         });
-        clientConnectedSub = model.getClientIsConnectedObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() {
+        clientConnectedSub = model.getClientIsRunningObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() {
             @Override
             public void call(Boolean isConnected) {
-                view.setClientConnected(isConnected);
+                view.setClientRunning(isConnected);
             }
         });
         serverRunningSub = model.getServerIsRunningObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Boolean>() {
             @Override
             public void call(Boolean isRunning) {
-                view.setServerConnected(isRunning);
+                view.setServerRunning(isRunning);
             }
         });
-        view.setClientConnected(model.isClientConnected());
-        view.setServerConnected(model.isServerRunning());
+        view.setClientRunning(model.isClientRunning());
+        view.setServerRunning(model.isServerRunning());
     }
 
     public void serverToggle() throws InterruptedException {
@@ -60,7 +108,7 @@ public class NetworkTestPresenter {
     public void clientToggle() {
         if (view.getClientToggle()) {
             String host;
-            if (view.getClientLocalToggle()) {
+            if (view.getLocalHostToggle()) {
                 host = "localhost";
             } else {
                 host = view.getIpText();
@@ -72,21 +120,41 @@ public class NetworkTestPresenter {
         }
     }
 
-    public void clientLocalToggle() {
-        view.setClientLocal(view.getClientLocalToggle());
+    public void localHostToggle() {
+        view.setLocalHost(view.getLocalHostToggle());
     }
 
     public void serverSend() {
-        model.serverSend(String.valueOf(serverMsg++));
+        SendVotableSongsMsg votableSongs = SendVotableSongsMsg.newBuilder()
+                .addSongs(SendVotableSongsMsg.VotableSong.newBuilder()
+                        .setArtist("Queen")
+                        .setName("Killer Queen")
+                        .setChoiceId(serverMsg)
+                        .build())
+                .addSongs(SendVotableSongsMsg.VotableSong.newBuilder()
+                        .setArtist("Queen")
+                        .setName("Good Old Fashioned Lover Boy")
+                        .setChoiceId(serverMsg + 1)
+                        .build())
+                .build();
+        serverMsg++;
+        model.serverSend(votableSongs);
     }
 
     public void clientSend() {
-        model.clientSend(String.valueOf(clientMsg++));
+        BrowseSongsMsg request = BrowseSongsMsg.newBuilder()
+                .setArtist("Queen" + String.valueOf(clientMsg))
+                .setSongTitle("Bicycle" + String.valueOf(clientMsg))
+                .build();
+        clientMsg++;
+        model.clientSend(request);
     }
 
     public void destroy() throws InterruptedException {
         clientSub.unsubscribe();
         serverSub.unsubscribe();
+        clientLogSub.unsubscribe();
+        serverLogSub.unsubscribe();
         clientConnectedSub.unsubscribe();
         serverRunningSub.unsubscribe();
         model.stopClient();

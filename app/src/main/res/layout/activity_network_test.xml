@@ -27,9 +27,9 @@
             android:id="@+id/use_local_client_switch"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="0.3"
+            android:layout_weight="0.25"
             android:onClick="onIsClientLocalSwitch"
-            android:text="Local Host" />
+            android:text="localhost" />
 
         <Switch
             android:id="@+id/client_switch"

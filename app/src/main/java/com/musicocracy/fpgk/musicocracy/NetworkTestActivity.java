@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.Switch;
 
 import com.musicocracy.fpgk.model.NetworkTestModel;
+import com.musicocracy.fpgk.model.net.ProtoEnvelopeFactory;
 import com.musicocracy.fpgk.presenter.NetworkTestPresenter;
 import com.musicocracy.fpgk.view.NetworkTestView;
 
@@ -37,7 +38,7 @@ public class NetworkTestActivity extends AppCompatActivity implements NetworkTes
         setContentView(R.layout.activity_network_test);
         initWidgets();
         initAdapters();
-        presenter = new NetworkTestPresenter(this, new NetworkTestModel());
+        presenter = new NetworkTestPresenter(this, new NetworkTestModel(new ProtoEnvelopeFactory()));
     }
 
     private void initWidgets() {
@@ -77,7 +78,7 @@ public class NetworkTestActivity extends AppCompatActivity implements NetworkTes
     }
 
     public void onIsClientLocalSwitch(View v) {
-        presenter.clientLocalToggle();
+        presenter.localHostToggle();
     }
 
     public void onServerSwitch(View v) {
@@ -117,25 +118,25 @@ public class NetworkTestActivity extends AppCompatActivity implements NetworkTes
     }
 
     @Override
-    public boolean getClientLocalToggle() {
+    public boolean getLocalHostToggle() {
         return isClientLocalSwitch.isChecked();
     }
 
     @Override
-    public void setServerConnected(boolean isConnected) {
+    public void setServerRunning(boolean isConnected) {
         serverSwitch.setChecked(isConnected);
         serverSendBtn.setEnabled(isConnected);
-        setClientLocal(isConnected);
+        setLocalHost(isConnected);
     }
 
     @Override
-    public void setClientConnected(boolean isConnected) {
+    public void setClientRunning(boolean isConnected) {
         clientSwitch.setChecked(isConnected);
         clientSendBtn.setEnabled(isConnected);
     }
 
     @Override
-    public void setClientLocal(boolean isLocal) {
+    public void setLocalHost(boolean isLocal) {
         isClientLocalSwitch.setChecked(isLocal);
         ipEditText.setEnabled(!isLocal);
     }

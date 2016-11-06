@@ -1,28 +1,30 @@
 package com.musicocracy.fpgk.model;
 
-import com.musicocracy.fpgk.model.net.StringMessageBySender;
+import com.google.protobuf.MessageLite;
+import com.musicocracy.fpgk.model.net.ClientEventBus;
+import com.musicocracy.fpgk.model.net.ProtoEnvelopeFactory;
+import com.musicocracy.fpgk.model.net.ProtoMessageBySender;
+import com.musicocracy.fpgk.model.net.ServerEventBus;
 import com.musicocracy.fpgk.model.net.RxTcpClient;
 import com.musicocracy.fpgk.model.net.RxTcpServer;
+import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
+import com.musicocracy.fpgk.net.proto.MessageType;
 
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 public class NetworkTestModel {
-    private final RxTcpClient client = new RxTcpClient();
-    private final RxTcpServer server = new RxTcpServer();
+    private final ClientEventBus client;
+    private final ServerEventBus server;
+    private final ProtoEnvelopeFactory factory;
 
-    public NetworkTestModel() {
-        server.getObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<StringMessageBySender>() {
-            @Override
-            public void call(StringMessageBySender messageBySender) {
-                messageBySender.sender.writeAndFlush("echo -> " + messageBySender.message + '\n');
-            }
-        });
+    public NetworkTestModel(final ProtoEnvelopeFactory factory) {
+        this.factory = factory;
+        this.client = new ClientEventBus(new RxTcpClient(), factory);
+        this.server = new ServerEventBus(new RxTcpServer(), factory);
+
     }
 
-    public Observable<Boolean> getClientIsConnectedObservable() {
+    public Observable<Boolean> getClientIsRunningObservable() {
         return client.getIsRunningObservable();
     }
 
@@ -30,15 +32,25 @@ public class NetworkTestModel {
         return server.getIsRunningObservable();
     }
 
-    public Observable<String> getClientEventObservable() {
+    public Observable<EnvelopeMsg> getClientReceiver() {
+        Observable<EnvelopeMsg> votable = client.getObservable(MessageType.SEND_VOTABLE_SONGS);
+        Observable<EnvelopeMsg> browse = client.getObservable(MessageType.BROWSE_SONGS_ACK);
+        return Observable.merge(votable, browse);
+    }
+
+    public Observable<ProtoMessageBySender> getServerReceiver() {
+        return server.getObservable(MessageType.BROWSE_SONGS);
+    }
+
+    public Observable<String> getClientLog() {
         return client.getObservableLog();
     }
 
-    public Observable<String> getServerEventObservable() {
+    public Observable<String> getServerLog() {
         return server.getObservableLog();
     }
 
-    public boolean isClientConnected() {
+    public boolean isClientRunning() {
         return client.isRunning();
     }
 
@@ -46,27 +58,27 @@ public class NetworkTestModel {
         return server.isRunning();
     }
 
-    public void startServer(int i) {
-        server.start(i);
+    public void startServer(int port) {
+        server.start(port);
     }
 
     public void stopServer() throws InterruptedException {
         server.stop();
     }
 
-    public void startClient(String host, int i) {
-        client.start(host, i);
+    public void startClient(String host, int port) {
+        client.start(host, port);
     }
 
     public void stopClient() {
         client.stop();
     }
 
-    public void serverSend(String s) {
-        server.sendToAll(s);
+    public void serverSend(MessageLite message) {
+        server.sendToAll(factory.createEnvelopeFor(message));
     }
 
-    public void clientSend(String s) {
-        client.send(s);
+    public void clientSend(MessageLite message) {
+        client.send(factory.createEnvelopeFor(message));
     }
 }

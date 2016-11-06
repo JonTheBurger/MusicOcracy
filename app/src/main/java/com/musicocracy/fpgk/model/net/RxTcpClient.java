@@ -70,23 +70,19 @@ public class RxTcpClient {
                         @Override
                         public Observable<String> call(final ObservableConnection<String, String> serverConnection) {
                             // Called whenever a connection is established. We store the connection for later so that we can close it.
+                            logStream.onNext("Client started.");
                             connection = serverConnection;
                             isRunningStream.onNext(true);
 
                             Observable<String> receiver = serverConnection
-                                    .getInput()
-                                    .map(new Func1<String, String>() {
-                                        @Override
-                                        public String call(String s) {
-                                            return s.trim();
-                                        }
-                                    });
+                                    .getInput();
 
                             Observable<String> transmitter = transmitStream.getObservable()
                                     .flatMap(new Func1<String, Observable<String>>() {
                                         @Override
-                                        public Observable<String> call(String s) {
-                                            serverConnection.writeAndFlush(s);
+                                        public Observable<String> call(String message) {
+                                            serverConnection.writeAndFlush(message);
+                                            logStream.onNext("Client sent: " + message);
                                             return Observable.just("");
                                         }
                                     });
@@ -111,10 +107,10 @@ public class RxTcpClient {
                         }
 
                         @Override
-                        public void onNext(String s) {
-                            if (!s.isEmpty()) {
-                                logStream.onNext("Client receive: " + s);
-                                receiveStream.onNext(s);
+                        public void onNext(String message) {
+                            if (!message.isEmpty()) {
+                                logStream.onNext("Client receive: " + message);
+                                receiveStream.onNext(message);
                             }
                         }
                     });

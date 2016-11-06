@@ -62,22 +62,30 @@ public class ClientEventBus {
     }
 
     /**
-     * An observable stream of received from the server.
-     * @param type Designates the type of messages to listen for
-     * @return An observable stream of received from the server.
+     * An observable stream of all possible events from the server.
+     * @return An observable stream of all possible events from the server.
      */
-    public Observable<EnvelopeMsg> getObservable(final MessageType type) {
+    public Observable<EnvelopeMsg> getObservable() {
         return client.getObservable()
             .map(new Func1<String, EnvelopeMsg>() {
                 @Override
                 public EnvelopeMsg call(String base64) {
-                return factory.envelopeFromBase64(base64);
+                    return factory.envelopeFromBase64(base64);
                 }
-            })
+            });
+    }
+
+    /**
+     * An observable stream of events received from the server filtered by type.
+     * @param type Designates the type of messages to listen for
+     * @return An observable stream of received from the server.
+     */
+    public Observable<EnvelopeMsg> getObservable(final MessageType type) {
+        return getObservable()
             .filter(new Func1<EnvelopeMsg, Boolean>() {
                 @Override
                 public Boolean call(EnvelopeMsg message) {
-                return message.getHeader().getType() == type;
+                    return message.getHeader().getType() == type;
                 }
             });
     }

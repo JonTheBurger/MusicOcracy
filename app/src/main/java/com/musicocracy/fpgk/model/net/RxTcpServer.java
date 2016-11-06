@@ -67,13 +67,13 @@ public class RxTcpServer {
                     Observable<Void> receiver = newConnection.getInput()
                             .flatMap(new Func1<String, Observable<? extends Void>>() {
                                 @Override
-                                public Observable<? extends Void> call(String msg) {    // called when connection sends something
+                                public Observable<? extends Void> call(String message) {    // called when connection sends something
                                     // Because the server doesn't stop immediately, we manually check if we're supposed to be running before sending events.
-                                    if (!isRunning()) {
-                                        logStream.onNext("Received: " + msg);
-                                        msg = msg.trim();
-                                        if (!msg.isEmpty()) {
-                                            receiveStream.onNext(new StringMessageBySender(msg, newConnection));
+                                    if (isRunning()) {
+                                        logStream.onNext("Received: " + message);
+                                        message = message.trim();
+                                        if (!message.isEmpty()) {
+                                            receiveStream.onNext(new StringMessageBySender(message, newConnection));
                                         }
                                     }
                                     return Observable.empty();
@@ -93,8 +93,9 @@ public class RxTcpServer {
                     Observable<Void> transmitter = transmitStream.getObservable()
                             .flatMap(new Func1<String, Observable<? extends Void>>() {
                                 @Override
-                                public Observable<? extends Void> call(String s) {
-                                    return newConnection.writeAndFlush(s);
+                                public Observable<? extends Void> call(String message) {
+                                    logStream.onNext("Server sent: " + message);
+                                    return newConnection.writeAndFlush(message);
                                 }
                             });
 

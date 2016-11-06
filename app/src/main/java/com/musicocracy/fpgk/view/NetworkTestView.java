@@ -5,10 +5,10 @@ public interface NetworkTestView {
     String getPortText();
     boolean getServerToggle();
     boolean getClientToggle();
-    boolean getClientLocalToggle();
-    void setServerConnected(boolean isConnected);
-    void setClientConnected(boolean isConnected);
-    void setClientLocal(boolean isLocal);
+    boolean getLocalHostToggle();
+    void setServerRunning(boolean isConnected);
+    void setClientRunning(boolean isConnected);
+    void setLocalHost(boolean isLocal);
     void logServerEvent(String event);
     void logClientEvent(String event);
 }
