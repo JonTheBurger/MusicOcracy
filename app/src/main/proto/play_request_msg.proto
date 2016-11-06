@@ -1,0 +1,13 @@
+syntax = "proto3";
+package net.proto;
+
+option java_multiple_files = true;
+option java_generate_equals_and_hash = true;
+option java_package = "com.musicocracy.fpgk.net.proto";
+option java_outer_classname = "PlayRequestMsgProto";
+
+message PlayRequestMsg {
+    string requester_id = 1;
+    string music_service = 2;
+    string song_id = 3;
+}

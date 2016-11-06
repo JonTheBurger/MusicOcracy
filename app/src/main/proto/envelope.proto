@@ -1,0 +1,17 @@
+syntax = "proto3";
+package net.proto;
+
+import "google/protobuf/any.proto";
+import "header.proto";
+import "footer.proto";
+
+option java_multiple_files = true;
+option java_generate_equals_and_hash = true;
+option java_package = "com.musicocracy.fpgk.net.proto";
+option java_outer_classname = "EnvelopeMsgProto";
+
+message EnvelopeMsg {
+    HeaderMsg header = 1;
+    google.protobuf.Any body = 2;
+    FooterMsg footer = 3;
+}
