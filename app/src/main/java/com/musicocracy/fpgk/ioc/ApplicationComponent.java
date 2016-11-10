@@ -1,19 +1,27 @@
 package com.musicocracy.fpgk.ioc;
 
-import com.musicocracy.fpgk.musicocracy.NetworkTestActivity;
+import com.musicocracy.fpgk.ioc.fullstack.NetworkTestModule;
+import com.musicocracy.fpgk.ui.NetworkTestActivity;
 
 import javax.inject.Singleton;
 
 import dagger.Component;
 
+/**
+ * Top-level injector class that defines the dependency injection graph
+ */
 @Singleton
-@Component(modules = {  // The dependency injection endpoints require class instances provided by the following modules:
-    ApplicationModule.class,
+@Component(
+modules = {  // The dependency injection endpoints require class instances provided by the following modules:
+        // Business Logic
+        ApplicationModule.class,
+        DatabaseModule.class,
+        NetworkingModule.class,
+
+        // Per-Activity
+        NetworkTestModule.class,
 })
 public interface ApplicationComponent {
-    // Components are injector classes that define the dependency injection graph.
-    // A program can have multiple components for the purpose of modularity, but for our purposes we'll only be using one.
-
     // We put dependency injection endpoints here, e.g. Activities as inject methods.
-    void inject(NetworkTestActivity activity); // Tell Dagger that DatabaseActivity opts in to dependency injection.
+    void inject(NetworkTestActivity activity); // Tell Dagger that NetworkTestActivity opts in to dependency injection.
 }

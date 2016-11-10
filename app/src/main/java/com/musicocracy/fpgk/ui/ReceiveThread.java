@@ -1,4 +1,4 @@
-package com.musicocracy.fpgk.musicocracy;
+package com.musicocracy.fpgk.ui;
 
 import android.os.AsyncTask;
 import android.util.Log;

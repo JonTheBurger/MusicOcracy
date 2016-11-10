@@ -1,4 +1,4 @@
-package com.musicocracy.fpgk.musicocracy;
+package com.musicocracy.fpgk.ui;
 
 import android.content.Context;
 import android.net.DhcpInfo;

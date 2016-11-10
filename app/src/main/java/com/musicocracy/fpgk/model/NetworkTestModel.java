@@ -10,6 +10,8 @@ import com.musicocracy.fpgk.model.net.RxTcpServer;
 import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
 import com.musicocracy.fpgk.net.proto.MessageType;
 
+import javax.inject.Inject;
+
 import rx.Observable;
 
 public class NetworkTestModel {
@@ -17,11 +19,10 @@ public class NetworkTestModel {
     private final ServerEventBus server;
     private final ProtoEnvelopeFactory factory;
 
-    public NetworkTestModel(final ProtoEnvelopeFactory factory) {
+    public NetworkTestModel(ClientEventBus client, ServerEventBus server, ProtoEnvelopeFactory factory) {
+        this.client = client;
+        this.server = server;
         this.factory = factory;
-        this.client = new ClientEventBus(new RxTcpClient(), factory);
-        this.server = new ServerEventBus(new RxTcpServer(), factory);
-
     }
 
     public Observable<Boolean> getClientIsRunningObservable() {

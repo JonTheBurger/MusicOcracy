@@ -71,7 +71,7 @@ dependencies {
     compile 'com.google.dagger:dagger:2.7'
     apt "com.google.dagger:dagger-compiler:2.7"
 
-    // Butter Knife - View injection framework
+    // Butter Knife - View Injection Framework
     compile 'com.jakewharton:butterknife:8.4.0'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
 

@@ -17,10 +17,9 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class NetworkTestPresenter {
-    private final NetworkTestView view;
+public class NetworkTestPresenter implements Presenter<NetworkTestView> {
     private final NetworkTestModel model;
-    private final ProtoEnvelopeFactory factory = new ProtoEnvelopeFactory();
+    private NetworkTestView view;
     private Subscription clientSub;
     private Subscription serverSub;
     private Subscription clientLogSub;
@@ -30,8 +29,7 @@ public class NetworkTestPresenter {
     private int clientMsg = 1;
     private int serverMsg = 1;
 
-    public NetworkTestPresenter(final NetworkTestView view, final NetworkTestModel model) {
-        this.view = view;
+    public NetworkTestPresenter(final NetworkTestModel model) {
         this.model = model;
         clientSub = model.getClientReceiver().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<EnvelopeMsg>() {
             @Override
@@ -94,8 +92,6 @@ public class NetworkTestPresenter {
                 view.setServerRunning(isRunning);
             }
         });
-        view.setClientRunning(model.isClientRunning());
-        view.setServerRunning(model.isServerRunning());
     }
 
     public void serverToggle() throws InterruptedException {
@@ -160,5 +156,13 @@ public class NetworkTestPresenter {
         serverRunningSub.unsubscribe();
         model.stopClient();
         model.stopServer();
+    }
+
+    @Override
+    public void setView(NetworkTestView networkTestView) {
+        this.view = networkTestView;
+
+        view.setClientRunning(model.isClientRunning());
+        view.setServerRunning(model.isServerRunning());
     }
 }

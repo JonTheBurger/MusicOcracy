@@ -1,4 +1,4 @@
-package com.musicocracy.fpgk.musicocracy;
+package com.musicocracy.fpgk.ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,25 +10,29 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Switch;
 
-import com.musicocracy.fpgk.model.NetworkTestModel;
-import com.musicocracy.fpgk.model.net.ProtoEnvelopeFactory;
+import com.musicocracy.fpgk.CyberJukeboxApplication;
 import com.musicocracy.fpgk.presenter.NetworkTestPresenter;
 import com.musicocracy.fpgk.view.NetworkTestView;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class NetworkTestActivity extends AppCompatActivity implements NetworkTestView {
     private static final String TAG = "NetworkTestActivity";
 
-    private Switch clientSwitch;
-    private Switch isClientLocalSwitch;
-    private Switch serverSwitch;
-    private Button clientSendBtn;
-    private Button serverSendBtn;
-    private EditText ipEditText;
-    private EditText portEditText;
-    private ListView clientListView;
-    private ListView serverListView;
+    @BindView(R.id.client_switch) Switch clientSwitch;
+    @BindView(R.id.use_local_client_switch) Switch isClientLocalSwitch;
+    @BindView(R.id.server_switch) Switch serverSwitch;
+    @BindView(R.id.client_send_btn) Button clientSendBtn;
+    @BindView(R.id.server_send_btn) Button serverSendBtn;
+    @BindView(R.id.ip_text_edit) EditText ipEditText;
+    @BindView(R.id.port_text_edit) EditText portEditText;
+    @BindView(R.id.client_listview) ListView clientListView;
+    @BindView(R.id.server_listview) ListView serverListView;
 
-    private NetworkTestPresenter presenter;
+    @Inject NetworkTestPresenter presenter;
     private ArrayAdapter<String> clientLogAdapter;
     private ArrayAdapter<String> serverLogAdapter;
 
@@ -36,22 +40,15 @@ public class NetworkTestActivity extends AppCompatActivity implements NetworkTes
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_network_test);
+        ButterKnife.bind(this);
+        CyberJukeboxApplication.getComponent(this).inject(this);
+        presenter.setView(this);
+
         initWidgets();
         initAdapters();
-        presenter = new NetworkTestPresenter(this, new NetworkTestModel(new ProtoEnvelopeFactory()));
     }
 
     private void initWidgets() {
-        clientSwitch =      (Switch)findViewById(R.id.client_switch);
-        isClientLocalSwitch=(Switch)findViewById(R.id.use_local_client_switch);
-        serverSwitch =      (Switch)findViewById(R.id.server_switch);
-        clientSendBtn =     (Button)findViewById(R.id.client_send_btn);
-        serverSendBtn =     (Button)findViewById(R.id.server_send_btn);
-        ipEditText =        (EditText)findViewById(R.id.ip_text_edit);
-        portEditText =      (EditText)findViewById(R.id.port_text_edit);
-        clientListView =    (ListView)findViewById(R.id.client_listview);
-        serverListView =    (ListView)findViewById(R.id.server_listview);
-
         ipEditText.setText("192.168.0.101");
         portEditText.setText("2025");
     }
