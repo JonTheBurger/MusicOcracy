@@ -9,9 +9,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 
-/**
- * Top-level dependency provider
- */
 @Module
 public class ApplicationModule {
     // Modules provide instances of classes

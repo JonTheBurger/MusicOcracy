@@ -1,6 +1,5 @@
 package com.musicocracy.fpgk.ui;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +11,7 @@ import android.widget.Switch;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
 import com.musicocracy.fpgk.presenter.NetworkTestPresenter;
+import com.musicocracy.fpgk.presenter.Presenter;
 import com.musicocracy.fpgk.view.NetworkTestView;
 
 import javax.inject.Inject;
@@ -20,7 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class NetworkTestActivity extends AppCompatActivity implements NetworkTestView {
+public class NetworkTestActivity extends ActivityBase<NetworkTestView> implements NetworkTestView {
     private static final String TAG = "NetworkTestActivity";
 
     @BindView(R.id.client_switch) Switch clientSwitch;
@@ -39,12 +39,7 @@ public class NetworkTestActivity extends AppCompatActivity implements NetworkTes
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_network_test);
-        ButterKnife.bind(this);
-        CyberJukeboxApplication.getComponent(this).inject(this);
-        presenter.setView(this);
-
+        super.onCreate(savedInstanceState, R.layout.activity_network_test, this);
         initWidgets();
         initAdapters();
     }
@@ -154,5 +149,20 @@ public class NetworkTestActivity extends AppCompatActivity implements NetworkTes
     public void logClientEvent(String event) {
         Log.i(TAG, "Client: " + event);
         clientLogAdapter.add(event);
+    }
+
+    @Override
+    protected Presenter<NetworkTestView> getPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void butterKnifeBind() {
+        ButterKnife.bind(this);
+    }
+
+    @Override
+    protected void daggerInject() {
+        CyberJukeboxApplication.getComponent(this).inject(this);
     }
 }
