@@ -14,6 +14,7 @@ import com.musicocracy.fpgk.view.NetworkTestView;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class NetworkTestPresenter {

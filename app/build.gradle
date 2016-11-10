@@ -67,25 +67,29 @@ dependencies {
     testCompile "org.mockito:mockito-core:1.+"
     compile 'com.android.support:appcompat-v7:24.2.0'
 
-    // Dagger 2 and Compiler
-    compile 'com.google.dagger:dagger:2.6.1'
-    apt "com.google.dagger:dagger-compiler:2.6.1"
+    // Dagger 2 - Dependency Injection Framework
+    compile 'com.google.dagger:dagger:2.7'
+    apt "com.google.dagger:dagger-compiler:2.7"
 
-    // RX Java
+    // Butter Knife - View injection framework
+    compile 'com.jakewharton:butterknife:8.4.0'
+    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+
+    // RX Java - Functional Reactive Java
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.6'
 
-    // RX Netty
+    // RX Netty - RX Networking
     compile 'io.reactivex:rxnetty:0.4.19'
 
-    // OrmLite
+    // OrmLite - Database Object Relational Mapping
     compile 'com.j256.ormlite:ormlite-core:5.0'
     compile 'com.j256.ormlite:ormlite-android:5.0'
 
-    // Google Guava
+    // Google Guava - Google Core Libraries for Java
     compile 'com.google.guava:guava:19.0'
 
-    // Google Protocol Buffers
+    // Google Protocol Buffers - Binary Serializable Class Generation
     compile 'com.google.protobuf:protobuf-lite:3.0.0'
     compile 'com.google.protobuf:protobuf-java-util:3.0.0'
 
