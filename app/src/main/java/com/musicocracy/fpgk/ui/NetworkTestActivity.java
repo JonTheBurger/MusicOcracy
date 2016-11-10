@@ -18,6 +18,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class NetworkTestActivity extends AppCompatActivity implements NetworkTestView {
     private static final String TAG = "NetworkTestActivity";
@@ -70,14 +71,17 @@ public class NetworkTestActivity extends AppCompatActivity implements NetworkTes
         }
     }
 
+    @OnClick(R.id.client_switch)
     public void onClientSwitch(View v) {
         presenter.clientToggle();
     }
 
+    @OnClick(R.id.use_local_client_switch)
     public void onIsClientLocalSwitch(View v) {
         presenter.localHostToggle();
     }
 
+    @OnClick(R.id.server_switch)
     public void onServerSwitch(View v) {
         try {
             presenter.serverToggle();
@@ -86,10 +90,12 @@ public class NetworkTestActivity extends AppCompatActivity implements NetworkTes
         }
     }
 
+    @OnClick(R.id.client_send_btn)
     public void onClientSendBtn(View v) {
         presenter.clientSend();
     }
 
+    @OnClick(R.id.server_send_btn)
     public void onServerSendBtn(View v) {
         presenter.serverSend();
     }

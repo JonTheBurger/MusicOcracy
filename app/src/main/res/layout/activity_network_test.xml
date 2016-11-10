@@ -20,7 +20,6 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="0.3"
-            android:onClick="onServerSwitch"
             android:text="Server" />
 
         <Switch
@@ -28,7 +27,6 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="0.25"
-            android:onClick="onIsClientLocalSwitch"
             android:text="localhost" />
 
         <Switch
@@ -36,7 +34,6 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="0.3"
-            android:onClick="onClientSwitch"
             android:text="Client" />
     </LinearLayout>
 
@@ -52,7 +49,6 @@
             android:layout_height="fill_parent"
             android:layout_below="@+id/server_switch"
             android:layout_weight="0.5"
-            android:onClick="onServerSendBtn"
             android:text="Server Send All" />
 
         <Button
@@ -60,7 +56,6 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="0.5"
-            android:onClick="onClientSendBtn"
             android:text="Client Send" />
     </LinearLayout>
 
