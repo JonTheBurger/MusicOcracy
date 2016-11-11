@@ -5,35 +5,36 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- We're going to use our custom application class CyberJukeboxApplication -->
     <application
+        android:name="com.musicocracy.fpgk.CyberJukeboxApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name="com.musicocracy.fpgk.CyberJukeboxApplication">
-        <!-- We're going to use our custom application class CyberJukeboxApplication -->
+        android:theme="@style/AppTheme">
+        <activity android:name=".SplashScreenActivity">
 
-        <activity android:name="com.musicocracy.fpgk.ui.MainActivity">
+            <!-- Make this the startup activity -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.musicocracy.fpgk.ui.BrowseActivity" />
-        <activity android:name="com.musicocracy.fpgk.ui.DatabaseActivity" />
+        <activity android:name=".TestMainActivity" />
+        <activity android:name=".TestBrowseActivity" />
+        <activity android:name=".TestDatabaseActivity" />
         <activity
-            android:name="com.musicocracy.fpgk.ui.BroadcastReceiverActivity"
+            android:name=".TestBroadcastReceiverActivity"
             android:launchMode="standard" />
-        <activity android:name="com.musicocracy.fpgk.ui.BroadcastSenderActivity" />
-        <activity android:name="com.musicocracy.fpgk.ui.AuthenticationActivity" />
-
+        <activity android:name=".TestBroadcastSenderActivity" />
+        <activity android:name=".TestAuthenticationActivity" />
         <!-- Needed for LoginActivity to work -->
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity android:name="com.musicocracy.fpgk.ui.NetworkTestActivity"></activity>
+        <activity android:name=".TestNetworkTestActivity" />
     </application>
 
 </manifest>

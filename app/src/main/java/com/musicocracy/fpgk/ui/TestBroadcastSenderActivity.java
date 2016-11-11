@@ -15,7 +15,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-public class BroadcastSenderActivity extends AppCompatActivity {
+public class TestBroadcastSenderActivity extends AppCompatActivity {
 
     private static final String TAG = "BroadcastSender";
     private static final int PORT = 2562;
@@ -23,7 +23,7 @@ public class BroadcastSenderActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_broadcast_sender);
+        setContentView(R.layout.test_activity_broadcast_sender);
     }
 
     public void prepMessage(View view) {

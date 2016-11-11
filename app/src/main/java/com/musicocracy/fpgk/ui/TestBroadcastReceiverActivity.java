@@ -9,13 +9,14 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.musicocracy.fpgk.model.spotify.Browser;
+import com.musicocracy.fpgk.model.spotify.ReceiveThread;
 import com.musicocracy.fpgk.model.spotify.ResultsListener;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-public class BroadcastReceiverActivity extends AppCompatActivity implements ResultsListener{
+public class TestBroadcastReceiverActivity extends AppCompatActivity implements ResultsListener{
 
     private static final String TAG = "BroadcastReceiver";
     private static final int PORT = 2562;
@@ -30,7 +31,7 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_broadcast_receiver);
+        setContentView(R.layout.test_activity_broadcast_receiver);
 
         initSocks();
     }
@@ -50,7 +51,7 @@ public class BroadcastReceiverActivity extends AppCompatActivity implements Resu
 
         if (togDiscovery.isChecked()) {
             // Get an access token
-            Intent authIntent = new Intent(this, AuthenticationActivity.class);
+            Intent authIntent = new Intent(this, TestAuthenticationActivity.class);
             if (browser == null) {
                 startActivityForResult(authIntent, AUTHENTICATION_REQUEST_CODE);
             } else { //already have a token

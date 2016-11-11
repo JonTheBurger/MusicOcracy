@@ -9,7 +9,7 @@ import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
-public class AuthenticationActivity extends AppCompatActivity {
+public class TestAuthenticationActivity extends AppCompatActivity {
     private static final String CLIENT_ID = "4becf88681f74bda9e38baac3bcf66d6";
     private static final String REDIRECT_URI = "social-music-app-sd://callback";
     // Request code that will be used to verify if the result comes from correct activity
@@ -18,7 +18,7 @@ public class AuthenticationActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_authenticate);
+        setContentView(R.layout.test_activity_authenticate);
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
                 AuthenticationResponse.Type.TOKEN,
                 REDIRECT_URI);

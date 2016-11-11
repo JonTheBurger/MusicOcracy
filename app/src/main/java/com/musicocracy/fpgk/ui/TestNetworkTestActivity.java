@@ -20,8 +20,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class NetworkTestActivity extends ActivityBase<NetworkTestView> implements NetworkTestView {
-    private static final String TAG = "NetworkTestActivity";
+public class TestNetworkTestActivity extends ActivityBase<NetworkTestView> implements NetworkTestView {
+    private static final String TAG = "TestNetworkTestActivity";
 
     @BindView(R.id.client_switch) Switch clientSwitch;
     @BindView(R.id.use_local_client_switch) Switch isClientLocalSwitch;
@@ -39,7 +39,7 @@ public class NetworkTestActivity extends ActivityBase<NetworkTestView> implement
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState, R.layout.activity_network_test, this);
+        super.onCreate(savedInstanceState, R.layout.test_activity_network_test, this);
         initWidgets();
         initAdapters();
     }

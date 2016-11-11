@@ -1,4 +1,4 @@
-package com.musicocracy.fpgk.ui;
+package com.musicocracy.fpgk.model.spotify;
 
 import android.os.AsyncTask;
 import android.util.Log;

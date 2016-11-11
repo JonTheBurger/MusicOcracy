@@ -1,7 +1,7 @@
 package com.musicocracy.fpgk.ioc;
 
 import com.musicocracy.fpgk.ioc.fullstack.NetworkTestModule;
-import com.musicocracy.fpgk.ui.NetworkTestActivity;
+import com.musicocracy.fpgk.ui.TestNetworkTestActivity;
 
 import javax.inject.Singleton;
 
@@ -23,5 +23,5 @@ modules = {  // The dependency injection endpoints require class instances provi
 })
 public interface ApplicationComponent {
     // We put dependency injection endpoints here, e.g. Activities as inject methods.
-    void inject(NetworkTestActivity activity); // Tell Dagger that NetworkTestActivity opts in to dependency injection.
+    void inject(TestNetworkTestActivity activity); // Tell Dagger that TestNetworkTestActivity opts in to dependency injection.
 }

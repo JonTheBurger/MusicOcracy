@@ -24,6 +24,9 @@ android {
         exclude 'META-INF/io.netty.versions.properties'
         exclude 'META-INF/INDEX.LIST'
     }
+    aaptOptions {
+        cruncherEnabled = false // workaround to make gradle recognize png files
+    }
 }
 
 repositories {

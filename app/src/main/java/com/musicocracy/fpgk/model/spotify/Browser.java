@@ -39,7 +39,7 @@ public class Browser {
 
             @Override
             public void onError(Throwable throwable) {
-                Log.e("BrowseActivity", "Could not initialize player: " + throwable.getMessage());
+                Log.e("TestBrowseActivity", "Could not initialize player: " + throwable.getMessage());
             }
         });
     }

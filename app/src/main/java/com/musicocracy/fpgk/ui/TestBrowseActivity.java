@@ -27,7 +27,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class BrowseActivity extends AppCompatActivity implements
+public class TestBrowseActivity extends AppCompatActivity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
 {
     private static final String CLIENT_ID = "4becf88681f74bda9e38baac3bcf66d6";
@@ -46,13 +46,13 @@ public class BrowseActivity extends AppCompatActivity implements
         spotify.getAlbum("2dIGnmEIy1WZIcZCFSj6i8", new Callback<Album>() {
             @Override
             public void success(Album album, Response response) {
-                Log.d("BrowseActivity", "Get Album success");
+                Log.d("TestBrowseActivity", "Get Album success");
                 Log.d("Album success", album.name);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Log.d("BrowseActivity", "Get Album failure");
+                Log.d("TestBrowseActivity", "Get Album failure");
                 Log.d("Album failure", error.toString());
             }
         });
@@ -62,14 +62,14 @@ public class BrowseActivity extends AppCompatActivity implements
         spotify.searchTracks(searchTrack.getText().toString(), new Callback<TracksPager>() {
             @Override
             public void success(TracksPager tp, Response response) {
-                Log.d("BrowseActivity", "Get TracksPager success");
+                Log.d("TestBrowseActivity", "Get TracksPager success");
                 Log.d("TracksPager success", tp.tracks.items.get(1).uri);
                 mPlayer.playUri(null, tp.tracks.items.get(0).uri, 0, 0);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Log.d("BrowseActivity", "Get TracksPager failure");
+                Log.d("TestBrowseActivity", "Get TracksPager failure");
                 Log.d("TracksPager failure", error.toString());
             }
         });
@@ -78,7 +78,7 @@ public class BrowseActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_browse);
+        setContentView(R.layout.test_activity_browse);
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
                 AuthenticationResponse.Type.TOKEN,
@@ -110,19 +110,19 @@ public class BrowseActivity extends AppCompatActivity implements
                     @Override
                     public void onInitialized(SpotifyPlayer spotifyPlayer) {
                         mPlayer = spotifyPlayer;
-                        mPlayer.addConnectionStateCallback(BrowseActivity.this);
-                        mPlayer.addNotificationCallback(BrowseActivity.this);
+                        mPlayer.addConnectionStateCallback(TestBrowseActivity.this);
+                        mPlayer.addNotificationCallback(TestBrowseActivity.this);
                     }
 
                     @Override
                     public void onError(Throwable throwable) {
-                        Log.e("BrowseActivity", "Could not initialize player: " + throwable.getMessage());
+                        Log.e("TestBrowseActivity", "Could not initialize player: " + throwable.getMessage());
                     }
                 });
             }
             else {
                 //Auth flow returned returned an error
-                Log.e("BrowseActivity", "Auth flow was cancelled or returned an error.");
+                Log.e("TestBrowseActivity", "Auth flow was cancelled or returned an error.");
             }
         }
     }
@@ -135,7 +135,7 @@ public class BrowseActivity extends AppCompatActivity implements
 
     @Override
     public void onPlaybackEvent(PlayerEvent playerEvent) {
-        Log.d("BrowseActivity", "Playback event received: " + playerEvent.name());
+        Log.d("TestBrowseActivity", "Playback event received: " + playerEvent.name());
         switch (playerEvent) {
             // Handle event type as necessary
             default:
@@ -145,7 +145,7 @@ public class BrowseActivity extends AppCompatActivity implements
 
     @Override
     public void onPlaybackError(Error error) {
-        Log.d("BrowseActivity", "Playback error received: " + error.name());
+        Log.d("TestBrowseActivity", "Playback error received: " + error.name());
         switch (error) {
             // Handle error type as necessary
             default:
@@ -155,26 +155,26 @@ public class BrowseActivity extends AppCompatActivity implements
 
     @Override
     public void onLoggedIn() {
-        Log.d("BrowseActivity", "User logged in");
+        Log.d("TestBrowseActivity", "User logged in");
     }
 
     @Override
     public void onLoggedOut() {
-        Log.d("BrowseActivity", "User logged out");
+        Log.d("TestBrowseActivity", "User logged out");
     }
 
     @Override
     public void onLoginFailed(int i) {
-        Log.d("BrowseActivity", "Login failed");
+        Log.d("TestBrowseActivity", "Login failed");
     }
 
     @Override
     public void onTemporaryError() {
-        Log.d("BrowseActivity", "Temporary error occurred");
+        Log.d("TestBrowseActivity", "Temporary error occurred");
     }
 
     @Override
     public void onConnectionMessage(String message) {
-        Log.d("BrowseActivity", "Received connection message: " + message);
+        Log.d("TestBrowseActivity", "Received connection message: " + message);
     }
 }

@@ -21,7 +21,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatabaseActivity extends AppCompatActivity {
+public class TestDatabaseActivity extends AppCompatActivity {
     private Database database;
     private Dao<PlayRequest, Integer> dao;
     private ArrayList<PlayRequest> requests = new ArrayList<>();
@@ -32,7 +32,7 @@ public class DatabaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_database);
+        setContentView(R.layout.test_activity_database);
         Log.i("Life", "onCreate");
 
         database = OpenHelperManager.getHelper(this, Database.class);

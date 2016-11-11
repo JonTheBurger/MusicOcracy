@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context="com.musicocracy.fpgk.ui.MainActivity">
+    tools:context="com.musicocracy.fpgk.ui.TestMainActivity">
 
     <Button
         android:text="@string/button_send"
