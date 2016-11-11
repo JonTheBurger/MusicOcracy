@@ -30,7 +30,11 @@
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity android:name=".NetworkTestActivity"></activity>
+        <activity android:name=".NetworkTestActivity" />
+        <activity
+            android:name=".GoogleCastActivity"
+            android:label="@string/title_activity_google_cast"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
