@@ -31,7 +31,7 @@ public class PlayRequestRepository {
     }
 
     public List<PlayRequest> getRequestsMadeByGuest(Guest guest){
-        List<PlayRequest> requestList = null;
+        List<PlayRequest> requestList = new ArrayList<>();
         try {
             dao = database.getPlayRequestDao();
 
@@ -97,6 +97,7 @@ public class PlayRequestRepository {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (IndexOutOfBoundsException e) {
         } finally {
             return returnList;
         }
@@ -136,6 +137,7 @@ public class PlayRequestRepository {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (IndexOutOfBoundsException e) {
         } finally {
             return returnList;
         }

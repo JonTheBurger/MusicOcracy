@@ -21,8 +21,8 @@ public class PlayRequestRepositoryTests {
     private Party party = new Party("MySweetParty", "#Party", new Timestamp((int)System.currentTimeMillis() - 1000000), null, FilterMode.NONE, true);
     private Guest guest = new Guest(party, "Bob", "74:29:20:05:12", new Timestamp((int)System.currentTimeMillis() - 10000), false);
     private PlayRequest pr1 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Don't Stop Me Now", new Timestamp((int)System.currentTimeMillis()));
-    private PlayRequest pr2 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Bicycle",  new Timestamp((int)System.currentTimeMillis() - 2500));
-    private PlayRequest pr3 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Bicycle",  new Timestamp((int)System.currentTimeMillis() - 1));
+    private PlayRequest pr2 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Bicycle",  new Timestamp((int)System.currentTimeMillis() - 25000));
+    private PlayRequest pr3 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Bicycle",  new Timestamp((int)System.currentTimeMillis() - 10000));
 
 
     private PlayRequestRepository setUpMocks() throws SQLException {
@@ -30,7 +30,6 @@ public class PlayRequestRepositoryTests {
         System.out.println("\nEVENT: Initializing mocks...");
         Database databaseMock = mock(Database.class);
         Dao<PlayRequest, Integer> daoMock = mock(Dao.class);
-        PlayRequest playRequestMock = mock(PlayRequest.class);
         System.out.println("SUCCESS: Mocks initialized.\n");
 
         // "Mock" for dao query
@@ -48,7 +47,6 @@ public class PlayRequestRepositoryTests {
         // Setup class to be tested
         return new PlayRequestRepository(databaseMock);
     }
-
 
     @Test
     public void testRepositoryReturnsCorrectMostRequestList() throws SQLException {
