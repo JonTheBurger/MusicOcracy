@@ -19,6 +19,11 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="26dp" />
+
         <TextView
             android:text="Request or Vote:"
             android:layout_width="match_parent"
@@ -37,7 +42,8 @@
             android:inputType="textPersonName"
             android:text="Request a Song"
             android:ems="10"
-            android:id="@+id/requestText" />
+            android:id="@+id/requestText"
+            android:textAlignment="center" />
 
         <Space
             android:layout_width="match_parent"
@@ -45,13 +51,15 @@
 
         <Button
             android:text="Request!"
-            android:layout_width="111dp"
+            android:layout_width="102dp"
             android:layout_height="wrap_content"
-            android:id="@+id/requestButton" />
+            android:id="@+id/requestButton"
+            android:layout_gravity="center" />
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:minHeight="0dp" />
 
         <EditText
             android:layout_width="match_parent"
@@ -59,7 +67,8 @@
             android:inputType="textPersonName"
             android:text="Vote for a Song"
             android:ems="10"
-            android:id="@+id/voteText" />
+            android:id="@+id/voteText"
+            android:textAlignment="center" />
 
         <Space
             android:layout_width="match_parent"
@@ -69,7 +78,8 @@
             android:text="Vote!"
             android:layout_width="106dp"
             android:layout_height="wrap_content"
-            android:id="@+id/voteButton" />
+            android:id="@+id/voteButton"
+            android:layout_gravity="center" />
 
         <Space
             android:layout_width="match_parent"
