@@ -1,4 +1,4 @@
-package com.musicocracy.fpgk.ioc.fullstack;
+package com.musicocracy.fpgk.ioc.activity;
 
 import com.musicocracy.fpgk.model.NetworkTestModel;
 import com.musicocracy.fpgk.model.net.ClientEventBus;

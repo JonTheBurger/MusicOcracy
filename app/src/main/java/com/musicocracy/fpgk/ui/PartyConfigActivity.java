@@ -1,6 +1,5 @@
 package com.musicocracy.fpgk.ui;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
@@ -8,17 +7,49 @@ import android.text.Spanned;
 import android.view.MenuItem;
 import android.widget.EditText;
 
-public class PartyConfigActivity extends AppCompatActivity {
-    private EditText tokenCountPicker;
-    private EditText tokenMinutePicker;
-    private EditText tokenSecondPicker;
+import com.musicocracy.fpgk.CyberJukeboxApplication;
+import com.musicocracy.fpgk.presenter.PartyConfigPresenter;
+import com.musicocracy.fpgk.presenter.Presenter;
+import com.musicocracy.fpgk.view.PartyConfigView;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class PartyConfigActivity extends ActivityBase<PartyConfigView> implements PartyConfigView {
+    private static final String TAG = "PartyConfigActivity";
+    @Inject PartyConfigPresenter presenter;
+
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.token_count_picker) EditText tokenCountPicker;
+    @BindView(R.id.token_refill_minute_picker) EditText tokenMinutePicker;
+    @BindView(R.id.token_refill_second_picker) EditText tokenSecondPicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_party_config);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        super.onCreate(savedInstanceState, R.layout.activity_party_config, this);
+
         setSupportActionBar(toolbar);
+        tokenCountPicker.setFilters(new InputFilter[] { new InputFilterMinMax(1, 99) });
+        InputFilter[] timeFilter = new InputFilter[] { new InputFilterMinMax(0, 59) };
+        tokenMinutePicker.setFilters(timeFilter);
+        tokenSecondPicker.setFilters(timeFilter);
+    }
+
+    @Override
+    protected Presenter<PartyConfigView> getPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void butterKnifeBind() {
+        ButterKnife.bind(this);
+    }
+
+    @Override
+    protected void daggerInject() {
+        CyberJukeboxApplication.getComponent(this).inject(this);
     }
 
     @Override
