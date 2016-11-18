@@ -42,7 +42,7 @@
         <activity android:name=".PartyConfigActivity" />
         <activity android:name=".BlacklistActivity" />
         <activity android:name=".NowPlayingActivity" />
-        <activity android:name=".AddTermActivity"></activity>
+        <activity android:name=".AddTermActivity" />
     </application>
 
 </manifest>
