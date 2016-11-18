@@ -35,6 +35,14 @@
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity android:name=".TestNetworkTestActivity" />
+        <activity android:name=".SelectionActivity" />
+        <activity android:name=".ConnectActivity" />
+        <activity android:name=".RequestActivity" />
+        <activity android:name=".SongSelectActivity" />
+        <activity android:name=".PartyConfigActivity" />
+        <activity android:name=".BlacklistActivity" />
+        <activity android:name=".NowPlayingActivity" />
+        <activity android:name=".AddTermActivity"></activity>
     </application>
 
 </manifest>
