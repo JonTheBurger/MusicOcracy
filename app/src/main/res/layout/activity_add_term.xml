@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_add_term"
     android:layout_width="match_parent"
@@ -10,4 +11,94 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.musicocracy.fpgk.ui.AddTermActivity">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp" />
+
+        <TextView
+            android:text="Add a Song Title or Artist to Filter From Records"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView3"
+            android:textAlignment="center"
+            android:textSize="30sp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:text="Song/Artist"
+            android:ems="10"
+            android:id="@+id/addTermText"
+            android:textAlignment="center" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="65dp" />
+
+        <TextView
+            android:text="Or Use CJ's Curate Song List"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView4"
+            android:textSize="30sp"
+            android:textAlignment="center" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp" />
+
+        <Button
+            android:text="Use List!"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/useListButton"
+            android:textSize="18sp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="60dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/back_button"
+                android:id="@+id/addTermBackButton"
+                android:layout_weight="1"
+                android:scaleType="fitStart"
+                android:background="@android:color/transparent" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/back_button"
+                android:id="@+id/addTermForwardButton"
+                android:layout_weight="1"
+                android:scaleX="-1"
+                android:scaleType="fitStart"
+                android:background="@android:color/transparent" />
+        </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>
