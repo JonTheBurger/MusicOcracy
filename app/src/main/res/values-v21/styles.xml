@@ -12,8 +12,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <iten name="colorSecondary>">#</iten>
-        <item name="android:background">@drawable/background_gradient</item>
+        <item name="android:windowBackground">@drawable/background_gradient</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+
+        <item name="android:buttonStyle">@style/ButtonTheme</item>
     </style>
 </resources>
