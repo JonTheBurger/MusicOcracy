@@ -51,7 +51,7 @@ public class TestBroadcastReceiverActivity extends AppCompatActivity implements 
 
         if (togDiscovery.isChecked()) {
             // Get an access token
-            Intent authIntent = new Intent(this, TestAuthenticationActivity.class);
+            Intent authIntent = new Intent(this, AuthenticationActivity.class);
             if (browser == null) {
                 startActivityForResult(authIntent, AUTHENTICATION_REQUEST_CODE);
             } else { //already have a token
