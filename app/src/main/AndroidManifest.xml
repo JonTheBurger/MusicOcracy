@@ -29,7 +29,7 @@
             android:name=".TestBroadcastReceiverActivity"
             android:launchMode="standard" />
         <activity android:name=".TestBroadcastSenderActivity" />
-        <activity android:name=".TestAuthenticationActivity" />
+        <activity android:name=".AuthenticationActivity" />
         <!-- Needed for LoginActivity to work -->
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
