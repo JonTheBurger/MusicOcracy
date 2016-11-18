@@ -89,7 +89,7 @@
         <ImageButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/back_button"
+            app:srcCompat="@drawable/half_moon_back_button"
             android:id="@+id/imageButton"
             android:scaleType="centerInside"
             android:background='"@null"' />
