@@ -95,7 +95,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/half_moon_back_button"
-            android:id="@+id/imageButton"
+            android:id="@+id/requestBackButton"
             android:scaleType="centerInside"
             android:background='"@null"' />
 
