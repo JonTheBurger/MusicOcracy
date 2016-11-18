@@ -10,4 +10,65 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.musicocracy.fpgk.ui.SelectionActivity">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="17dp" />
+
+        <TextView
+            android:text="Welcome!"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectWelcomeTextView"
+            android:textSize="40sp"
+            android:textAlignment="center" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="73dp"
+            android:elevation="0dp" />
+
+        <TextView
+            android:text="Are you:"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectPromptTextView"
+            android:textAlignment="center"
+            android:textSize="24sp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="43dp" />
+
+        <Button
+            android:text="Host"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/hostButton" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="39dp" />
+
+        <Button
+            android:text="Guest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/guestButton" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 </RelativeLayout>
