@@ -97,7 +97,8 @@
                 android:layout_weight="1"
                 android:layout_gravity="left"
                 android:saveEnabled="false"
-                android:scaleType="fitStart" />
+                android:scaleType="fitStart"
+                android:background="@android:color/transparent" />
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -108,7 +109,8 @@
                 android:layout_weight="1"
                 android:scaleType="fitStart"
                 android:layout_gravity="right"
-                android:baselineAlignBottom="false" />
+                android:baselineAlignBottom="false"
+                android:background="@android:color/transparent" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

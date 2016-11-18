@@ -96,7 +96,8 @@
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/half_moon_back_button"
             android:id="@+id/requestBackButton"
-            android:scaleType="centerInside" />
+            android:scaleType="centerInside"
+            android:background="@android:color/transparent" />
 
     </LinearLayout>
 </RelativeLayout>

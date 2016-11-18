@@ -38,6 +38,7 @@
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/half_moon_back_button"
             android:id="@+id/selectBackButton"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:background="@android:color/transparent" />
     </LinearLayout>
 </RelativeLayout>
