@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
 
     <TableLayout
         android:layout_width="fill_parent"
@@ -42,8 +42,7 @@
                 android:text="36YA9" />
         </TableRow>
 
-        <TableRow
-            android:layout_weight="1">
+        <TableRow android:layout_weight="1">
 
             <TextView
                 android:layout_width="0dp"
@@ -61,8 +60,7 @@
                 android:textSize="14sp" />
         </TableRow>
 
-        <TableRow
-            android:layout_weight="1">
+        <TableRow android:layout_weight="1">
 
             <TextView
                 android:layout_width="0dp"
@@ -80,8 +78,7 @@
                 android:text="5" />
         </TableRow>
 
-        <TableRow
-            android:layout_weight="1">
+        <TableRow android:layout_weight="1">
 
             <TextView
                 android:layout_width="0dp"
@@ -92,18 +89,19 @@
             <LinearLayout
                 android:layout_gravity="center_vertical"
                 android:orientation="horizontal">
+
                 <EditText
                     android:id="@+id/token_refill_minute_picker"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:inputType="number"
                     android:maxLength="2"
-                    android:text="3"/>
+                    android:text="3" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=":"/>
+                    android:text=":" />
 
                 <EditText
                     android:id="@+id/token_refill_second_picker"
@@ -111,7 +109,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="number"
                     android:maxLength="2"
-                    android:text="30"/>
+                    android:text="30" />
             </LinearLayout>
         </TableRow>
     </TableLayout>

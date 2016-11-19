@@ -10,6 +10,7 @@ import com.musicocracy.fpgk.view.SongSelectView;
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class SongSelectActivity extends ActivityBase<SongSelectView> implements SongSelectView {
     private static final String TAG = "SongSelectActivity";
@@ -18,6 +19,11 @@ public class SongSelectActivity extends ActivityBase<SongSelectView> implements 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.activity_song_select, this);
+    }
+
+    @OnClick(R.id.selectBackButton)
+    public void backClick() {
+        onBackPressed();
     }
 
     @Override

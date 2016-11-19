@@ -10,6 +10,7 @@ import com.musicocracy.fpgk.view.AddTermView;
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class AddTermActivity extends ActivityBase<AddTermView> implements AddTermView {
     private static final String TAG = "AddTermActivity";
@@ -18,6 +19,21 @@ public class AddTermActivity extends ActivityBase<AddTermView> implements AddTer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.activity_add_term, this);
+    }
+
+    @OnClick(R.id.useListButton)
+    public void useListClick() {
+
+    }
+
+    @OnClick(R.id.addTermBackButton)
+    public void backClick() {
+        onBackPressed();
+    }
+
+    @OnClick(R.id.addTermForwardButton)
+    public void forwardClick() {
+
     }
 
     @Override

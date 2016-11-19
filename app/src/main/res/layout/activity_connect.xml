@@ -12,12 +12,12 @@
     tools:context="com.musicocracy.fpgk.ui.ConnectActivity">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
 
         <Space
             android:layout_width="match_parent"
@@ -25,12 +25,12 @@
             android:minHeight="34dp" />
 
         <TextView
-            android:text="Connect:"
+            android:id="@+id/connectTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/connectTextView"
-            android:textSize="36sp"
-            android:textAlignment="center" />
+            android:text="Connect:"
+            android:textAlignment="center"
+            android:textSize="36sp" />
 
         <Space
             android:layout_width="match_parent"
@@ -38,10 +38,10 @@
             android:minHeight="60dp" />
 
         <TextView
-            android:text="Party Id:"
+            android:id="@+id/partyIdTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/partyIdTextView"
+            android:text="Party Id:"
             android:textSize="18sp" />
 
         <Space
@@ -50,21 +50,21 @@
             android:minHeight="13dp" />
 
         <EditText
+            android:id="@+id/partyIdText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
             android:ems="10"
-            android:id="@+id/partyIdText" />
+            android:inputType="textPersonName" />
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <TextView
-            android:text="Party Name:"
+            android:id="@+id/partyNameTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/partyNameTextView"
+            android:text="Party Name:"
             android:textSize="18sp" />
 
         <Space
@@ -73,11 +73,11 @@
             android:minHeight="13dp" />
 
         <EditText
+            android:id="@+id/partyNameText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
             android:ems="10"
-            android:id="@+id/partyNameText" />
+            android:inputType="textPersonName" />
 
         <Space
             android:layout_width="match_parent"
@@ -85,32 +85,32 @@
             android:minHeight="142dp" />
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <ImageButton
+                android:id="@+id/connectBackButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/back_button"
-                android:id="@+id/connectBackButton"
-                android:layout_weight="1"
                 android:layout_gravity="left"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
                 android:saveEnabled="false"
                 android:scaleType="fitStart"
-                android:background="@android:color/transparent" />
+                app:srcCompat="@drawable/back_button" />
 
             <ImageButton
+                android:id="@+id/connectForwardButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/back_button"
-                android:id="@+id/connectForwardButton"
-                android:scaleX="-1"
-                android:layout_weight="1"
-                android:scaleType="fitStart"
                 android:layout_gravity="right"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
                 android:baselineAlignBottom="false"
-                android:background="@android:color/transparent" />
+                android:scaleType="fitStart"
+                android:scaleX="-1"
+                app:srcCompat="@drawable/back_button" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

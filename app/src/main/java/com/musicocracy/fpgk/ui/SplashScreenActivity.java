@@ -17,9 +17,8 @@ public class SplashScreenActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable(){
             @Override
             public void run() {
-                /* Create an Intent that will start the Menu-Activity. */
-                Intent mainIntent = new Intent(SplashScreenActivity.this, TestMainActivity.class);
-                SplashScreenActivity.this.startActivity(mainIntent);
+                Intent intent = new Intent(SplashScreenActivity.this, SelectionActivity.class);
+                SplashScreenActivity.this.startActivity(intent);
                 SplashScreenActivity.this.finish();
             }
         }, SPLASH_DISPLAY_LENGTH);

@@ -11,12 +11,12 @@
     tools:context="com.musicocracy.fpgk.ui.SelectionActivity">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
 
         <Space
             android:layout_width="match_parent"
@@ -24,24 +24,24 @@
             android:minHeight="17dp" />
 
         <TextView
-            android:text="Welcome!"
+            android:id="@+id/selectWelcomeTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/selectWelcomeTextView"
-            android:textSize="40sp"
-            android:textAlignment="center" />
+            android:text="Welcome!"
+            android:textAlignment="center"
+            android:textSize="40sp" />
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="73dp"
-            android:elevation="0dp" />
+            android:elevation="0dp"
+            android:minHeight="73dp" />
 
         <TextView
-            android:text="Are you:"
+            android:id="@+id/selectPromptTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/selectPromptTextView"
+            android:text="Are you:"
             android:textAlignment="center"
             android:textSize="24sp" />
 
@@ -51,10 +51,10 @@
             android:minHeight="43dp" />
 
         <Button
-            android:text="Host"
+            android:id="@+id/hostButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/hostButton" />
+            android:text="Host" />
 
         <Space
             android:layout_width="match_parent"
@@ -62,10 +62,10 @@
             android:minHeight="39dp" />
 
         <Button
-            android:text="Guest"
+            android:id="@+id/guestButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/guestButton" />
+            android:text="Guest" />
 
         <Space
             android:layout_width="match_parent"

@@ -1,9 +1,11 @@
 package com.musicocracy.fpgk.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
@@ -16,6 +18,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class PartyConfigActivity extends ActivityBase<PartyConfigView> implements PartyConfigView {
     private static final String TAG = "PartyConfigActivity";
@@ -29,12 +32,19 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.activity_party_config, this);
+        initMenu();
+        initNumberEdits();
+    }
 
-        setSupportActionBar(toolbar);
-        tokenCountPicker.setFilters(new InputFilter[] { new InputFilterMinMax(1, 99) });
-        InputFilter[] timeFilter = new InputFilter[] { new InputFilterMinMax(0, 59) };
-        tokenMinutePicker.setFilters(timeFilter);
-        tokenSecondPicker.setFilters(timeFilter);
+    @OnClick(R.id.config_backward_btn)
+    public void backClick() {
+        onBackPressed();
+    }
+
+    @OnClick(R.id.config_forward_btn)
+    public void forwardClick() {
+        Intent intent = new Intent(this, NowPlayingActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -52,28 +62,49 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
         CyberJukeboxApplication.getComponent(this).inject(this);
     }
 
+    //region Menu Bar Setup
+    private void initMenu() {
+        setSupportActionBar(toolbar);
+        toolbar.inflateMenu(R.menu.party_config_menu);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Options");
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.party_config_menu, menu);
+        return true;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.action_open_filter:
+                Intent intent = new Intent(this, BlacklistActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+    //endregion
+
+    //region Number Edit Setup
+    private void initNumberEdits() {
+        tokenCountPicker.setFilters(new InputFilter[] { new InputFilterMinMax(1, 99) });
+        InputFilter[] timeFilter = new InputFilter[] { new InputFilterMinMax(0, 59) };
+        tokenMinutePicker.setFilters(timeFilter);
+        tokenSecondPicker.setFilters(timeFilter);
+    }
 
     // http://stackoverflow.com/questions/14212518/is-there-a-way-to-define-a-min-and-max-value-for-edittext-in-android
     private class InputFilterMinMax implements InputFilter {
-        private int min, max;
+        private final int min, max;
 
         public InputFilterMinMax(int min, int max) {
             this.min = min;
             this.max = max;
-        }
-
-        public InputFilterMinMax(String min, String max) {
-            this.min = Integer.parseInt(min);
-            this.max = Integer.parseInt(max);
         }
 
         @Override
@@ -94,4 +125,5 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
             return b > a ? c >= a && c <= b : c >= b && c <= a;
         }
     }
+    //endregion
 }

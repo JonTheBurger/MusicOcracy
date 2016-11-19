@@ -12,17 +12,17 @@
     tools:context="com.musicocracy.fpgk.ui.RequestActivity">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="63dp"></LinearLayout>
+            android:layout_height="63dp"
+            android:orientation="horizontal"></LinearLayout>
 
         <Space
             android:layout_width="match_parent"
@@ -30,10 +30,10 @@
             android:minHeight="26dp" />
 
         <TextView
-            android:text="Request or Vote:"
+            android:id="@+id/requestTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/requestTextView"
+            android:text="Request or Vote:"
             android:textSize="36sp" />
 
         <Space
@@ -42,12 +42,12 @@
             android:minHeight="20dp" />
 
         <EditText
+            android:id="@+id/requestText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ems="10"
             android:inputType="textPersonName"
             android:text="Request a Song"
-            android:ems="10"
-            android:id="@+id/requestText"
             android:textAlignment="center" />
 
         <Space
@@ -55,11 +55,11 @@
             android:layout_height="wrap_content" />
 
         <Button
-            android:text="Request!"
+            android:id="@+id/requestButton"
             android:layout_width="102dp"
             android:layout_height="wrap_content"
-            android:id="@+id/requestButton"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:text="Request!" />
 
         <Space
             android:layout_width="match_parent"
@@ -67,12 +67,12 @@
             android:minHeight="0dp" />
 
         <EditText
+            android:id="@+id/voteText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ems="10"
             android:inputType="textPersonName"
             android:text="Vote for a Song"
-            android:ems="10"
-            android:id="@+id/voteText"
             android:textAlignment="center" />
 
         <Space
@@ -80,11 +80,11 @@
             android:layout_height="wrap_content" />
 
         <Button
-            android:text="Vote!"
+            android:id="@+id/voteButton"
             android:layout_width="106dp"
             android:layout_height="wrap_content"
-            android:id="@+id/voteButton"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:text="Vote!" />
 
         <Space
             android:layout_width="match_parent"
@@ -92,12 +92,12 @@
             android:minHeight="112dp" />
 
         <ImageButton
+            android:id="@+id/requestBackButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/half_moon_back_button"
-            android:id="@+id/requestBackButton"
+            android:background="@android:color/transparent"
             android:scaleType="centerInside"
-            android:background="@android:color/transparent" />
+            app:srcCompat="@drawable/half_moon_back_button" />
 
     </LinearLayout>
 </RelativeLayout>
