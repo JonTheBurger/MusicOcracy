@@ -115,19 +115,19 @@
     </TableLayout>
 
     <ImageButton
-        android:id="@+id/config_forward_btn"
-        android:contentDescription="forward button"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:scaleX="-1"
+        android:id="@+id/config_backward_btn"
         style="@style/QuarterButtonTheme"
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@string/back_button_description"
         app:srcCompat="@drawable/back_arrow" />
 
     <ImageButton
-        android:id="@+id/config_backward_btn"
-        android:contentDescription="back button"
-        android:layout_alignParentBottom="true"
+        android:id="@+id/config_forward_btn"
         style="@style/QuarterButtonTheme"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:contentDescription="@string/forward_button_description"
+        android:scaleX="-1"
         app:srcCompat="@drawable/back_arrow" />
 </RelativeLayout>

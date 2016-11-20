@@ -5,19 +5,19 @@
     android:id="@+id/activity_connect"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.musicocracy.fpgk.ui.ConnectActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
 
         <Space
             android:layout_width="match_parent"
@@ -78,39 +78,22 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="142dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <ImageButton
-                android:id="@+id/connectBackButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:saveEnabled="false"
-                android:scaleType="fitStart"
-                app:srcCompat="@drawable/back_button" />
-
-            <ImageButton
-                android:id="@+id/connectForwardButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:baselineAlignBottom="false"
-                android:scaleType="fitStart"
-                android:scaleX="-1"
-                app:srcCompat="@drawable/back_button" />
-        </LinearLayout>
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/connectBackButton"
+        style="@style/QuarterButtonTheme"
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@string/back_button_description"
+        app:srcCompat="@drawable/back_arrow" />
+
+    <ImageButton
+        android:id="@+id/connectForwardButton"
+        style="@style/QuarterButtonTheme"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:contentDescription="@string/forward_button_description"
+        android:scaleX="-1"
+        app:srcCompat="@drawable/back_arrow" />
 </RelativeLayout>
