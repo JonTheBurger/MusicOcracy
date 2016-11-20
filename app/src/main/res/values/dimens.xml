@@ -6,4 +6,6 @@
     <dimen name="quarter_circle_size">90dp</dimen>
     <dimen name="quarter_circle_outerpad">30dp</dimen>
     <dimen name="quarter_circle_innerpad">10dp</dimen>
+    <dimen name="half_circle_vertical_pad">15dp</dimen>
+    <dimen name="half_circle_width">180dp</dimen>
 </resources>

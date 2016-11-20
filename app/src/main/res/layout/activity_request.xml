@@ -93,11 +93,8 @@
 
         <ImageButton
             android:id="@+id/requestBackButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:scaleType="centerInside"
-            app:srcCompat="@drawable/half_moon_back_button" />
+            style="@style/HalfButtonTheme"
+            app:srcCompat="@drawable/back_arrow" />
 
     </LinearLayout>
 </RelativeLayout>

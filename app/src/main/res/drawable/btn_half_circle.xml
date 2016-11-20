@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:right="@dimen/quarter_circle_size">
+        <rotate
+            android:drawable="@drawable/btn_quarter_circle"
+            android:fromDegrees="-90" />
+    </item>
+    <item
+        android:drawable="@drawable/btn_quarter_circle"
+        android:left="@dimen/quarter_circle_size" />
+</layer-list>
