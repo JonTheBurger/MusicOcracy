@@ -16,6 +16,17 @@
         <item name="android:textColor">@drawable/btn_text_color</item>
     </style>
 
+    <style name="QuarterButtonTheme" parent="@android:style/Widget.ImageButton">
+        <item name="android:background">@drawable/btn_quarter_circle_background</item>
+        <item name="android:layout_width">@dimen/quarter_circle_size</item>
+        <item name="android:layout_height">@dimen/quarter_circle_size</item>
+        <item name="android:paddingTop">@dimen/quarter_circle_outerpad</item>
+        <item name="android:paddingRight">@dimen/quarter_circle_outerpad</item>
+        <item name="android:paddingBottom">@dimen/quarter_circle_innerpad</item>
+        <item name="android:paddingLeft">@dimen/quarter_circle_innerpad</item>
+        <item name="android:scaleType">centerInside</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
