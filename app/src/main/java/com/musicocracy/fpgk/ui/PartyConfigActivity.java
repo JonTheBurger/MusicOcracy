@@ -8,6 +8,7 @@ import android.text.Spanned;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
 import com.musicocracy.fpgk.presenter.PartyConfigPresenter;
@@ -25,15 +26,18 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
     @Inject PartyConfigPresenter presenter;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.token_count_picker) EditText tokenCountPicker;
-    @BindView(R.id.token_refill_minute_picker) EditText tokenMinutePicker;
-    @BindView(R.id.token_refill_second_picker) EditText tokenSecondPicker;
+    @BindView(R.id.party_code_text_view) TextView partyCode;
+    @BindView(R.id.party_name_edit_text) EditText partyName;
+    @BindView(R.id.token_count_picker) EditText tokenCount;
+    @BindView(R.id.token_refill_minute_picker) EditText tokenMinutes;
+    @BindView(R.id.token_refill_second_picker) EditText tokenSeconds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.activity_party_config, this);
         initMenu();
         initNumberEdits();
+        presenter.onCreate(this);
     }
 
     @OnClick(R.id.config_backward_btn)
@@ -43,10 +47,44 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
 
     @OnClick(R.id.config_forward_btn)
     public void forwardClick() {
+        presenter.confirmSettings();
         Intent intent = new Intent(this, NowPlayingActivity.class);
         startActivity(intent);
     }
 
+    //region View Implementation
+    @Override
+    public String getPartyCode() {
+        return partyCode.getText().toString();
+    }
+
+    @Override
+    public void setPartyCode(String code) {
+        partyCode.setText(code);
+    }
+
+    @Override
+    public String getPartyName() {
+        return partyName.getText().toString();
+    }
+
+    @Override
+    public int getTokenCount() {
+        return Integer.parseInt(tokenCount.getText().toString());
+    }
+
+    @Override
+    public int getTokenRefillMinutes() {
+        return Integer.parseInt(tokenMinutes.getText().toString());
+    }
+
+    @Override
+    public int getTokenRefillSeconds() {
+        return Integer.parseInt(tokenSeconds.getText().toString());
+    }
+    //endregion View Implementation
+
+    //region IOC Boilerplate
     @Override
     protected Presenter<PartyConfigView> getPresenter() {
         return presenter;
@@ -61,6 +99,7 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
     protected void daggerInject() {
         CyberJukeboxApplication.getComponent(this).inject(this);
     }
+    //endregion IOC Boilerplate
 
     //region Menu Bar Setup
     private void initMenu() {
@@ -88,14 +127,14 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
                 return super.onOptionsItemSelected(item);
         }
     }
-    //endregion
+    //endregion Menu Bar Setup
 
     //region Number Edit Setup
     private void initNumberEdits() {
-        tokenCountPicker.setFilters(new InputFilter[] { new InputFilterMinMax(1, 99) });
+        tokenCount.setFilters(new InputFilter[] { new InputFilterMinMax(1, 99) });
         InputFilter[] timeFilter = new InputFilter[] { new InputFilterMinMax(0, 59) };
-        tokenMinutePicker.setFilters(timeFilter);
-        tokenSecondPicker.setFilters(timeFilter);
+        tokenMinutes.setFilters(timeFilter);
+        tokenSeconds.setFilters(timeFilter);
     }
 
     // http://stackoverflow.com/questions/14212518/is-there-a-way-to-define-a-min-and-max-value-for-edittext-in-android
@@ -125,5 +164,5 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
             return b > a ? c >= a && c <= b : c >= b && c <= a;
         }
     }
-    //endregion
+    //endregion Number Edit Setup
 }
