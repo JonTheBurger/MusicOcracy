@@ -13,10 +13,18 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
         this.model = model;
     }
 
-    public void populateSongs() {
+    public void populateBrowseSongs(String requestString) {
         ArrayList<String> testList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            testList.add("test" + i);
+            testList.add(requestString + " " + i);
+        }
+        view.updateSongs(testList);
+    }
+
+    public void populateVoteSongs() {
+        ArrayList<String> testList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            testList.add("vote song " + i);
         }
         view.updateSongs(testList);
     }
