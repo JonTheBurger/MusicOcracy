@@ -8,6 +8,7 @@ import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
@@ -16,6 +17,7 @@ import kaaes.spotify.webapi.android.models.Track;
 
 public class Browser {
     private static final String CLIENT_ID = "4becf88681f74bda9e38baac3bcf66d6";
+    private static final int NUM_RESULTS = 10;
     private static SpotifyApi api;
     private static SpotifyService spotify;
     private static String token;
@@ -39,22 +41,19 @@ public class Browser {
         });
     }
 
-    public List<Track> browseTracks(String trackName) {
+    public List<String> browseTracks(String trackName) {
 
         List<Track> resultTracks = spotify.searchTracks(trackName).tracks.items;
-
+        List<String> resultStrings = new ArrayList<>();
         //If result tracks are found
         if (resultTracks.size() != 0) {
-            //Get the top 5 result tracks
-            resultTracks = resultTracks.subList(0, 5);
-
-            //Display the top 5 results
-            for (int i = 0; i < resultTracks.size() && i < 5; i++) {
-                Log.d("Browser", "Result: " + i + ", Album: " + resultTracks.get(i).album.name +
+            //Construct result string for tracks
+            for (int i = 0; i < resultTracks.size() && i < NUM_RESULTS; i++) {
+                resultStrings.add("Album: " + resultTracks.get(i).album.name +
                         ", Artist: " + resultTracks.get(i).artists.get(0).name);
             }
         }
 
-        return resultTracks;
+        return resultStrings;
     }
 }
