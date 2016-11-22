@@ -2,6 +2,7 @@ package com.musicocracy.fpgk.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
 import com.musicocracy.fpgk.presenter.Presenter;
@@ -10,6 +11,7 @@ import com.musicocracy.fpgk.view.RequestView;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -39,6 +41,9 @@ public class RequestActivity extends ActivityBase<RequestView> implements Reques
         onBackPressed();
     }
 
+    @BindView(R.id.requestText)
+    public TextView requestText;
+
     @Override
     protected Presenter<RequestView> getPresenter() {
         return presenter;
@@ -52,5 +57,10 @@ public class RequestActivity extends ActivityBase<RequestView> implements Reques
     @Override
     protected void daggerInject() {
         CyberJukeboxApplication.getComponent(this).inject(this);
+    }
+
+    @Override
+    public String getRequestString() {
+        return requestText.toString();
     }
 }
