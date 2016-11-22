@@ -7,6 +7,8 @@ import com.musicocracy.fpgk.presenter.NowPlayingPresenter;
 import com.musicocracy.fpgk.presenter.Presenter;
 import com.musicocracy.fpgk.view.NowPlayingView;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
@@ -33,5 +35,20 @@ public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements 
     @Override
     protected void daggerInject() {
         CyberJukeboxApplication.getComponent(this).inject(this);
+    }
+
+    @Override
+    public void updateArtist(String artistName) {
+
+    }
+
+    @Override
+    public void updateSong(String songName) {
+
+    }
+
+    @Override
+    public void updateVotableSongs(List<String> votableSongs) {
+
     }
 }
