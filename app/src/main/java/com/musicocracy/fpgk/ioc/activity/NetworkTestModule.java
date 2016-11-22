@@ -1,10 +1,10 @@
 package com.musicocracy.fpgk.ioc.activity;
 
-import com.musicocracy.fpgk.model.NetworkTestModel;
-import com.musicocracy.fpgk.model.net.ClientEventBus;
-import com.musicocracy.fpgk.model.net.ProtoEnvelopeFactory;
-import com.musicocracy.fpgk.model.net.ServerEventBus;
-import com.musicocracy.fpgk.presenter.NetworkTestPresenter;
+import com.musicocracy.fpgk.mvp.model.NetworkTestModel;
+import com.musicocracy.fpgk.domain.net.ClientEventBus;
+import com.musicocracy.fpgk.domain.net.ProtoEnvelopeFactory;
+import com.musicocracy.fpgk.domain.net.ServerEventBus;
+import com.musicocracy.fpgk.mvp.presenter.NetworkTestPresenter;
 
 import dagger.Module;
 import dagger.Provides;

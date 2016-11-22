@@ -1,4 +1,4 @@
-import com.musicocracy.fpgk.model.net.IpUtils;
+import com.musicocracy.fpgk.domain.net.IpUtils;
 
 import org.junit.Test;
 

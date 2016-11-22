@@ -8,9 +8,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.musicocracy.fpgk.model.spotify.Browser;
-import com.musicocracy.fpgk.model.spotify.ReceiveThread;
-import com.musicocracy.fpgk.model.spotify.ResultsListener;
+import com.musicocracy.fpgk.domain.spotify.Browser;
+import com.musicocracy.fpgk.domain.spotify.ReceiveThread;
+import com.musicocracy.fpgk.domain.spotify.ResultsListener;
 
 import java.io.IOException;
 import java.net.DatagramSocket;

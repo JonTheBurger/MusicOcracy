@@ -3,9 +3,9 @@ package com.musicocracy.fpgk.ui;
 import android.os.Bundle;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
-import com.musicocracy.fpgk.presenter.AddTermPresenter;
-import com.musicocracy.fpgk.presenter.Presenter;
-import com.musicocracy.fpgk.view.AddTermView;
+import com.musicocracy.fpgk.mvp.presenter.AddTermPresenter;
+import com.musicocracy.fpgk.mvp.presenter.Presenter;
+import com.musicocracy.fpgk.mvp.view.AddTermView;
 
 import javax.inject.Inject;
 

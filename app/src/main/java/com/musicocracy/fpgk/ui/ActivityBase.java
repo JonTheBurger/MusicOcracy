@@ -3,7 +3,7 @@ package com.musicocracy.fpgk.ui;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.musicocracy.fpgk.presenter.Presenter;
+import com.musicocracy.fpgk.mvp.presenter.Presenter;
 
 public abstract class ActivityBase<TView> extends AppCompatActivity {
     protected abstract Presenter<TView> getPresenter();

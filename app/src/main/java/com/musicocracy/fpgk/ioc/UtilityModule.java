@@ -1,7 +1,7 @@
 package com.musicocracy.fpgk.ioc;
 
-import com.musicocracy.fpgk.model.util.PartySettings;
-import com.musicocracy.fpgk.model.util.ReadOnlyPartySettings;
+import com.musicocracy.fpgk.domain.util.PartySettings;
+import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
 
 import javax.inject.Singleton;
 

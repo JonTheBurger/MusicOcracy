@@ -1,7 +1,6 @@
-import com.google.protobuf.Any;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.musicocracy.fpgk.model.dal.MusicService;
-import com.musicocracy.fpgk.model.net.ProtoEnvelopeFactory;
+import com.musicocracy.fpgk.domain.dal.MusicService;
+import com.musicocracy.fpgk.domain.net.ProtoEnvelopeFactory;
 import com.musicocracy.fpgk.net.proto.BrowseSongsMsg;
 import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
 import com.musicocracy.fpgk.net.proto.PlayRequestMsg;

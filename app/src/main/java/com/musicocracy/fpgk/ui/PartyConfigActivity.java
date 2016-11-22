@@ -11,9 +11,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
-import com.musicocracy.fpgk.presenter.PartyConfigPresenter;
-import com.musicocracy.fpgk.presenter.Presenter;
-import com.musicocracy.fpgk.view.PartyConfigView;
+import com.musicocracy.fpgk.mvp.presenter.PartyConfigPresenter;
+import com.musicocracy.fpgk.mvp.presenter.Presenter;
+import com.musicocracy.fpgk.mvp.view.PartyConfigView;
 
 import javax.inject.Inject;
 

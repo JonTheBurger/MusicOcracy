@@ -1,11 +1,11 @@
 import com.j256.ormlite.dao.Dao;
-import com.musicocracy.fpgk.model.dal.Database;
-import com.musicocracy.fpgk.model.dal.FilterMode;
-import com.musicocracy.fpgk.model.dal.Guest;
-import com.musicocracy.fpgk.model.dal.MusicService;
-import com.musicocracy.fpgk.model.dal.Party;
-import com.musicocracy.fpgk.model.dal.PlayRequest;
-import com.musicocracy.fpgk.model.query_layer.PlayRequestRepository;
+import com.musicocracy.fpgk.domain.dal.Database;
+import com.musicocracy.fpgk.domain.dal.FilterMode;
+import com.musicocracy.fpgk.domain.dal.Guest;
+import com.musicocracy.fpgk.domain.dal.MusicService;
+import com.musicocracy.fpgk.domain.dal.Party;
+import com.musicocracy.fpgk.domain.dal.PlayRequest;
+import com.musicocracy.fpgk.domain.query_layer.PlayRequestRepository;
 
 import org.junit.Test;
 

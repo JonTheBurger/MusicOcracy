@@ -3,8 +3,8 @@ package com.musicocracy.fpgk.ioc;
 import android.content.Context;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-import com.musicocracy.fpgk.model.dal.Database;
-import com.musicocracy.fpgk.model.query_layer.PlayRequestRepository;
+import com.musicocracy.fpgk.domain.dal.Database;
+import com.musicocracy.fpgk.domain.query_layer.PlayRequestRepository;
 
 import javax.inject.Singleton;
 

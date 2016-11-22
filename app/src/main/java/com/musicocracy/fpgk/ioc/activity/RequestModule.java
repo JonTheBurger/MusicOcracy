@@ -1,7 +1,7 @@
 package com.musicocracy.fpgk.ioc.activity;
 
-import com.musicocracy.fpgk.model.RequestModel;
-import com.musicocracy.fpgk.presenter.RequestPresenter;
+import com.musicocracy.fpgk.mvp.model.RequestModel;
+import com.musicocracy.fpgk.mvp.presenter.RequestPresenter;
 
 import dagger.Module;
 import dagger.Provides;

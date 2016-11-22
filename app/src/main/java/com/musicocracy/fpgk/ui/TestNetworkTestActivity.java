@@ -10,9 +10,9 @@ import android.widget.ListView;
 import android.widget.Switch;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
-import com.musicocracy.fpgk.presenter.NetworkTestPresenter;
-import com.musicocracy.fpgk.presenter.Presenter;
-import com.musicocracy.fpgk.view.NetworkTestView;
+import com.musicocracy.fpgk.mvp.presenter.NetworkTestPresenter;
+import com.musicocracy.fpgk.mvp.presenter.Presenter;
+import com.musicocracy.fpgk.mvp.view.NetworkTestView;
 
 import javax.inject.Inject;
 

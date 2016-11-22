@@ -1,7 +1,7 @@
 package com.musicocracy.fpgk.ioc.activity;
 
-import com.musicocracy.fpgk.model.ConnectModel;
-import com.musicocracy.fpgk.presenter.ConnectPresenter;
+import com.musicocracy.fpgk.mvp.model.ConnectModel;
+import com.musicocracy.fpgk.mvp.presenter.ConnectPresenter;
 
 import dagger.Module;
 import dagger.Provides;

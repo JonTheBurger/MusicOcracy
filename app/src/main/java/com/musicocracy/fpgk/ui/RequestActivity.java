@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
-import com.musicocracy.fpgk.presenter.Presenter;
-import com.musicocracy.fpgk.presenter.RequestPresenter;
-import com.musicocracy.fpgk.view.RequestView;
+import com.musicocracy.fpgk.mvp.presenter.Presenter;
+import com.musicocracy.fpgk.mvp.presenter.RequestPresenter;
+import com.musicocracy.fpgk.mvp.view.RequestView;
 
 import javax.inject.Inject;
 

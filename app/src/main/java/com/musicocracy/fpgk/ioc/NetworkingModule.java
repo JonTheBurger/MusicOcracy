@@ -1,10 +1,10 @@
 package com.musicocracy.fpgk.ioc;
 
-import com.musicocracy.fpgk.model.net.ClientEventBus;
-import com.musicocracy.fpgk.model.net.ProtoEnvelopeFactory;
-import com.musicocracy.fpgk.model.net.RxTcpClient;
-import com.musicocracy.fpgk.model.net.RxTcpServer;
-import com.musicocracy.fpgk.model.net.ServerEventBus;
+import com.musicocracy.fpgk.domain.net.ClientEventBus;
+import com.musicocracy.fpgk.domain.net.ProtoEnvelopeFactory;
+import com.musicocracy.fpgk.domain.net.RxTcpClient;
+import com.musicocracy.fpgk.domain.net.RxTcpServer;
+import com.musicocracy.fpgk.domain.net.ServerEventBus;
 
 import javax.inject.Singleton;
 

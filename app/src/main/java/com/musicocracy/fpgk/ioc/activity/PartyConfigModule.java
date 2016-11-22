@@ -1,8 +1,8 @@
 package com.musicocracy.fpgk.ioc.activity;
 
-import com.musicocracy.fpgk.model.PartyConfigModel;
-import com.musicocracy.fpgk.model.util.PartySettings;
-import com.musicocracy.fpgk.presenter.PartyConfigPresenter;
+import com.musicocracy.fpgk.mvp.model.PartyConfigModel;
+import com.musicocracy.fpgk.domain.util.PartySettings;
+import com.musicocracy.fpgk.mvp.presenter.PartyConfigPresenter;
 
 import dagger.Module;
 import dagger.Provides;

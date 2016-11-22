@@ -3,9 +3,9 @@ package com.musicocracy.fpgk.ui;
 import android.os.Bundle;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
-import com.musicocracy.fpgk.presenter.NowPlayingPresenter;
-import com.musicocracy.fpgk.presenter.Presenter;
-import com.musicocracy.fpgk.view.NowPlayingView;
+import com.musicocracy.fpgk.mvp.presenter.NowPlayingPresenter;
+import com.musicocracy.fpgk.mvp.presenter.Presenter;
+import com.musicocracy.fpgk.mvp.view.NowPlayingView;
 
 import java.util.List;
 

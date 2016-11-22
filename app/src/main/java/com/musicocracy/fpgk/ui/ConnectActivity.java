@@ -4,9 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
-import com.musicocracy.fpgk.presenter.ConnectPresenter;
-import com.musicocracy.fpgk.presenter.Presenter;
-import com.musicocracy.fpgk.view.ConnectView;
+import com.musicocracy.fpgk.mvp.presenter.ConnectPresenter;
+import com.musicocracy.fpgk.mvp.presenter.Presenter;
+import com.musicocracy.fpgk.mvp.view.ConnectView;
 
 import javax.inject.Inject;
 

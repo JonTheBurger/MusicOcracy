@@ -1,0 +1,18 @@
+package com.musicocracy.fpgk.mvp.presenter;
+
+import com.musicocracy.fpgk.mvp.model.AddTermModel;
+import com.musicocracy.fpgk.mvp.view.AddTermView;
+
+public class AddTermPresenter implements Presenter<AddTermView> {
+    private final AddTermModel model;
+    private AddTermView view;
+
+    public AddTermPresenter(AddTermModel model) {
+        this.model = model;
+    }
+
+    @Override
+    public void setView(AddTermView view) {
+        this.view = view;
+    }
+}

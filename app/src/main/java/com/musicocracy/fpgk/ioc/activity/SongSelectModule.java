@@ -1,7 +1,7 @@
 package com.musicocracy.fpgk.ioc.activity;
 
-import com.musicocracy.fpgk.model.SongSelectModel;
-import com.musicocracy.fpgk.presenter.SongSelectPresenter;
+import com.musicocracy.fpgk.mvp.model.SongSelectModel;
+import com.musicocracy.fpgk.mvp.presenter.SongSelectPresenter;
 
 import dagger.Module;
 import dagger.Provides;

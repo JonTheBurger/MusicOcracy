@@ -1,7 +1,7 @@
 package com.musicocracy.fpgk.ioc.activity;
 
-import com.musicocracy.fpgk.model.AddTermModel;
-import com.musicocracy.fpgk.presenter.AddTermPresenter;
+import com.musicocracy.fpgk.mvp.model.AddTermModel;
+import com.musicocracy.fpgk.mvp.presenter.AddTermPresenter;
 
 import dagger.Module;
 import dagger.Provides;

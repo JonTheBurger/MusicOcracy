@@ -1,7 +1,7 @@
 package com.musicocracy.fpgk.ioc.activity;
 
-import com.musicocracy.fpgk.model.NowPlayingModel;
-import com.musicocracy.fpgk.presenter.NowPlayingPresenter;
+import com.musicocracy.fpgk.mvp.model.NowPlayingModel;
+import com.musicocracy.fpgk.mvp.presenter.NowPlayingPresenter;
 
 import dagger.Module;
 import dagger.Provides;

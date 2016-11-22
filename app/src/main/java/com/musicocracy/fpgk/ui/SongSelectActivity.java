@@ -5,12 +5,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
-import com.musicocracy.fpgk.model.dal.PlayRequest;
-import com.musicocracy.fpgk.presenter.Presenter;
-import com.musicocracy.fpgk.presenter.SongSelectPresenter;
-import com.musicocracy.fpgk.view.SongSelectView;
+import com.musicocracy.fpgk.mvp.presenter.Presenter;
+import com.musicocracy.fpgk.mvp.presenter.SongSelectPresenter;
+import com.musicocracy.fpgk.mvp.view.SongSelectView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;

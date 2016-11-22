@@ -4,13 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
-import com.musicocracy.fpgk.presenter.Presenter;
-import com.musicocracy.fpgk.presenter.SelectionPresenter;
-import com.musicocracy.fpgk.view.SelectionView;
+import com.musicocracy.fpgk.mvp.presenter.Presenter;
+import com.musicocracy.fpgk.mvp.presenter.SelectionPresenter;
+import com.musicocracy.fpgk.mvp.view.SelectionView;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 

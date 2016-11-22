@@ -1,7 +1,7 @@
 package com.musicocracy.fpgk.ioc.activity;
 
-import com.musicocracy.fpgk.model.BlacklistModel;
-import com.musicocracy.fpgk.presenter.BlacklistPresenter;
+import com.musicocracy.fpgk.mvp.model.BlacklistModel;
+import com.musicocracy.fpgk.mvp.presenter.BlacklistPresenter;
 
 import dagger.Module;
 import dagger.Provides;
