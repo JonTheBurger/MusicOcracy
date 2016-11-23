@@ -27,6 +27,13 @@ public class RequestActivity extends ActivityBase<RequestView> implements Reques
     @OnClick(R.id.requestButton)
     public void requestClick() {
         Intent intent = new Intent(this, SongSelectActivity.class);
+        Bundle requestData = new Bundle();
+        // Load the string to be browsed for into the bundle with the request_string identifier
+        String requestString = getRequestString();
+        requestData.putString(getString(R.string.request_string), requestString);
+
+        intent.putExtras(requestData);
+
         RequestActivity.this.startActivity(intent);
     }
 
@@ -61,6 +68,6 @@ public class RequestActivity extends ActivityBase<RequestView> implements Reques
 
     @Override
     public String getRequestString() {
-        return requestText.toString();
+        return requestText.getEditableText().toString();
     }
 }

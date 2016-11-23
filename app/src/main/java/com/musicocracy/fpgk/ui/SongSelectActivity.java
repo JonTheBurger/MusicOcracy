@@ -1,5 +1,6 @@
 package com.musicocracy.fpgk.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -19,6 +20,7 @@ import butterknife.OnClick;
 
 public class SongSelectActivity extends ActivityBase<SongSelectView> implements SongSelectView {
     private static final String TAG = "SongSelectActivity";
+    private static final int AUTHENTICATION_REQUEST_CODE = 1001;
     private ArrayAdapter<String> adapter;
 
     @Inject SongSelectPresenter presenter;
@@ -26,7 +28,16 @@ public class SongSelectActivity extends ActivityBase<SongSelectView> implements 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.activity_song_select, this);
-        presenter.populateSongs();
+
+        Bundle requestBundle = getIntent().getExtras();
+
+        // Data received from parent activity (Browse Request)
+        if (requestBundle != null) {
+            String requestString = requestBundle.getString(getString(R.string.request_string));
+            presenter.populateBrowseSongs(requestString);
+        } else { // No data received from parent activity (Vote Request)
+            presenter.populateVoteSongs();
+        }
     }
 
     @Override
@@ -56,5 +67,11 @@ public class SongSelectActivity extends ActivityBase<SongSelectView> implements 
     @Override
     protected void daggerInject() {
         CyberJukeboxApplication.getComponent(this).inject(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
     }
 }

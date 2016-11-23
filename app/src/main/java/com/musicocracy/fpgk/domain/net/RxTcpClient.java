@@ -92,7 +92,6 @@ public class RxTcpClient {
                         }
                     })
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<String>() {
                         @Override
                         public void onCompleted() {

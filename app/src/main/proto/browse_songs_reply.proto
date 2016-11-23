@@ -1,0 +1,18 @@
+syntax = "proto3";
+package net.proto;
+
+option java_multiple_files = true;
+option java_generate_equals_and_hash = true;
+option java_package = "com.musicocracy.fpgk.net.proto";
+option java_outer_classname = "BrowseSongsReplyProto";
+
+message BrowseSongsReply {
+    message BrowsableSong {
+        string title = 1;
+        string artist = 2;
+        string uri = 3;
+        string music_service = 4;
+    }
+
+    repeated BrowsableSong songs = 1;
+}

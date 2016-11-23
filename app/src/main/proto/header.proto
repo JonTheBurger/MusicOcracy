@@ -6,9 +6,9 @@ import "message_type.proto";
 option java_multiple_files = true;
 option java_generate_equals_and_hash = true;
 option java_package = "com.musicocracy.fpgk.net.proto";
-option java_outer_classname = "HeaderMsgProto";
+option java_outer_classname = "HeaderProto";
 
-message HeaderMsg {
+message Header {
     int32 version = 1;
     MessageType type = 2;
 }

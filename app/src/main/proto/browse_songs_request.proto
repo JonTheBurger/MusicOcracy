@@ -4,9 +4,8 @@ package net.proto;
 option java_multiple_files = true;
 option java_generate_equals_and_hash = true;
 option java_package = "com.musicocracy.fpgk.net.proto";
-option java_outer_classname = "SendVoteMsgProto";
+option java_outer_classname = "BrowseSongsRequestProto";
 
-message SendVoteMsg {
-    string requester_id = 1;
-    int32 choice_id = 2;
+message BrowseSongsRequest {
+    string song_title = 1;
 }

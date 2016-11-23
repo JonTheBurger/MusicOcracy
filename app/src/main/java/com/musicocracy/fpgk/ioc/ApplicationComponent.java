@@ -33,6 +33,7 @@ modules = {  // The dependency injection endpoints require class instances provi
         ApplicationModule.class,
         DatabaseModule.class,
         NetworkingModule.class,
+        SpotifyModule.class,
         UtilityModule.class,
 
         // Per-Activity

@@ -8,6 +8,7 @@ import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
@@ -15,44 +16,27 @@ import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Track;
 
 public class Browser {
-    private static final String CLIENT_ID = "4becf88681f74bda9e38baac3bcf66d6";
-    private static SpotifyApi api;
-    private static SpotifyService spotify;
-    private static String token;
-    private Player mPlayer;
+    private static final int NUM_RESULTS = 10;
+    private final SpotifyService spotify;
 
-    public Browser(String token, Context context) {
-        api = new SpotifyApi();
-        api.setAccessToken(token);
-        spotify = api.getService();
-        Config playerConfig = new Config(context, token, CLIENT_ID);
-        Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
-            @Override
-            public void onInitialized(SpotifyPlayer spotifyPlayer) {
-                mPlayer = spotifyPlayer;
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                Log.e("TestBrowseActivity", "Could not initialize player: " + throwable.getMessage());
-            }
-        });
+    public Browser(SpotifyService spotify) {
+        this.spotify = spotify;
     }
 
     public List<Track> browseTracks(String trackName) {
 
         List<Track> resultTracks = spotify.searchTracks(trackName).tracks.items;
-
+        //List<String> resultStrings = new ArrayList<>();
         //If result tracks are found
         if (resultTracks.size() != 0) {
-            //Get the top 5 result tracks
-            resultTracks = resultTracks.subList(0, 5);
 
-            //Display the top 5 results
-            for (int i = 0; i < resultTracks.size() && i < 5; i++) {
-                Log.d("Browser", "Result: " + i + ", Album: " + resultTracks.get(i).album.name +
+            resultTracks = resultTracks.subList(0, NUM_RESULTS);
+            /*
+            //Construct result string for tracks
+            for (int i = 0; i < resultTracks.size() && i < NUM_RESULTS; i++) {
+                resultStrings.add("Album: " + resultTracks.get(i).album.name +
                         ", Artist: " + resultTracks.get(i).artists.get(0).name);
-            }
+            }*/
         }
 
         return resultTracks;
