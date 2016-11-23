@@ -23,19 +23,22 @@ public class Browser {
         this.spotify = spotify;
     }
 
-    public List<String> browseTracks(String trackName) {
+    public List<Track> browseTracks(String trackName) {
 
         List<Track> resultTracks = spotify.searchTracks(trackName).tracks.items;
-        List<String> resultStrings = new ArrayList<>();
+        //List<String> resultStrings = new ArrayList<>();
         //If result tracks are found
         if (resultTracks.size() != 0) {
+
+            resultTracks = resultTracks.subList(0, NUM_RESULTS);
+            /*
             //Construct result string for tracks
             for (int i = 0; i < resultTracks.size() && i < NUM_RESULTS; i++) {
                 resultStrings.add("Album: " + resultTracks.get(i).album.name +
                         ", Artist: " + resultTracks.get(i).artists.get(0).name);
-            }
+            }*/
         }
 
-        return resultStrings;
+        return resultTracks;
     }
 }
