@@ -6,11 +6,12 @@ import com.musicocracy.fpgk.mvp.presenter.SongSelectPresenter;
 
 import dagger.Module;
 import dagger.Provides;
+import kaaes.spotify.webapi.android.SpotifyApi;
 
 @Module
 public class SongSelectModule {
     @Provides
-    public SongSelectModel provideSongSelectModel(Browser browser) {
+    public SongSelectModel provideSongSelectModel(Browser browser, SpotifyApi api) {
         return new SongSelectModel(browser, api);
     }
 
