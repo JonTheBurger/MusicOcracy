@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -38,6 +39,16 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
         initMenu();
         initNumberEdits();
         presenter.onCreate(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        try {
+            presenter.onBack();
+        } catch (InterruptedException e) {
+            Log.e(TAG, e.toString());
+        }
     }
 
     @OnClick(R.id.config_backward_btn)

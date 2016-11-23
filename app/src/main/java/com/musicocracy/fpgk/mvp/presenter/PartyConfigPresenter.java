@@ -25,6 +25,12 @@ public class PartyConfigPresenter implements Presenter<PartyConfigView> {
         model.getSettings().setTokens(view.getTokenCount());
         long refillMillis = (view.getTokenRefillMinutes() * 60 + view.getTokenRefillSeconds()) * 1000;
         model.getSettings().setTokenRefillMillis(refillMillis);
+
+        model.startServer();
+    }
+
+    public void onBack() throws InterruptedException {
+        model.stopServer();
     }
 
     @Override

@@ -25,7 +25,6 @@
             android:minHeight="34dp" />
 
         <TextView
-            android:id="@+id/connectTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Connect:"
@@ -38,10 +37,9 @@
             android:minHeight="60dp" />
 
         <TextView
-            android:id="@+id/partyIdTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Party Id:"
+            android:text="Party Code:"
             android:textSize="18sp" />
 
         <Space
@@ -50,7 +48,7 @@
             android:minHeight="13dp" />
 
         <EditText
-            android:id="@+id/partyIdText"
+            android:id="@+id/party_code_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -61,7 +59,6 @@
             android:layout_height="wrap_content" />
 
         <TextView
-            android:id="@+id/partyNameTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Party Name:"
@@ -73,7 +70,7 @@
             android:minHeight="13dp" />
 
         <EditText
-            android:id="@+id/partyNameText"
+            android:id="@+id/party_name_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -81,14 +78,14 @@
     </LinearLayout>
 
     <ImageButton
-        android:id="@+id/connectBackButton"
+        android:id="@+id/connect_back_btn"
         style="@style/QuarterButtonTheme"
         android:layout_alignParentBottom="true"
         android:contentDescription="@string/back_button_description"
         app:srcCompat="@drawable/back_arrow" />
 
     <ImageButton
-        android:id="@+id/connectForwardButton"
+        android:id="@+id/connect_forward_btn"
         style="@style/QuarterButtonTheme"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"

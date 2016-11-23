@@ -1,5 +1,6 @@
 package com.musicocracy.fpgk.ioc.activity;
 
+import com.musicocracy.fpgk.domain.net.ClientEventBus;
 import com.musicocracy.fpgk.mvp.model.ConnectModel;
 import com.musicocracy.fpgk.mvp.presenter.ConnectPresenter;
 
@@ -9,8 +10,8 @@ import dagger.Provides;
 @Module
 public class ConnectModule {
     @Provides
-    public ConnectModel provideConnectModel() {
-        return new ConnectModel();
+    public ConnectModel provideConnectModel(ClientEventBus client) {
+        return new ConnectModel(client);
     }
 
     @Provides

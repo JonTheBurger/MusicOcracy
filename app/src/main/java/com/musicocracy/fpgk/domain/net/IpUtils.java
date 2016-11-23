@@ -10,6 +10,8 @@ import java.net.InetAddress;
 import static android.content.Context.WIFI_SERVICE;
 
 public class IpUtils {
+    public static final int DEFAULT_PORT = 2025;
+
     public static String ipAddressToBase36(String ipAddress) {
         InetAddress inetAddress = InetAddresses.forString(ipAddress);
         return inetAddressToBase36(inetAddress);

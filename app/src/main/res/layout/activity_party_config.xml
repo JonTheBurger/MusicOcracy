@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:inputType="text"
-                android:text="Sick Party"
+                android:hint="Sick Party"
                 android:textSize="14sp" />
         </TableRow>
 
