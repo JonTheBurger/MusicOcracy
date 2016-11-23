@@ -4,12 +4,12 @@ package net.proto;
 option java_multiple_files = true;
 option java_generate_equals_and_hash = true;
 option java_package = "com.musicocracy.fpgk.net.proto";
-option java_outer_classname = "SendVotableSongsMsgProto";
+option java_outer_classname = "VotableSongsReplyProto";
 
-message SendVotableSongsMsg {
+message VotableSongsReply {
     message VotableSong {
         int32 choice_id = 1;
-        string name = 2;
+        string title = 2;
         string artist = 3;
     }
 

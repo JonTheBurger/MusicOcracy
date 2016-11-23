@@ -1,14 +1,14 @@
 package com.musicocracy.fpgk.domain.net;
 
 import com.google.protobuf.MessageLite;
-import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
+import com.musicocracy.fpgk.net.proto.Envelope;
 import com.musicocracy.fpgk.net.proto.MessageType;
 
 import rx.Observable;
 import rx.functions.Func1;
 
 /**
- * A wrapper around {@link RxTcpClient} that translates between {@link EnvelopeMsg} and Strings
+ * A wrapper around {@link RxTcpClient} that translates between {@link Envelope} and Strings
  * @see ServerEventBus
  */
 public class ClientEventBus {
@@ -18,7 +18,7 @@ public class ClientEventBus {
     /**
      * Basic constructor.
      * @param client reactive client used as networking backend
-     * @param factory {@link EnvelopeMsg} to String translator
+     * @param factory {@link Envelope} to String translator
      */
     public ClientEventBus(RxTcpClient client, ProtoEnvelopeFactory factory) {
         this.client = client;
@@ -66,11 +66,11 @@ public class ClientEventBus {
      * An observable stream of all possible events from the server.
      * @return An observable stream of all possible events from the server.
      */
-    public Observable<EnvelopeMsg> getObservable() {
+    public Observable<Envelope> getObservable() {
         return client.getObservable()
-            .map(new Func1<String, EnvelopeMsg>() {
+            .map(new Func1<String, Envelope>() {
                 @Override
-                public EnvelopeMsg call(String base64) {
+                public Envelope call(String base64) {
                     return factory.envelopeFromBase64(base64);
                 }
             });
@@ -81,11 +81,11 @@ public class ClientEventBus {
      * @param type Designates the type of messages to listen for
      * @return An observable stream of received from the server.
      */
-    public Observable<EnvelopeMsg> getObservable(final MessageType type) {
+    public Observable<Envelope> getObservable(final MessageType type) {
         return getObservable()
-            .filter(new Func1<EnvelopeMsg, Boolean>() {
+            .filter(new Func1<Envelope, Boolean>() {
                 @Override
-                public Boolean call(EnvelopeMsg message) {
+                public Boolean call(Envelope message) {
                     return message.getHeader().getType() == type;
                 }
             });

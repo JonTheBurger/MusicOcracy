@@ -2,8 +2,8 @@ package com.musicocracy.fpgk.mvp.presenter;
 
 import com.musicocracy.fpgk.mvp.model.SongSelectModel;
 import com.musicocracy.fpgk.mvp.view.SongSelectView;
-import com.musicocracy.fpgk.net.proto.BrowseSongsAckMsg;
-import com.musicocracy.fpgk.net.proto.BrowseSongsMsg;
+import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
+import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
 
 import java.util.ArrayList;
 
@@ -20,24 +20,23 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
         this.model = model;
         browseSubscription = model.getBrowseResponse()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<BrowseSongsAckMsg>() {
+                .subscribe(new Action1<BrowseSongsReply>() {
             @Override
-            public void call(BrowseSongsAckMsg browseSongsAckMsg) {
-                onBrowseResultsReceived(browseSongsAckMsg);
+            public void call(BrowseSongsReply BrowseSongsReply) {
+                onBrowseResultsReceived(BrowseSongsReply);
             }
         });
     }
 
     public void populateBrowseSongs(String requestString) {
-        BrowseSongsMsg msg = BrowseSongsMsg.newBuilder()
-                .setArtist("")
+        BrowseSongsRequest msg = BrowseSongsRequest.newBuilder()
                 .setSongTitle(requestString)
                 .build();
 
         model.sendBrowseMsg(msg);
     }
 
-    public void onBrowseResultsReceived(BrowseSongsAckMsg msg) {
+    public void onBrowseResultsReceived(BrowseSongsReply msg) {
         ArrayList<String> testList = new ArrayList<>();
         for (int i = 0; i < msg.getSongsCount(); i++) {
             testList.add(msg.getSongs(i).toString());

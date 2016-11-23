@@ -1,0 +1,11 @@
+syntax = "proto3";
+package net.proto;
+
+option java_multiple_files = true;
+option java_package = "com.musicocracy.fpgk.net.proto";
+option java_outer_classname = "CoinStatusReplyProto";
+
+message CoinStatusReply {
+    int32 coin_count = 1;
+    int64 time_to_next_coin = 2;
+}

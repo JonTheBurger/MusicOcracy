@@ -5,7 +5,7 @@ import com.musicocracy.fpgk.domain.net.ClientEventBus;
 import com.musicocracy.fpgk.domain.net.ProtoEnvelopeFactory;
 import com.musicocracy.fpgk.domain.net.ProtoMessageBySender;
 import com.musicocracy.fpgk.domain.net.ServerEventBus;
-import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
+import com.musicocracy.fpgk.net.proto.Envelope;
 import com.musicocracy.fpgk.net.proto.MessageType;
 
 import rx.Observable;
@@ -29,14 +29,14 @@ public class NetworkTestModel {
         return server.getIsRunningObservable();
     }
 
-    public Observable<EnvelopeMsg> getClientReceiver() {
-        Observable<EnvelopeMsg> votable = client.getObservable(MessageType.SEND_VOTABLE_SONGS);
-        Observable<EnvelopeMsg> browse = client.getObservable(MessageType.BROWSE_SONGS_ACK);
+    public Observable<Envelope> getClientReceiver() {
+        Observable<Envelope> votable = client.getObservable(MessageType.VOTABLE_SONGS_REPLY);
+        Observable<Envelope> browse = client.getObservable(MessageType.BROWSE_SONGS_REPLY);
         return Observable.merge(votable, browse);
     }
 
     public Observable<ProtoMessageBySender> getServerReceiver() {
-        return server.getObservable(MessageType.BROWSE_SONGS);
+        return server.getObservable(MessageType.BROWSE_SONGS_REQUEST);
     }
 
     public Observable<String> getClientLog() {

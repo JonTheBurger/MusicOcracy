@@ -1,14 +1,14 @@
 package com.musicocracy.fpgk.domain.net;
 
 import com.google.protobuf.MessageLite;
-import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
+import com.musicocracy.fpgk.net.proto.Envelope;
 import com.musicocracy.fpgk.net.proto.MessageType;
 
 import rx.Observable;
 import rx.functions.Func1;
 
 /**
- * A wrapper around {@link RxTcpServer} that translates between {@link EnvelopeMsg} and String
+ * A wrapper around {@link RxTcpServer} that translates between {@link Envelope} and String
  * @see ClientEventBus
  */
 public class ServerEventBus {
@@ -18,7 +18,7 @@ public class ServerEventBus {
     /**
      * Basic constructor.
      * @param server reactive client used as networking backend
-     * @param factory {@link EnvelopeMsg} to String translator
+     * @param factory {@link Envelope} to String translator
      */
     public ServerEventBus(RxTcpServer server, ProtoEnvelopeFactory factory) {
         this.server = server;

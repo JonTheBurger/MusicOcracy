@@ -3,9 +3,9 @@ package com.musicocracy.fpgk.mvp.model;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.domain.net.ClientEventBus;
 import com.musicocracy.fpgk.domain.spotify.Browser;
-import com.musicocracy.fpgk.net.proto.BrowseSongsAckMsg;
-import com.musicocracy.fpgk.net.proto.BrowseSongsMsg;
-import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
+import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
+import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
+import com.musicocracy.fpgk.net.proto.Envelope;
 import com.musicocracy.fpgk.net.proto.MessageType;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
@@ -23,19 +23,19 @@ public class SongSelectModel {
         this.client = client;
     }
 
-    public void sendBrowseMsg(BrowseSongsMsg msg) {
+    public void sendBrowseMsg(BrowseSongsRequest msg) {
         client.send(msg);
     }
 
-    public Observable<BrowseSongsAckMsg> getBrowseResponse() {
-        return client.getObservable(MessageType.BROWSE_SONGS_ACK)
-                .map(new Func1<EnvelopeMsg, BrowseSongsAckMsg>() {
+    public Observable<BrowseSongsReply> getBrowseResponse() {
+        return client.getObservable(MessageType.BROWSE_SONGS_REPLY)
+                .map(new Func1<Envelope, BrowseSongsReply>() {
                     @Override
-                    public BrowseSongsAckMsg call(EnvelopeMsg envelopeMsg) {
+                    public BrowseSongsReply call(Envelope Envelope) {
                         try {
-                            return BrowseSongsAckMsg.parseFrom(envelopeMsg.getBody());
+                            return BrowseSongsReply.parseFrom(Envelope.getBody());
                         } catch (InvalidProtocolBufferException e) {
-                            return BrowseSongsAckMsg.getDefaultInstance();
+                            return BrowseSongsReply.getDefaultInstance();
                         }
                     }
                 });

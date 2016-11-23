@@ -3,12 +3,12 @@ package com.musicocracy.fpgk.mvp.presenter;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.mvp.model.NetworkTestModel;
 import com.musicocracy.fpgk.domain.net.ProtoMessageBySender;
-import com.musicocracy.fpgk.net.proto.BrowseSongsAckMsg;
-import com.musicocracy.fpgk.net.proto.BrowseSongsMsg;
-import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
+import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
+import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
+import com.musicocracy.fpgk.net.proto.Envelope;
 import com.musicocracy.fpgk.net.proto.MessageType;
-import com.musicocracy.fpgk.net.proto.SendVotableSongsMsg;
 import com.musicocracy.fpgk.mvp.view.NetworkTestView;
+import com.musicocracy.fpgk.net.proto.VotableSongsReply;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -29,16 +29,16 @@ public class NetworkTestPresenter implements Presenter<NetworkTestView> {
 
     public NetworkTestPresenter(final NetworkTestModel model) {
         this.model = model;
-        clientSub = model.getClientReceiver().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<EnvelopeMsg>() {
+        clientSub = model.getClientReceiver().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Envelope>() {
             @Override
-            public void call(EnvelopeMsg message) {
+            public void call(Envelope message) {
                 String parsed = "ERROR: Unrecognized message";
 
                 try {
-                    if (message.getHeader().getType() == MessageType.BROWSE_SONGS_ACK) {
-                        parsed = BrowseSongsAckMsg.parseFrom(message.getBody()).toString();
-                    } else if (message.getHeader().getType() == MessageType.SEND_VOTABLE_SONGS) {
-                        parsed = SendVotableSongsMsg.parseFrom(message.getBody()).toString();
+                    if (message.getHeader().getType() == MessageType.BROWSE_SONGS_REPLY) {
+                        parsed = BrowseSongsReply.parseFrom(message.getBody()).toString();
+                    } else if (message.getHeader().getType() == MessageType.VOTABLE_SONGS_REPLY) {
+                        parsed = VotableSongsReply.parseFrom(message.getBody()).toString();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -50,14 +50,14 @@ public class NetworkTestPresenter implements Presenter<NetworkTestView> {
         serverSub = model.getServerReceiver().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ProtoMessageBySender>() {
             @Override
             public void call(ProtoMessageBySender messageBySender) {
-                BrowseSongsMsg received = BrowseSongsMsg.getDefaultInstance();
+                BrowseSongsRequest received = BrowseSongsRequest.getDefaultInstance();
                 try {
-                    received = BrowseSongsMsg.parseFrom(messageBySender.message.getBody());
+                    received = BrowseSongsRequest.parseFrom(messageBySender.message.getBody());
                     view.logServerEvent(received.toString());
                 } catch (InvalidProtocolBufferException e) {
                     e.printStackTrace();
                 }
-                BrowseSongsAckMsg response = BrowseSongsAckMsg.getDefaultInstance();
+                BrowseSongsReply response = BrowseSongsReply.getDefaultInstance();
                 messageBySender.replyWith(response);
             }
         });
@@ -115,15 +115,15 @@ public class NetworkTestPresenter implements Presenter<NetworkTestView> {
     }
 
     public void serverSend() {
-        SendVotableSongsMsg votableSongs = SendVotableSongsMsg.newBuilder()
-                .addSongs(SendVotableSongsMsg.VotableSong.newBuilder()
+        VotableSongsReply votableSongs = VotableSongsReply.newBuilder()
+                .addSongs(VotableSongsReply.VotableSong.newBuilder()
                         .setArtist("Queen")
-                        .setName("Killer Queen")
+                        .setTitle("Killer Queen")
                         .setChoiceId(serverMsg)
                         .build())
-                .addSongs(SendVotableSongsMsg.VotableSong.newBuilder()
+                .addSongs(VotableSongsReply.VotableSong.newBuilder()
                         .setArtist("Queen")
-                        .setName("Good Old Fashioned Lover Boy")
+                        .setTitle("Good Old Fashioned Lover Boy")
                         .setChoiceId(serverMsg + 1)
                         .build())
                 .build();
@@ -132,8 +132,7 @@ public class NetworkTestPresenter implements Presenter<NetworkTestView> {
     }
 
     public void clientSend() {
-        BrowseSongsMsg request = BrowseSongsMsg.newBuilder()
-                .setArtist("Queen" + String.valueOf(clientMsg))
+        BrowseSongsRequest request = BrowseSongsRequest.newBuilder()
                 .setSongTitle("Bicycle" + String.valueOf(clientMsg))
                 .build();
         clientMsg++;
