@@ -10,6 +10,7 @@ import com.musicocracy.fpgk.net.proto.BasicReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
 import com.musicocracy.fpgk.net.proto.CoinStatusReply;
+import com.musicocracy.fpgk.net.proto.CoinStatusRequest;
 import com.musicocracy.fpgk.net.proto.ConnectRequest;
 import com.musicocracy.fpgk.net.proto.Envelope;
 import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
@@ -34,7 +35,7 @@ public class ProtoEnvelopeFactory {
         map.put(MessageType.VOTABLE_SONGS_REPLY, VotableSongsReply.class);
         map.put(MessageType.BROWSE_SONGS_REQUEST, BrowseSongsRequest.class);
         map.put(MessageType.BROWSE_SONGS_REPLY, BrowseSongsReply.class);
-        map.put(MessageType.COIN_STATUS_REQUEST, ConnectRequest.class);
+        map.put(MessageType.COIN_STATUS_REQUEST, CoinStatusRequest.class);
         map.put(MessageType.COIN_STATUS_REPLY, CoinStatusReply.class);
 
         messageTypeMap = Maps.unmodifiableBiMap(map);
