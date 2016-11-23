@@ -7,8 +7,12 @@ option java_package = "com.musicocracy.fpgk.net.proto";
 option java_outer_classname = "BrowseSongsAckMsgProto";
 
 message BrowseSongsAckMsg {
-    string song_title = 1;
-    string artist = 2;
-    string uri = 3;
-    string music_service = 4;
+    message BrowsableSong {
+        string song_title = 1;
+        string artist = 2;
+        string uri = 3;
+        string music_service = 4;
+    }
+
+    repeated BrowsableSong songs = 1;
 }

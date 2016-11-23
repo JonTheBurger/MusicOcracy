@@ -68,4 +68,10 @@ public class SongSelectActivity extends ActivityBase<SongSelectView> implements 
     protected void daggerInject() {
         CyberJukeboxApplication.getComponent(this).inject(this);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
 }

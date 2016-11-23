@@ -57,12 +57,7 @@ public class NetworkTestPresenter implements Presenter<NetworkTestView> {
                 } catch (InvalidProtocolBufferException e) {
                     e.printStackTrace();
                 }
-                BrowseSongsAckMsg response = BrowseSongsAckMsg.newBuilder()
-                        .setMusicService("Spotify")
-                        .setUri("URI")
-                        .setArtist(received.getArtist())
-                        .setSongTitle(received.getSongTitle())
-                        .build();
+                BrowseSongsAckMsg response = BrowseSongsAckMsg.getDefaultInstance();
                 messageBySender.replyWith(response);
             }
         });
