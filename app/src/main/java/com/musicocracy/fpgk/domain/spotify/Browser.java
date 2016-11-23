@@ -16,29 +16,11 @@ import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Track;
 
 public class Browser {
-    private static final String CLIENT_ID = "4becf88681f74bda9e38baac3bcf66d6";
     private static final int NUM_RESULTS = 10;
-    private static SpotifyApi api;
-    private static SpotifyService spotify;
-    private static String token;
-    private Player mPlayer;
+    private final SpotifyService spotify;
 
-    public Browser(String token, Context context) {
-        api = new SpotifyApi();
-        api.setAccessToken(token);
-        spotify = api.getService();
-        Config playerConfig = new Config(context, token, CLIENT_ID);
-        Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
-            @Override
-            public void onInitialized(SpotifyPlayer spotifyPlayer) {
-                mPlayer = spotifyPlayer;
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                Log.e("TestBrowseActivity", "Could not initialize player: " + throwable.getMessage());
-            }
-        });
+    public Browser(SpotifyService spotify) {
+        this.spotify = spotify;
     }
 
     public List<String> browseTracks(String trackName) {

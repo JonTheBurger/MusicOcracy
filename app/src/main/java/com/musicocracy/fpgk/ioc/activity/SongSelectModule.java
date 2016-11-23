@@ -1,5 +1,6 @@
 package com.musicocracy.fpgk.ioc.activity;
 
+import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.mvp.model.SongSelectModel;
 import com.musicocracy.fpgk.mvp.presenter.SongSelectPresenter;
 
@@ -9,8 +10,8 @@ import dagger.Provides;
 @Module
 public class SongSelectModule {
     @Provides
-    public SongSelectModel provideSongSelectModel() {
-        return new SongSelectModel();
+    public SongSelectModel provideSongSelectModel(Browser browser) {
+        return new SongSelectModel(browser, api);
     }
 
     @Provides
