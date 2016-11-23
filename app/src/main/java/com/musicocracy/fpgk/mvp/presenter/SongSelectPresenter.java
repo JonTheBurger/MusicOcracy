@@ -2,6 +2,7 @@ package com.musicocracy.fpgk.mvp.presenter;
 
 import com.musicocracy.fpgk.mvp.model.SongSelectModel;
 import com.musicocracy.fpgk.mvp.view.SongSelectView;
+import com.musicocracy.fpgk.net.proto.BrowseSongsMsg;
 
 import java.util.ArrayList;
 
@@ -14,7 +15,10 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     }
 
     public void populateBrowseSongs(String requestString) {
-                
+        BrowseSongsMsg msg = BrowseSongsMsg.newBuilder()
+                .setArtist("")
+                .setSongTitle(requestString)
+                .build();
 
         ArrayList<String> testList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

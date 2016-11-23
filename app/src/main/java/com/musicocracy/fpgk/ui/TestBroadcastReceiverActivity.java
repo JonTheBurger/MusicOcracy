@@ -73,7 +73,7 @@ public class TestBroadcastReceiverActivity extends AppCompatActivity implements 
                 Bundle authBundle = intent.getExtras();
                 token = authBundle.getString(getString(R.string.result_string));
 
-                browser = new Browser(token, this);
+                //browser = new Browser(token, this);
 
                 rt = new ReceiveThread(token, socket, this);
                 rt.execute();

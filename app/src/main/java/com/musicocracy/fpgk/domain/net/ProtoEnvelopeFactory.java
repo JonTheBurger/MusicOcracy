@@ -43,14 +43,25 @@ public class ProtoEnvelopeFactory {
         return messageTypeMap;
     }
 
-    public EnvelopeMsg createEnvelopeFor(MessageLite body) {
-        return createEnvelopeFor(body, CURRENT_VERSION);
+    public EnvelopeMsg createEnvelopeFor(MessageLite message) {
+        return createEnvelopeFor(message, CURRENT_VERSION);
     }
 
-    public EnvelopeMsg createEnvelopeFor(MessageLite body, int version) {
+    public EnvelopeMsg createEnvelopeFor(MessageLite message, int version) {
+        if (!(message instanceof EnvelopeMsg)) {
+            return createEnvelopeForRaw(message, version);
+        } else if (((EnvelopeMsg)message).getHeader().getVersion() == version) {
+            return (EnvelopeMsg)message;
+        } else {
+            throw new IllegalArgumentException("Attempted to create EnvelopeMsg of version " + version + " with an EnvelopeMsg of version " + ((EnvelopeMsg)message).getHeader().getVersion());
+        }
+    }
+
+    // Assumes MessageLite !instanceof EnvelopeMsg
+    private EnvelopeMsg createEnvelopeForRaw(MessageLite message, int version) {
         switch (version) {
             case 0:
-                return createEnvelopeVersion0(body);
+                return createEnvelopeVersion0(message);
             default:
                 return EnvelopeMsg.getDefaultInstance();
         }

@@ -20,6 +20,7 @@ import butterknife.OnClick;
 
 public class SongSelectActivity extends ActivityBase<SongSelectView> implements SongSelectView {
     private static final String TAG = "SongSelectActivity";
+    private static final int AUTHENTICATION_REQUEST_CODE = 1001;
     private ArrayAdapter<String> adapter;
 
     @Inject SongSelectPresenter presenter;

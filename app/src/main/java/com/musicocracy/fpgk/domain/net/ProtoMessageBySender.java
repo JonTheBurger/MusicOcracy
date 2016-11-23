@@ -15,9 +15,7 @@ public class ProtoMessageBySender {
     }
 
     public void replyWith(MessageLite message) {
-        if (!(message instanceof EnvelopeMsg)) {
-            message = factory.createEnvelopeFor(message);
-        }
-        raw.sender.writeAndFlush(factory.envelopeToBase64((EnvelopeMsg)message));
+        EnvelopeMsg envelope = factory.createEnvelopeFor(message);
+        raw.sender.writeAndFlush(factory.envelopeToBase64(envelope));
     }
 }

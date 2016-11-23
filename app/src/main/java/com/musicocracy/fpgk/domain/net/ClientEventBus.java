@@ -1,5 +1,6 @@
 package com.musicocracy.fpgk.domain.net;
 
+import com.google.protobuf.MessageLite;
 import com.musicocracy.fpgk.net.proto.EnvelopeMsg;
 import com.musicocracy.fpgk.net.proto.MessageType;
 
@@ -38,8 +39,8 @@ public class ClientEventBus {
      * Sends a message to the connected server. If no server is connected, the message is swallowed.
      * @param message Message that will attempted to be sent to the server.
      */
-    public void send(EnvelopeMsg message) {
-        client.send(factory.envelopeToBase64(message));
+    public void send(MessageLite message) {
+        client.send(factory.envelopeToBase64(factory.createEnvelopeFor(message)));
     }
 
     /**
