@@ -3,7 +3,7 @@ package com.musicocracy.fpgk.mvp.presenter;
 import android.content.Context;
 
 import com.musicocracy.fpgk.mvp.model.PartyConfigModel;
-import com.musicocracy.fpgk.domain.net.IpUtils;
+import com.musicocracy.fpgk.domain.net.NetworkUtils;
 import com.musicocracy.fpgk.mvp.view.PartyConfigView;
 
 public class PartyConfigPresenter implements Presenter<PartyConfigView> {
@@ -15,8 +15,8 @@ public class PartyConfigPresenter implements Presenter<PartyConfigView> {
     }
 
     public void onCreate(Context context) {
-        String address = IpUtils.getMyIpAddress(context);
-        view.setPartyCode(IpUtils.ipAddressToBase36(address));
+        String address = NetworkUtils.getMyIpAddress(context);
+        view.setPartyCode(NetworkUtils.ipAddressToBase36(address).toUpperCase());
     }
 
     public void confirmSettings() {

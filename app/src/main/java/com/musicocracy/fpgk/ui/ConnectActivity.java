@@ -29,7 +29,7 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.activity_connect, this);
-        setImageBtnEnabled(false);
+        setForwardBtnEnabled(false);
     }
 
     @Override
@@ -41,30 +41,24 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
     @OnTextChanged(value = {R.id.party_code_edit_text, R.id.party_name_edit_text}, callback = OnTextChanged.Callback.TEXT_CHANGED)
     public void onTextChanged() {
         if (partyCode.toString().trim().length() == 0 || partyName.toString().trim().length() == 0) {
-            setImageBtnEnabled(false);
+            setForwardBtnEnabled(false);
         } else {
-            setImageBtnEnabled(true);
+            setForwardBtnEnabled(true);
         }
     }
 
     @OnClick(R.id.connect_back_btn)
     public void backClick() {
-        presenter.stopClient();
+        presenter.leaveParty();
         onBackPressed();
     }
 
     @OnClick(R.id.connect_forward_btn)
     public void forwardClick() {
-        if (presenter.startClient()) {
-            Intent intent = new Intent(ConnectActivity.this, RequestActivity.class);
-            ConnectActivity.this.startActivity(intent);
-        } else {
-            CharSequence text = "Connection Failed.";
-            Toast.makeText(this, text, Toast.LENGTH_SHORT);
-        }
+        presenter.joinParty();
     }
 
-    private void setImageBtnEnabled(boolean enabled) {
+    private void setForwardBtnEnabled(boolean enabled) {
         forwardBtn.setEnabled(enabled);
         forwardBtn.setClickable(enabled);
         forwardBtn.setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
@@ -79,6 +73,18 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
     @Override
     public String getPartyName() {
         return partyName.getText().toString();
+    }
+
+    @Override
+    public void onJoinSuccess() {
+        Intent intent = new Intent(ConnectActivity.this, RequestActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onJoinError(String error) {
+        CharSequence text = "Connection Failed: " + error;
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
     //endregion View Implementation
 

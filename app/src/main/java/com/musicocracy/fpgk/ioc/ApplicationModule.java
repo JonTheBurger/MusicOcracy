@@ -1,9 +1,11 @@
 package com.musicocracy.fpgk.ioc;
 
 import android.content.Context;
+import android.provider.Settings;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -11,6 +13,8 @@ import dagger.Provides;
 
 @Module
 public class ApplicationModule {
+    public static final String UNIQUE_ANDROID_ID = "Unique Android Id";
+
     // Modules provide instances of classes
     // A program can have multiple modules for the purpose of modularity.
     private final CyberJukeboxApplication application;
@@ -26,8 +30,14 @@ public class ApplicationModule {
     }
 
     @Provides
-    @Singleton
     public Context provideContext() {
         return this.application;
+    }
+
+    @Provides
+    @Named(UNIQUE_ANDROID_ID)
+    @Singleton
+    public String provideUniqueId(Context context) {
+        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 }

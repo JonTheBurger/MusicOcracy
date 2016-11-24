@@ -1,5 +1,8 @@
 package com.musicocracy.fpgk.ioc;
 
+import android.content.Context;
+
+import com.musicocracy.fpgk.CyberJukeboxApplication;
 import com.musicocracy.fpgk.ioc.activity.AddTermModule;
 import com.musicocracy.fpgk.ioc.activity.BlacklistModule;
 import com.musicocracy.fpgk.ioc.activity.ConnectModule;
@@ -49,6 +52,7 @@ modules = {  // The dependency injection endpoints require class instances provi
 })
 public interface ApplicationComponent {
     // We put dependency injection endpoints here, e.g. Activities as inject methods.
+    void inject(CyberJukeboxApplication application);
     void inject(TestNetworkTestActivity activity); // Tell Dagger that TestNetworkTestActivity opts in to dependency injection.
     void inject(AddTermActivity activity);
     void inject(BlacklistActivity activity);

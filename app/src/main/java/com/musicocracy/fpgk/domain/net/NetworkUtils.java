@@ -4,14 +4,15 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 
 import com.google.common.net.InetAddresses;
+import com.google.protobuf.MessageLite;
+import com.musicocracy.fpgk.net.proto.Envelope;
 
 import java.net.InetAddress;
 
 import static android.content.Context.WIFI_SERVICE;
 
-public class IpUtils {
-    public static final int DEFAULT_PORT = 2025;
-
+public class NetworkUtils {
+    //region IP Address
     public static String ipAddressToBase36(String ipAddress) {
         InetAddress inetAddress = InetAddresses.forString(ipAddress);
         return inetAddressToBase36(inetAddress);
@@ -37,4 +38,5 @@ public class IpUtils {
         InetAddress inetAddress = InetAddresses.fromInteger(addressAsInt);
         return inetAddress.getHostAddress();
     }
+    //endregion IP Address
 }
