@@ -22,7 +22,7 @@ public class PartyConfigPresenter implements Presenter<PartyConfigView> {
         this.model = model;
     }
 
-    public void onCreate(Context context) {
+    public void onCreate() {
         globalIpSub = Observable.defer(new Func0<Observable<String>>() {
             @Override
             public Observable<String> call() {

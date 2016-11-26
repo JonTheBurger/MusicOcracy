@@ -1,11 +1,8 @@
 package com.musicocracy.fpgk.domain.net;
 
-import android.content.Context;
-import android.net.wifi.WifiManager;
-
 import com.google.common.net.InetAddresses;
-import com.google.protobuf.MessageLite;
-import com.musicocracy.fpgk.net.proto.Envelope;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,8 +10,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
-
-import static android.content.Context.WIFI_SERVICE;
+import java.util.Arrays;
 
 public class NetworkUtils {
     //region IP Address
@@ -25,7 +21,12 @@ public class NetworkUtils {
 
     public static String inetAddressToBase36(InetAddress inetAddress) {
         int addressAsInt = InetAddresses.coerceToInteger(inetAddress);
-        return Integer.toString(addressAsInt, 36);
+        byte[] intBytes = Ints.toByteArray(addressAsInt);
+        byte[] bytes = new byte[8];
+        for (int i = 4; i < 8; i++) {
+            bytes[i] = intBytes[i - 4];
+        }
+        return Long.toString(Longs.fromByteArray(bytes), 36);
     }
 
     public static String base36ToIpAddress(String base36) {
@@ -33,7 +34,9 @@ public class NetworkUtils {
     }
 
     public static InetAddress base36ToInetAddress(String base36) {
-        int addressAsInt = Integer.parseInt(base36, 36);
+        long addressAsLong = Long.parseLong(base36, 36);
+        byte[] bytes = Longs.toByteArray(addressAsLong);
+        int addressAsInt = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
         return InetAddresses.fromInteger(addressAsInt);
     }
 

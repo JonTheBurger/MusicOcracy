@@ -39,7 +39,7 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
         super.onCreate(savedInstanceState, R.layout.activity_party_config, this);
         initMenu();
         initNumberEdits();
-        presenter.onCreate(this);
+        presenter.onCreate();
     }
 
     @Override
