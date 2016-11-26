@@ -39,7 +39,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="36YA9" />
+                android:text="Loading..." />
         </TableRow>
 
         <TableRow android:layout_weight="1">

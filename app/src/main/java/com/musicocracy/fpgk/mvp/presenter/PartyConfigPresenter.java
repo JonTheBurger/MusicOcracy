@@ -6,17 +6,37 @@ import com.musicocracy.fpgk.mvp.model.PartyConfigModel;
 import com.musicocracy.fpgk.domain.net.NetworkUtils;
 import com.musicocracy.fpgk.mvp.view.PartyConfigView;
 
+import rx.Observable;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func0;
+import rx.schedulers.Schedulers;
+
 public class PartyConfigPresenter implements Presenter<PartyConfigView> {
     private final PartyConfigModel model;
     private PartyConfigView view;
+    private Subscription globalIpSub;
 
     public PartyConfigPresenter(PartyConfigModel model) {
         this.model = model;
     }
 
     public void onCreate(Context context) {
-        String address = NetworkUtils.getMyIpAddress(context);
-        view.setPartyCode(NetworkUtils.ipAddressToBase36(address).toUpperCase());
+        globalIpSub = Observable.defer(new Func0<Observable<String>>() {
+            @Override
+            public Observable<String> call() {
+                return Observable.just(NetworkUtils.getPublicIpAddress());
+            }
+        })
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Action1<String>() {
+            @Override
+            public void call(String address) {
+                view.setPartyCode(NetworkUtils.ipAddressToBase36(address).toUpperCase());
+            }
+        });
     }
 
     public void confirmSettings() {
@@ -31,6 +51,12 @@ public class PartyConfigPresenter implements Presenter<PartyConfigView> {
 
     public void onBack() throws InterruptedException {
         model.stopServer();
+    }
+
+    public void onDestroy() {
+        if (globalIpSub != null && !globalIpSub.isUnsubscribed()) {
+            globalIpSub.unsubscribe();
+        }
     }
 
     @Override

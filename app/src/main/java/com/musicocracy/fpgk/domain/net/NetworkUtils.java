@@ -7,7 +7,12 @@ import com.google.common.net.InetAddresses;
 import com.google.protobuf.MessageLite;
 import com.musicocracy.fpgk.net.proto.Envelope;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.URL;
+import java.net.URLConnection;
 
 import static android.content.Context.WIFI_SERVICE;
 
@@ -32,11 +37,16 @@ public class NetworkUtils {
         return InetAddresses.fromInteger(addressAsInt);
     }
 
-    public static String getMyIpAddress(Context context) {
-        WifiManager wm = (WifiManager) context.getSystemService(WIFI_SERVICE);
-        int addressAsInt = wm.getConnectionInfo().getIpAddress();
-        InetAddress inetAddress = InetAddresses.fromInteger(addressAsInt);
-        return inetAddress.getHostAddress();
+    public static String getPublicIpAddress() {
+        try {
+            URLConnection conn = new URL("http://api.ipify.org").openConnection();
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String ip = in.readLine();
+            in.close();
+            return ip;
+        } catch (IOException e) {
+            return "";
+        }
     }
     //endregion IP Address
 }

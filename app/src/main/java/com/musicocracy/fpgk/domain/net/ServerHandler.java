@@ -26,7 +26,7 @@ public class ServerHandler {
                         BasicReply reply = BasicReply.newBuilder()
                                 .setSuccess(true)
                                 .setMessage("")
-                                .setReplyingTo(MessageType.CONNECT_REQUEST)
+                                .setReplyingTo(msgBySender.message.getHeader().getType())
                                 .build();
                         msgBySender.replyWith(reply);
                     }

@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
+import com.musicocracy.fpgk.domain.net.NetworkUtils;
 import com.musicocracy.fpgk.mvp.presenter.PartyConfigPresenter;
 import com.musicocracy.fpgk.mvp.presenter.Presenter;
 import com.musicocracy.fpgk.mvp.view.PartyConfigView;
@@ -39,6 +40,12 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
         initMenu();
         initNumberEdits();
         presenter.onCreate(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
     }
 
     @Override
@@ -72,6 +79,7 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
     @Override
     public void setPartyCode(String code) {
         partyCode.setText(code);
+        Log.i(TAG, "Code: " + code + " : " + NetworkUtils.base36ToIpAddress(code));
     }
 
     @Override
