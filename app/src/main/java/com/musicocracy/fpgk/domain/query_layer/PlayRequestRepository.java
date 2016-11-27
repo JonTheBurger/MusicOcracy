@@ -22,11 +22,23 @@ public class PlayRequestRepository {
         this.database = database;
     }
 
-    public void addRequestToQueue(PlayRequest playRequest) {
+    public void add(PlayRequest playRequest) {
         try {
+            dao = database.getPlayRequestDao();
             dao.createOrUpdate(playRequest);
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public List<String> getVotableSongIds(int count) {
+        List<String> returnList = new ArrayList<>();
+        try {
+            dao = database.getPlayRequestDao();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            return returnList;
         }
     }
 

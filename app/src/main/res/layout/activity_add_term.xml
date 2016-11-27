@@ -28,7 +28,7 @@
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Add a Song Title or Artist to Filter From Records"
+            android:text="@string/add_a_song_title_or_artist_to_filter_from_records"
             android:textAlignment="center"
             android:textSize="30sp" />
 
@@ -38,12 +38,12 @@
             android:minHeight="30dp" />
 
         <EditText
-            android:id="@+id/addTermText"
+            android:id="@+id/add_term_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Song/Artist"
+            android:text="@string/song_artist"
             android:textAlignment="center" />
 
         <Space
@@ -55,7 +55,7 @@
             android:id="@+id/textView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Or Use CJ's Curate Song List"
+            android:text="@string/or_use_cj_s_curate_song_list"
             android:textAlignment="center"
             android:textSize="30sp" />
 
@@ -65,15 +65,15 @@
             android:minHeight="30dp" />
 
         <Button
-            android:id="@+id/useListButton"
+            android:id="@+id/use_list_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Use List!"
+            android:text="@string/use_list"
             android:textSize="18sp" />
     </LinearLayout>
 
     <ImageButton
-        android:id="@+id/addTermBackButton"
+        android:id="@+id/add_term_back_button"
         style="@style/QuarterButtonTheme"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
@@ -82,7 +82,7 @@
         app:srcCompat="@drawable/back_arrow" />
 
     <ImageButton
-        android:id="@+id/addTermForwardButton"
+        android:id="@+id/add_term_forward_button"
         style="@style/QuarterButtonTheme"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
