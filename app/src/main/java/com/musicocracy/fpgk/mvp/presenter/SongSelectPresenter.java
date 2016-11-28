@@ -59,7 +59,9 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
 
         ArrayList<String> testList = new ArrayList<>();
         for (int i = 0; i < msg.getSongsCount(); i++) {
-            testList.add(msg.getSongs(i).toString());
+            //testList.add(msg.getSongs(i).toString());
+            testList.add(Integer.toString(i + 1) + ") Title: " + msg.getSongs(i).getTitle()
+                + "\nArtist: " + msg.getSongs(i).getArtist());
         }
 
         view.updateBrowseSongs(testList);
