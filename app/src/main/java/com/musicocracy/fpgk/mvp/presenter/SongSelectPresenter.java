@@ -21,6 +21,7 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     private final Subscription browseSubscription;
     private final Subscription voteSubscription;
     private SongSelectView view;
+    private BrowseSongsReply currentBrowseReply;
 
     public SongSelectPresenter(SongSelectModel model) {
         this.model = model;
@@ -52,6 +53,8 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     }
 
     public void onBrowseResultsReceived(BrowseSongsReply msg) {
+        currentBrowseReply = msg;
+
         ArrayList<String> testList = new ArrayList<>();
         for (int i = 0; i < msg.getSongsCount(); i++) {
             testList.add(msg.getSongs(i).toString());
@@ -74,11 +77,14 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
         view.updateVotableSongs(testList);
     }
 
-    public void playRequest(String song) {
+    public void playRequest(int songId) {
+        BrowseSongsReply.BrowsableSong song = currentBrowseReply.getSongs(songId);
         PlayRequestRequest msg = PlayRequestRequest.newBuilder()
-                .setMusicService("Spotify")
+                .setRequesterId("TODO")
+                .setMusicService(song.getMusicService())
+                .setUri(song.getUri())
                 .build();
-        //TODO: Get URI from string and set it
+        //TODO: Get Requester ID
 
         model.sendPlayRequest(msg);
     }

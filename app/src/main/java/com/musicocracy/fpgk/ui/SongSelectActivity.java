@@ -50,7 +50,7 @@ public class SongSelectActivity extends ActivityBase<SongSelectView> implements 
         AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
-                presenter.playRequest(songs.get(position));
+                presenter.playRequest(position);
             }
         };
         listView.setOnItemClickListener(listener);
