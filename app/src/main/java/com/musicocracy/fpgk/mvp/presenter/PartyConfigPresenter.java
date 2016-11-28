@@ -39,12 +39,13 @@ public class PartyConfigPresenter implements Presenter<PartyConfigView> {
         });
     }
 
-    public void confirmSettings() {
+    public void confirmSettings(String SpotifyToken) {
         model.getSettings().setPartyCode(view.getPartyCode());
         model.getSettings().setPartyName(view.getPartyName());
         model.getSettings().setTokens(view.getTokenCount());
         long refillMillis = (view.getTokenRefillMinutes() * 60 + view.getTokenRefillSeconds()) * 1000;
         model.getSettings().setTokenRefillMillis(refillMillis);
+        model.getSettings().setSpotifyToken(SpotifyToken);
 
         model.startServer();
     }
