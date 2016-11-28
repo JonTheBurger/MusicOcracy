@@ -8,6 +8,7 @@ public class Ipv4ToBase36Tests {
     @Test
     public void Base36IpAddress_SerializeDeserialize_SameReturns() {
         String[] expected = {
+                "192.168.0.100",
                 "174.60.75.1",
                 "127.0.0.1",
                 "0.0.0.0",

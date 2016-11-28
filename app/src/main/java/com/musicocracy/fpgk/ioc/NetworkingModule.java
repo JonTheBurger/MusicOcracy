@@ -6,6 +6,7 @@ import com.musicocracy.fpgk.domain.net.RxTcpClient;
 import com.musicocracy.fpgk.domain.net.RxTcpServer;
 import com.musicocracy.fpgk.domain.net.ServerEventBus;
 import com.musicocracy.fpgk.domain.net.ServerHandler;
+import com.musicocracy.fpgk.domain.util.PartySettings;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -49,8 +50,8 @@ public class NetworkingModule {
 
     @Provides
     @Singleton
-    public ServerHandler provideServerHandler(ServerEventBus eventBus) {
-        return new ServerHandler(eventBus);
+    public ServerHandler provideServerHandler(ServerEventBus eventBus, PartySettings partySettings) {
+        return new ServerHandler(eventBus, partySettings);
     }
 
     @Provides

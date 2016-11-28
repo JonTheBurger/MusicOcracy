@@ -18,4 +18,8 @@ public class ProtoMessageBySender {
         Envelope envelope = factory.createEnvelopeFor(message);
         raw.sender.writeAndFlush(factory.envelopeToBase64(envelope));
     }
+
+    public void closeConnection() {
+        raw.sender.close();
+    }
 }

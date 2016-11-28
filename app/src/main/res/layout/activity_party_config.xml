@@ -51,7 +51,7 @@
                 android:text="Party Name" />
 
             <EditText
-                android:id="@+id/party_name_edit_text"
+                android:id="@+id/config_party_name_edit_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"

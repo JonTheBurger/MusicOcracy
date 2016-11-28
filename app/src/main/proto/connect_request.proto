@@ -9,5 +9,4 @@ option java_outer_classname = "ConnectRequestProto";
 message ConnectRequest {
     string requester_id = 1;
     string party_name = 2;
-    string party_code = 3;
 }

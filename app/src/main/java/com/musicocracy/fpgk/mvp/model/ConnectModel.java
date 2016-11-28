@@ -30,13 +30,12 @@ public class ConnectModel {
     }
 
     public void joinParty(String partyName, String partyCode) {
-        if (!client.isRunning()) {
-            throw new UnsupportedOperationException("Must be connected to request access");
-        }
+//        if (!client.isRunning()) {
+//            throw new UnsupportedOperationException("Must be connected to request access");
+//        }
         ConnectRequest message = ConnectRequest.newBuilder()
                 .setRequesterId(uniqueAndroidId)
                 .setPartyName(partyName)
-                .setPartyCode(partyCode)
                 .build();
         client.send(message);
     }

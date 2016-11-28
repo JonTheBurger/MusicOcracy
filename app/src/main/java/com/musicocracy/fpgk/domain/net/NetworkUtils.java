@@ -1,5 +1,9 @@
 package com.musicocracy.fpgk.domain.net;
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
+
+import com.google.common.collect.Lists;
 import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -11,6 +15,8 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
+
+import static android.content.Context.WIFI_SERVICE;
 
 public class NetworkUtils {
     //region IP Address
@@ -38,6 +44,14 @@ public class NetworkUtils {
         byte[] bytes = Longs.toByteArray(addressAsLong);
         int addressAsInt = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
         return InetAddresses.fromInteger(addressAsInt);
+    }
+
+    public static String getLocalIpAddress(Context context) {
+        WifiManager wifi = (WifiManager)context.getSystemService(WIFI_SERVICE);
+        int raw = wifi.getConnectionInfo().getIpAddress();
+        InetAddress inet = InetAddresses.fromInteger(raw);
+        String[] bytes = inet.getHostAddress().split("\\.");
+        return bytes[3] + '.' + bytes[2] + '.' + bytes[1] + '.' + bytes[0]; // For some reason Android gives the ip address bytes in reverse
     }
 
     public static String getPublicIpAddress() {

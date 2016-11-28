@@ -2,12 +2,12 @@ package com.musicocracy.fpgk.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
+import com.musicocracy.fpgk.domain.util.AndroidViewUtils;
 import com.musicocracy.fpgk.mvp.presenter.ConnectPresenter;
 import com.musicocracy.fpgk.mvp.presenter.Presenter;
 import com.musicocracy.fpgk.mvp.view.ConnectView;
@@ -29,7 +29,7 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.activity_connect, this);
-        setForwardBtnEnabled(false);
+        AndroidViewUtils.setImgBtnEnabled(forwardBtn, false);
     }
 
     @Override
@@ -41,27 +41,21 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
     @OnTextChanged(value = {R.id.party_code_edit_text, R.id.party_name_edit_text}, callback = OnTextChanged.Callback.TEXT_CHANGED)
     public void onTextChanged() {
         if (partyCode.toString().trim().length() == 0 || partyName.toString().trim().length() == 0) {
-            setForwardBtnEnabled(false);
+            AndroidViewUtils.setImgBtnEnabled(forwardBtn, false);
         } else {
-            setForwardBtnEnabled(true);
+            AndroidViewUtils.setImgBtnEnabled(forwardBtn, true);
         }
     }
 
     @OnClick(R.id.connect_back_btn)
     public void backClick() {
+        super.onBackPressed();
         presenter.leaveParty();
-        onBackPressed();
     }
 
     @OnClick(R.id.connect_forward_btn)
     public void forwardClick() {
         presenter.joinParty();
-    }
-
-    private void setForwardBtnEnabled(boolean enabled) {
-        forwardBtn.setEnabled(enabled);
-        forwardBtn.setClickable(enabled);
-        forwardBtn.setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
     }
 
     //region View Implementation
@@ -79,6 +73,7 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
     public void onJoinSuccess() {
         Intent intent = new Intent(ConnectActivity.this, RequestActivity.class);
         startActivity(intent);
+        presenter.onDestroy();
     }
 
     @Override
