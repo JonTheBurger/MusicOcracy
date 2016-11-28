@@ -7,6 +7,8 @@ import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
 import com.musicocracy.fpgk.net.proto.Envelope;
 import com.musicocracy.fpgk.net.proto.MessageType;
+import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
+import com.musicocracy.fpgk.net.proto.SendVoteRequest;
 import com.musicocracy.fpgk.net.proto.VotableSongsReply;
 import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
 
@@ -58,6 +60,10 @@ public class SongSelectModel {
                     }
                 });
     }
+
+    public void sendPlayRequest(PlayRequestRequest msg) { client.send(msg); }
+
+    public void sendVoteRequest(SendVoteRequest msg) { client.send(msg); }
 
     public void setToken(String token) {
         api.setAccessToken(token);

@@ -2,6 +2,8 @@ package com.musicocracy.fpgk.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -41,10 +43,33 @@ public class SongSelectActivity extends ActivityBase<SongSelectView> implements 
     }
 
     @Override
-    public void updateSongs(List<String> songs) {
+    public void updateBrowseSongs(final List<String> songs) {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, songs);
         listView.setAdapter(adapter);
+
+        AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                                    long id) {
+                presenter.playRequest(songs.get(position));
+            }
+        };
+        listView.setOnItemClickListener(listener);
     }
+
+    @Override
+    public void updateVotableSongs(List<String> songs) {
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, songs);
+        listView.setAdapter(adapter);
+
+        AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                                    long id) {
+                presenter.voteRequest(position);
+            }
+        };
+        listView.setOnItemClickListener(listener);
+    }
+
 
     @OnClick(R.id.selectBackButton)
     public void backClick() {

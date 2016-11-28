@@ -1,9 +1,12 @@
 package com.musicocracy.fpgk.mvp.presenter;
 
+import com.musicocracy.fpgk.domain.dal.PlayRequest;
 import com.musicocracy.fpgk.mvp.model.SongSelectModel;
 import com.musicocracy.fpgk.mvp.view.SongSelectView;
 import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
+import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
+import com.musicocracy.fpgk.net.proto.SendVoteRequest;
 import com.musicocracy.fpgk.net.proto.VotableSongsReply;
 import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
 
@@ -54,7 +57,7 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
             testList.add(msg.getSongs(i).toString());
         }
 
-        view.updateSongs(testList);
+        view.updateBrowseSongs(testList);
     }
 
     public void populateVoteSongs() {
@@ -68,7 +71,25 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
         for (int i = 0; i < msg.getSongsCount(); i++) {
             testList.add(msg.getSongs(i).toString());
         }
-        view.updateSongs(testList);
+        view.updateVotableSongs(testList);
+    }
+
+    public void playRequest(String song) {
+        PlayRequestRequest msg = PlayRequestRequest.newBuilder()
+                .setMusicService("Spotify")
+                .build();
+        //TODO: Get URI from string and set it
+
+        model.sendPlayRequest(msg);
+    }
+
+    public void voteRequest(int songId) {
+        SendVoteRequest msg = SendVoteRequest.newBuilder()
+                .setChoiceId(songId)
+                .build();
+        //TODO: Make sure songId is the correct song to vote for.
+
+        model.sendVoteRequest(msg);
     }
 
     public void onDestroy() {
