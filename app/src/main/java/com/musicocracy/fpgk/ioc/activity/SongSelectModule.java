@@ -2,8 +2,11 @@ package com.musicocracy.fpgk.ioc.activity;
 
 import com.musicocracy.fpgk.domain.net.ClientEventBus;
 import com.musicocracy.fpgk.domain.util.Logger;
+import com.musicocracy.fpgk.ioc.ApplicationModule;
 import com.musicocracy.fpgk.mvp.model.SongSelectModel;
 import com.musicocracy.fpgk.mvp.presenter.SongSelectPresenter;
+
+import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
@@ -16,7 +19,7 @@ public class SongSelectModule {
     }
 
     @Provides
-    public SongSelectPresenter provideSongSelectPresenter(SongSelectModel model) {
-        return new SongSelectPresenter(model);
+    public SongSelectPresenter provideSongSelectPresenter(SongSelectModel model, @Named(ApplicationModule.UNIQUE_ANDROID_ID)String uniqueAndroidId) {
+        return new SongSelectPresenter(model, uniqueAndroidId);
     }
 }

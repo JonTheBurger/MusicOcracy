@@ -20,10 +20,11 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     private final SongSelectModel model;
     private final Subscription browseSubscription;
     private final Subscription voteSubscription;
+    private final String uniqueAndroidId;
     private SongSelectView view;
     private BrowseSongsReply currentBrowseReply;
 
-    public SongSelectPresenter(SongSelectModel model) {
+    public SongSelectPresenter(SongSelectModel model, String uniqueAndroidId) {
         this.model = model;
         browseSubscription = model.getBrowseReply()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -42,6 +43,7 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
                         onVotableSongsReceived(VotableSongsReply);
                     }
                 });
+        this.uniqueAndroidId = uniqueAndroidId;
     }
 
     public void populateBrowseSongs(String requestString) {
@@ -80,11 +82,10 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     public void playRequest(int songId) {
         BrowseSongsReply.BrowsableSong song = currentBrowseReply.getSongs(songId);
         PlayRequestRequest msg = PlayRequestRequest.newBuilder()
-                .setRequesterId("TODO")
+                .setRequesterId(uniqueAndroidId)
                 .setMusicService(song.getMusicService())
                 .setUri(song.getUri())
                 .build();
-        //TODO: Get Requester ID
 
         model.sendPlayRequest(msg);
     }
