@@ -39,7 +39,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="36YA9" />
+                android:text="Loading..." />
         </TableRow>
 
         <TableRow android:layout_weight="1">
@@ -51,12 +51,12 @@
                 android:text="Party Name" />
 
             <EditText
-                android:id="@+id/party_name_edit_text"
+                android:id="@+id/config_party_name_edit_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:inputType="text"
-                android:text="Sick Party"
+                android:hint="Sick Party"
                 android:textSize="14sp" />
         </TableRow>
 

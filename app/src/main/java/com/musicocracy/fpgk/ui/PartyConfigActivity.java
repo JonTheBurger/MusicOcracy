@@ -5,12 +5,16 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
+import com.musicocracy.fpgk.domain.net.NetworkUtils;
+import com.musicocracy.fpgk.domain.util.AndroidViewUtils;
 import com.musicocracy.fpgk.mvp.presenter.PartyConfigPresenter;
 import com.musicocracy.fpgk.mvp.presenter.Presenter;
 import com.musicocracy.fpgk.mvp.view.PartyConfigView;
@@ -20,6 +24,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnTextChanged;
 
 public class PartyConfigActivity extends ActivityBase<PartyConfigView> implements PartyConfigView {
     private static final String TAG = "PartyConfigActivity";
@@ -27,17 +32,36 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.party_code_text_view) TextView partyCode;
-    @BindView(R.id.party_name_edit_text) EditText partyName;
+    @BindView(R.id.config_party_name_edit_text) EditText partyName;
     @BindView(R.id.token_count_picker) EditText tokenCount;
     @BindView(R.id.token_refill_minute_picker) EditText tokenMinutes;
     @BindView(R.id.token_refill_second_picker) EditText tokenSeconds;
+    @BindView(R.id.config_forward_btn) ImageButton forwardBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.activity_party_config, this);
         initMenu();
         initNumberEdits();
-        presenter.onCreate(this);
+        //presenter.onCreate();
+        String ip = NetworkUtils.getLocalIpAddress(this);
+        setPartyCode(NetworkUtils.ipAddressToBase36(ip).toUpperCase());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        try {
+            presenter.onBack();
+        } catch (InterruptedException e) {
+            Log.e(TAG, e.toString());
+        }
     }
 
     @OnClick(R.id.config_backward_btn)
@@ -52,6 +76,21 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
         startActivity(intent);
     }
 
+    @OnTextChanged({R.id.config_party_name_edit_text, R.id.party_code_text_view, R.id.token_count_picker, R.id.token_refill_minute_picker})
+    public void checkInputs() {
+        if (getPartyName().trim().length() == 0 ||
+                getPartyCode().contains(".") || // Loading...
+                tokenCount.getText().toString().trim().length() == 0 ||
+                getTokenCount() <= 0 ||
+                tokenMinutes.getText().toString().trim().length() == 0 ||
+                tokenSeconds.getText().toString().trim().length() == 0 ||
+                getTokenRefillSeconds() + getTokenRefillMinutes() * 60 <= 0) {
+            AndroidViewUtils.setImgBtnEnabled(forwardBtn, false);
+        } else {
+            AndroidViewUtils.setImgBtnEnabled(forwardBtn, true);
+        }
+    }
+
     //region View Implementation
     @Override
     public String getPartyCode() {
@@ -61,6 +100,7 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
     @Override
     public void setPartyCode(String code) {
         partyCode.setText(code);
+        Log.i(TAG, "Code: " + code + " : " + NetworkUtils.base36ToIpAddress(code));
     }
 
     @Override
