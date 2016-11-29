@@ -105,7 +105,7 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
 
     @Override
     public String getPartyName() {
-        return partyName.getText().toString();
+        return partyName.getText().toString().trim();
     }
 
     @Override

@@ -61,12 +61,12 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
     //region View Implementation
     @Override
     public String getPartyCode() {
-        return partyCode.getText().toString();
+        return partyCode.getText().toString().trim();
     }
 
     @Override
     public String getPartyName() {
-        return partyName.getText().toString();
+        return partyName.getText().toString().trim();
     }
 
     @Override
