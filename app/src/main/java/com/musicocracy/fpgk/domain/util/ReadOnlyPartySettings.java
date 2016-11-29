@@ -5,4 +5,5 @@ public interface ReadOnlyPartySettings {
     String getPartyName();
     int getTokens();
     long getTokenRefillMillis();
+    String getSpotifyToken();
 }

@@ -5,14 +5,22 @@ import com.musicocracy.fpgk.domain.net.ProtoEnvelopeFactory;
 import com.musicocracy.fpgk.domain.net.RxTcpClient;
 import com.musicocracy.fpgk.domain.net.RxTcpServer;
 import com.musicocracy.fpgk.domain.net.ServerEventBus;
+import com.musicocracy.fpgk.domain.net.ServerHandler;
+import com.musicocracy.fpgk.domain.spotify.Browser;
+import com.musicocracy.fpgk.domain.util.Logger;
+import com.musicocracy.fpgk.domain.util.PartySettings;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import kaaes.spotify.webapi.android.SpotifyApi;
 
 @Module
 public class NetworkingModule {
+    public static final String DEFAULT_PORT = "Default Port";
+
     @Provides
     @Singleton
     public ProtoEnvelopeFactory provideProtoEnvelopeFactory() {
@@ -41,5 +49,18 @@ public class NetworkingModule {
     @Singleton
     public ServerEventBus provideServerEventBus(RxTcpServer server, ProtoEnvelopeFactory factory) {
         return new ServerEventBus(server, factory);
+    }
+
+    @Provides
+    @Singleton
+    public ServerHandler provideServerHandler(ServerEventBus eventBus, PartySettings partySettings, Browser browser, SpotifyApi api, Logger log) {
+        return new ServerHandler(eventBus, partySettings, browser, api, log);
+    }
+
+    @Provides
+    @Named(DEFAULT_PORT)
+    @Singleton
+    public int provideDefaultPort() {
+        return 2025;
     }
 }

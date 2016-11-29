@@ -1,6 +1,7 @@
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.domain.dal.MusicService;
 import com.musicocracy.fpgk.domain.net.ProtoEnvelopeFactory;
+import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
 import com.musicocracy.fpgk.net.proto.Envelope;
 import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
@@ -60,5 +61,27 @@ public class ProtobufTests {
         BrowseSongsRequest received = BrowseSongsRequest.parseFrom(receivedEnvelope.getBody());
 
         assertEquals(sent, received);
+    }
+
+    @Test
+    public void protobufBrowseRequestReply_ConvertToAndBack_SameProto_Browse() throws InvalidProtocolBufferException {
+        BrowseSongsReply.Builder builder = BrowseSongsReply.newBuilder();
+        for (int i = 0; i < 10; i++) {
+            builder .addSongs(BrowseSongsReply.BrowsableSong.newBuilder()
+                    .setTitle("Title" + i)
+                    // Gets the name of the first artist
+                    .setArtist("Artist" + i)
+                    .setUri("URI" + i)
+                    .setMusicService("Spotify")
+                    .build());
+        }
+        BrowseSongsReply sentProto = builder.build();
+        Envelope sent = factory.createEnvelopeFor(sentProto);
+        String base64 = factory.envelopeToBase64(sent);
+
+        Envelope received = factory.envelopeFromBase64(base64);
+        BrowseSongsReply receivedProto = BrowseSongsReply.parseFrom(received.getBody());
+
+        assertEquals(sentProto, receivedProto);
     }
 }

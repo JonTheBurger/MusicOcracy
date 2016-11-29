@@ -3,6 +3,7 @@ package com.musicocracy.fpgk.domain.util;
 public class PartySettings implements ReadOnlyPartySettings {
     private String partyCode = "";
     private String partyName = "";
+    private String SpotifyToken = "";
     private int tokens;
     private long tokenRefillMillis;
 
@@ -41,4 +42,9 @@ public class PartySettings implements ReadOnlyPartySettings {
     public void setTokenRefillMillis(long tokenRefillMillis) {
         this.tokenRefillMillis = tokenRefillMillis;
     }
+
+    @Override
+    public String getSpotifyToken() { return SpotifyToken;}
+
+    public void setSpotifyToken(String token) {this.SpotifyToken = token;}
 }
