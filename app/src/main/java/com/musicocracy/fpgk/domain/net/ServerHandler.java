@@ -1,5 +1,7 @@
 package com.musicocracy.fpgk.domain.net;
 
+import android.util.Log;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
@@ -10,6 +12,9 @@ import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
 import com.musicocracy.fpgk.net.proto.ConnectRequest;
 import com.musicocracy.fpgk.net.proto.MessageType;
+import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
+import com.spotify.sdk.android.player.Player;
+import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.util.List;
 
@@ -26,16 +31,17 @@ public class ServerHandler {
     private final PartySettings partySettings;
     private final Browser browser;
     private final SpotifyApi api;
+    private Player player;
     private final Logger log;
     private Subscription[] subscriptions = emptySubs;
 
-
-    public ServerHandler(ServerEventBus eventBus, PartySettings partySettings, Browser browser, SpotifyApi api, Logger log) {
+    public ServerHandler(ServerEventBus eventBus, PartySettings partySettings, Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log) {
         this.eventBus = eventBus;
         this.partySettings = partySettings;
         this.browser = browser;
         this.api = api;
         this.log = log;
+        this.player = player;
     }
 
     public void onCreate() {
@@ -135,7 +141,21 @@ public class ServerHandler {
     }
 
     private Subscription createPlayRequestSub() {
-        return null;
+        return eventBus.getObservable(MessageType.PLAY_REQUEST_REQUEST)
+                .subscribe(new Action1<ProtoMessageBySender>() {
+                    @Override
+                    public void call(ProtoMessageBySender msgBySender) {
+                        PlayRequestRequest request;
+                        try {
+                            request = PlayRequestRequest.parseFrom(msgBySender.message.getBody());
+                        } catch (InvalidProtocolBufferException e) {
+                            request = PlayRequestRequest.getDefaultInstance();
+                            e.printStackTrace();
+                        }
+
+                        player.playUri(null, request.getUri(), 0, 0);
+                    }
+                });
     }
 
     private Subscription createVoteRequestSub() {
