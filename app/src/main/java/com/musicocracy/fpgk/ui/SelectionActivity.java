@@ -15,6 +15,7 @@ import butterknife.OnClick;
 
 public class SelectionActivity extends ActivityBase<SelectionView> implements SelectionView {
     private static final String TAG = "SelectionActivity";
+    private static final int AUTHENTICATION_REQUEST_CODE = 1001;
     @Inject SelectionPresenter presenter;
 
     @Override
@@ -24,8 +25,26 @@ public class SelectionActivity extends ActivityBase<SelectionView> implements Se
 
     @OnClick(R.id.hostButton)
     public void hostClick() {
-        Intent intent = new Intent(this, PartyConfigActivity.class);
-        startActivity(intent);
+        // Get an access token
+        Intent authIntent = new Intent(this, AuthenticationActivity.class);
+        startActivityForResult(authIntent, AUTHENTICATION_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        // Check if result comes from the correct activity
+        if (requestCode == AUTHENTICATION_REQUEST_CODE && resultCode == RESULT_OK) {
+            //Use Data to get string
+            Bundle authBundle = intent.getExtras();
+            String token = authBundle.getString(getString(R.string.result_string));
+
+            presenter.setSpotifyToken(token);
+
+            Intent partyConfigIntent = new Intent(this, PartyConfigActivity.class);
+            startActivity(partyConfigIntent);
+        }
     }
 
     @OnClick(R.id.guestButton)

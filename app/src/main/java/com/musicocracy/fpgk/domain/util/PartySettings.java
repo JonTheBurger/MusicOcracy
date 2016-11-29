@@ -7,6 +7,10 @@ public class PartySettings implements ReadOnlyPartySettings {
     private int tokens;
     private long tokenRefillMillis;
 
+    public PartySettings() {
+        int x = 5;
+    }
+
     @Override
     public String getPartyCode() {
         return partyCode;
