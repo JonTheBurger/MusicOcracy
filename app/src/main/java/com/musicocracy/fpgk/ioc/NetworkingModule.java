@@ -9,6 +9,7 @@ import com.musicocracy.fpgk.domain.net.ServerHandler;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.domain.util.PartySettings;
+import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -53,8 +54,8 @@ public class NetworkingModule {
 
     @Provides
     @Singleton
-    public ServerHandler provideServerHandler(ServerEventBus eventBus, PartySettings partySettings, Browser browser, SpotifyApi api, Logger log) {
-        return new ServerHandler(eventBus, partySettings, browser, api, log);
+    public ServerHandler provideServerHandler(ServerEventBus eventBus, PartySettings partySettings, Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log) {
+        return new ServerHandler(eventBus, partySettings, browser, api, player, log);
     }
 
     @Provides

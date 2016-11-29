@@ -28,7 +28,6 @@ import butterknife.OnTextChanged;
 
 public class PartyConfigActivity extends ActivityBase<PartyConfigView> implements PartyConfigView {
     private static final String TAG = "PartyConfigActivity";
-    private static final int AUTHENTICATION_REQUEST_CODE = 1001;
     @Inject PartyConfigPresenter presenter;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -72,25 +71,9 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
 
     @OnClick(R.id.config_forward_btn)
     public void forwardClick() {
-        // Get an access token
-        Intent authIntent = new Intent(this, AuthenticationActivity.class);
-        startActivityForResult(authIntent, AUTHENTICATION_REQUEST_CODE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-
-        // Check if result comes from the correct activity
-        if (requestCode == AUTHENTICATION_REQUEST_CODE && resultCode == RESULT_OK) {
-            //Use Data to get string
-            Bundle authBundle = intent.getExtras();
-            String token = authBundle.getString(getString(R.string.result_string));
-
-            presenter.confirmSettings(token);
-            Intent nowPlayingIntent = new Intent(this, NowPlayingActivity.class);
-            startActivity(nowPlayingIntent);
-        }
+        presenter.confirmSettings();
+        Intent nowPlayingIntent = new Intent(this, NowPlayingActivity.class);
+        startActivity(nowPlayingIntent);
     }
 
     @OnTextChanged({R.id.config_party_name_edit_text, R.id.party_code_text_view, R.id.token_count_picker, R.id.token_refill_minute_picker})
@@ -122,7 +105,7 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
 
     @Override
     public String getPartyName() {
-        return partyName.getText().toString();
+        return partyName.getText().toString().trim();
     }
 
     @Override

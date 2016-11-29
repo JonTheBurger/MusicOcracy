@@ -119,7 +119,7 @@ public class TestBrowseActivity extends AppCompatActivity implements
                         Log.e("TestBrowseActivity", "Could not initialize player: " + throwable.getMessage());
                     }
                 });
-            }
+        }
             else {
                 //Auth flow returned returned an error
                 Log.e("TestBrowseActivity", "Auth flow was cancelled or returned an error.");

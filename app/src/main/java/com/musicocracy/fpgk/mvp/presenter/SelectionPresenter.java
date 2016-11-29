@@ -1,5 +1,6 @@
 package com.musicocracy.fpgk.mvp.presenter;
 
+import com.musicocracy.fpgk.domain.util.PartySettings;
 import com.musicocracy.fpgk.mvp.model.SelectionModel;
 import com.musicocracy.fpgk.mvp.view.SelectionView;
 
@@ -14,5 +15,9 @@ public class SelectionPresenter implements Presenter<SelectionView> {
     @Override
     public void setView(SelectionView view) {
         this.view = view;
+    }
+
+    public void setSpotifyToken(String spotifyToken){
+        model.getSettings().setSpotifyToken(spotifyToken);
     }
 }

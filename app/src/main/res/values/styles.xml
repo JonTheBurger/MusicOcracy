@@ -9,12 +9,19 @@
         <item name="android:windowBackground">@drawable/background_gradient</item>
 
         <item name="android:buttonStyle">@style/ButtonTheme</item>
+        <item name="android:listViewStyle">@style/ListViewTheme</item>
     </style>
 
     <style name="ButtonTheme" parent="@android:style/Widget.Button">
         <item name="android:foreground">?android:attr/selectableItemBackground</item>
         <item name="android:background">@drawable/btn_rectangle</item>
         <item name="android:textColor">@color/btn_text_color</item>
+    </style>
+
+    <style name="ListViewTheme" parent="@android:style/Widget.ListView">
+        <item name="android:divider">@color/colorPrimaryDark</item>
+        <item name="android:dividerHeight">1dp</item>
+        <item name="android:listSelector">@drawable/list_item_gradient</item>
     </style>
 
     <style name="QuarterButtonTheme" parent="@android:style/Widget.ImageButton">

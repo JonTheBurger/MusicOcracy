@@ -23,6 +23,7 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     private final String uniqueAndroidId;
     private SongSelectView view;
     private BrowseSongsReply currentBrowseReply;
+    private VotableSongsReply currentVotableReply;
 
     public SongSelectPresenter(SongSelectModel model, String uniqueAndroidId) {
         this.model = model;
@@ -57,14 +58,13 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     public void onBrowseResultsReceived(BrowseSongsReply msg) {
         currentBrowseReply = msg;
 
-        ArrayList<String> testList = new ArrayList<>();
+        ArrayList<String> browseList = new ArrayList<>();
         for (int i = 0; i < msg.getSongsCount(); i++) {
-            //testList.add(msg.getSongs(i).toString());
-            testList.add(Integer.toString(i + 1) + ") Title: " + msg.getSongs(i).getTitle()
+            browseList.add(Integer.toString(i + 1) + ") Title: " + msg.getSongs(i).getTitle()
                 + "\nArtist: " + msg.getSongs(i).getArtist());
         }
 
-        view.updateBrowseSongs(testList);
+        view.updateBrowseSongs(browseList);
     }
 
     public void populateVoteSongs() {
@@ -74,11 +74,14 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     }
 
     public void onVotableSongsReceived(VotableSongsReply msg) {
-        ArrayList<String> testList = new ArrayList<>();
+        currentVotableReply = msg;
+
+        ArrayList<String> voteList = new ArrayList<>();
         for (int i = 0; i < msg.getSongsCount(); i++) {
-            testList.add(msg.getSongs(i).toString());
+            voteList.add(Integer.toString(i + 1) + ") Title: " + msg.getSongs(i).getTitle()
+                    + "\nArtist: " + msg.getSongs(i).getArtist());
         }
-        view.updateVotableSongs(testList);
+        view.updateVotableSongs(voteList);
     }
 
     public void playRequest(int songId) {
@@ -93,10 +96,10 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     }
 
     public void voteRequest(int songId) {
+        VotableSongsReply.VotableSong song = currentVotableReply.getSongs(songId);
         SendVoteRequest msg = SendVoteRequest.newBuilder()
-                .setChoiceId(songId)
+                .setChoiceId(song.getChoiceId())
                 .build();
-        //TODO: Make sure songId is the correct song to vote for.
 
         model.sendVoteRequest(msg);
     }

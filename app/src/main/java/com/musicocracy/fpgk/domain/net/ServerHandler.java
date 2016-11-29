@@ -1,5 +1,7 @@
 package com.musicocracy.fpgk.domain.net;
 
+import android.util.Log;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
@@ -10,11 +12,20 @@ import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
 import com.musicocracy.fpgk.net.proto.ConnectRequest;
 import com.musicocracy.fpgk.net.proto.MessageType;
+import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
+import com.musicocracy.fpgk.net.proto.SendVoteRequest;
+import com.musicocracy.fpgk.net.proto.VotableSongsReply;
+import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
+import com.spotify.sdk.android.player.Metadata;
+import com.spotify.sdk.android.player.Player;
+import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
+
 import kaaes.spotify.webapi.android.models.Track;
+import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 
@@ -26,16 +37,18 @@ public class ServerHandler {
     private final PartySettings partySettings;
     private final Browser browser;
     private final SpotifyApi api;
+    private Player player;
     private final Logger log;
     private Subscription[] subscriptions = emptySubs;
+    private final SharedSubject<Metadata.Track> newTrackPlayingSubject = SharedSubject.create();
 
-
-    public ServerHandler(ServerEventBus eventBus, PartySettings partySettings, Browser browser, SpotifyApi api, Logger log) {
+    public ServerHandler(ServerEventBus eventBus, PartySettings partySettings, Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log) {
         this.eventBus = eventBus;
         this.partySettings = partySettings;
         this.browser = browser;
         this.api = api;
         this.log = log;
+        this.player = player;
     }
 
     public void onCreate() {
@@ -131,18 +144,85 @@ public class ServerHandler {
     }
 
     private Subscription createVotableSongsRequestSub() {
-        return null;
+        return eventBus.getObservable(MessageType.VOTABLE_SONGS_REQUEST)
+                .subscribe(new Action1<ProtoMessageBySender>() {
+                    @Override
+                    public void call(ProtoMessageBySender msgBySender) {
+                        VotableSongsRequest request;
+                        try {
+                            request = VotableSongsRequest.parseFrom(msgBySender.message.getBody());
+                        } catch (InvalidProtocolBufferException e) {
+                            request = VotableSongsRequest.getDefaultInstance();
+                            e.printStackTrace();
+                        }
+
+                        // TODO:Implement getting songs being voted on from database
+                        /*
+                        List<Track> voteTracks = new ArrayList<Track>();
+
+                        VotableSongsReply.Builder builder = VotableSongsReply.newBuilder();
+
+                        for (int i = 0; i < voteTracks.size(); i++) {
+                            builder .addSongs(VotableSongsReply.VotableSong.newBuilder()
+                                    .setArtist()
+                                    .setChoiceId()
+                                    .build());
+                        }
+                        VotableSongsReply reply = builder.build();
+
+                        log.info(TAG, "Sending msg " + reply);
+                        msgBySender.replyWith(reply);
+                        log.info(TAG, "Send complete. ~" + reply.toByteArray().length + " byte body");
+                        */
+                    }
+                });
     }
 
     private Subscription createPlayRequestSub() {
-        return null;
+        return eventBus.getObservable(MessageType.PLAY_REQUEST_REQUEST)
+                .subscribe(new Action1<ProtoMessageBySender>() {
+                    @Override
+                    public void call(ProtoMessageBySender msgBySender) {
+                        PlayRequestRequest request;
+                        try {
+                            request = PlayRequestRequest.parseFrom(msgBySender.message.getBody());
+                        } catch (InvalidProtocolBufferException e) {
+                            request = PlayRequestRequest.getDefaultInstance();
+                            e.printStackTrace();
+                        }
+
+                        player.playUri(null, request.getUri(), 0, 0);
+                        Metadata.Track test = player.getMetadata().currentTrack;
+                        newTrackPlayingSubject.onNext(test);
+                    }
+                });
     }
 
     private Subscription createVoteRequestSub() {
-        return null;
+        return eventBus.getObservable(MessageType.SEND_VOTE_REQUEST)
+                .subscribe(new Action1<ProtoMessageBySender>() {
+                    @Override
+                    public void call(ProtoMessageBySender msgBySender) {
+                        SendVoteRequest request;
+                        try {
+                            request = SendVoteRequest.parseFrom(msgBySender.message.getBody());
+                        } catch (InvalidProtocolBufferException e) {
+                            request = SendVoteRequest.getDefaultInstance();
+                            e.printStackTrace();
+                        }
+
+                        // TODO:Implement adding vote to database
+                    }
+                });
+    }
+
+    public Observable<Metadata.Track> newSongPlaying() {
+        return newTrackPlayingSubject.asObservable();
     }
 
     public void onDestroy() {
+        newTrackPlayingSubject.onCompleted();
+
         for (int i = 0; i < subscriptions.length; i++) {
             safeUnsubscribe(subscriptions[i]);
         }

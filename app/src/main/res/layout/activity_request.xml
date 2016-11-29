@@ -51,7 +51,7 @@
             android:ems="10"
             android:inputType="textPersonName"
             android:textAlignment="center"
-            android:hint="Request a Song" />
+            android:hint="Search Term" />
 
         <Space
             android:layout_width="match_parent"
