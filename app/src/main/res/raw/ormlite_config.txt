@@ -1,19 +1,19 @@
 #
-# generated on 2016/09/30 04:40:52
+# generated on 2016/11/28 04:54:59
 #
 # --table-start--
-dataClass=com.musicocracy.fpgk.model.dal.FilterMode
+dataClass=com.musicocracy.fpgk.domain.dal.FilterMode
 tableName=filtermode
 # --table-fields-start--
 # --field-start--
 fieldName=NONE
-unknownEnumValue=com.musicocracy.fpgk.model.dal.FilterMode#NONE
+unknownEnumValue=com.musicocracy.fpgk.domain.dal.FilterMode#NONE
 # --field-end--
 # --table-fields-end--
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.musicocracy.fpgk.model.dal.Guest
+dataClass=com.musicocracy.fpgk.domain.dal.Guest
 tableName=Guest
 # --table-fields-start--
 # --field-start--
@@ -40,18 +40,18 @@ fieldName=isBanned
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.musicocracy.fpgk.model.dal.MusicService
+dataClass=com.musicocracy.fpgk.domain.dal.MusicService
 tableName=musicservice
 # --table-fields-start--
 # --field-start--
 fieldName=UNKNOWN
-unknownEnumValue=com.musicocracy.fpgk.model.dal.MusicService#UNKNOWN
+unknownEnumValue=com.musicocracy.fpgk.domain.dal.MusicService#UNKNOWN
 # --field-end--
 # --table-fields-end--
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.musicocracy.fpgk.model.dal.Party
+dataClass=com.musicocracy.fpgk.domain.dal.Party
 tableName=Party
 # --table-fields-start--
 # --field-start--
@@ -80,7 +80,7 @@ fieldName=isHosting
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.musicocracy.fpgk.model.dal.PlayRequest
+dataClass=com.musicocracy.fpgk.domain.dal.PlayRequest
 tableName=PlayRequest
 # --table-fields-start--
 # --field-start--
@@ -108,7 +108,7 @@ fieldName=requestTime
 # --table-end--
 #################################
 # --table-start--
-dataClass=com.musicocracy.fpgk.model.dal.SongFilter
+dataClass=com.musicocracy.fpgk.domain.dal.SongFilter
 tableName=SongFilter
 # --table-fields-start--
 # --field-start--

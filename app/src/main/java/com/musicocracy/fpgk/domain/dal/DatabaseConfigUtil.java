@@ -15,11 +15,13 @@ import java.io.File;
 
 public class DatabaseConfigUtil extends OrmLiteConfigUtil {
     public static void main(String[] args) throws Exception {
+        System.out.println("test");
         String currDirectory = "user.dir";
         String configPath = "/app/src/main/res/raw/ormlite_config.txt";
         String projectRoot = System.getProperty(currDirectory);
 
         String fullConfigPath = projectRoot + configPath;
+        System.out.println("Writing OrmLiteConfig to " + fullConfigPath);
 
         File configFile = new File(fullConfigPath);
 
