@@ -16,14 +16,16 @@ import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
 import com.musicocracy.fpgk.net.proto.SendVoteRequest;
 import com.musicocracy.fpgk.net.proto.VotableSongsReply;
 import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
+import com.spotify.sdk.android.player.Metadata;
 import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
+
 import kaaes.spotify.webapi.android.models.Track;
+import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 
@@ -38,6 +40,7 @@ public class ServerHandler {
     private Player player;
     private final Logger log;
     private Subscription[] subscriptions = emptySubs;
+    private final SharedSubject<Metadata.Track> newTrackPlayingSubject = SharedSubject.create();
 
     public ServerHandler(ServerEventBus eventBus, PartySettings partySettings, Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log) {
         this.eventBus = eventBus;
@@ -189,6 +192,8 @@ public class ServerHandler {
                         }
 
                         player.playUri(null, request.getUri(), 0, 0);
+                        Metadata.Track test = player.getMetadata().currentTrack;
+                        newTrackPlayingSubject.onNext(test);
                     }
                 });
     }
@@ -211,7 +216,13 @@ public class ServerHandler {
                 });
     }
 
+    public Observable<Metadata.Track> newSongPlaying() {
+        return newTrackPlayingSubject.asObservable();
+    }
+
     public void onDestroy() {
+        newTrackPlayingSubject.onCompleted();
+
         for (int i = 0; i < subscriptions.length; i++) {
             safeUnsubscribe(subscriptions[i]);
         }

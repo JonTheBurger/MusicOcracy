@@ -1,6 +1,7 @@
 package com.musicocracy.fpgk.ui;
 
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
 import com.musicocracy.fpgk.mvp.presenter.NowPlayingPresenter;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements NowPlayingView {
@@ -37,18 +39,32 @@ public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements 
         CyberJukeboxApplication.getComponent(this).inject(this);
     }
 
+    @BindView(R.id.currentArtistTextView)
+    public TextView artistText;
+
+    @BindView(R.id.currentSongTextView)
+    public TextView songText;
+
     @Override
     public void updateArtist(String artistName) {
-
+        artistText.setText(artistName);
+        artistText.postInvalidate();
     }
 
     @Override
     public void updateSong(String songName) {
-
+        songText.setText(songName);
+        songText.postInvalidate();
     }
 
     @Override
     public void updateVotableSongs(List<String> votableSongs) {
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
     }
 }
