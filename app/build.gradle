@@ -12,6 +12,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        //multiDexEnabled true  // Uncomment if DatabaseConfigUtil complains about dex limit
     }
     buildTypes {
         release {
@@ -87,7 +88,6 @@ dependencies {
     compile 'com.google.guava:guava:19.0'
     // Google Protocol Buffers - Binary Serializable Class Generation
     compile 'com.google.protobuf:protobuf-lite:3.0.0'
-    compile 'com.google.protobuf:protobuf-java-util:3.0.0'
     // This library handles authentication and authorization
     compile 'com.spotify.sdk:spotify-auth:beta22-noconnect-2.20b@aar'
     // This library handles music playback
