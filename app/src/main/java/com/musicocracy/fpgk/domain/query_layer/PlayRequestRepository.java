@@ -1,6 +1,7 @@
 package com.musicocracy.fpgk.domain.query_layer;
 
 import com.j256.ormlite.dao.Dao;
+import com.musicocracy.fpgk.domain.dal.FilterMode;
 import com.musicocracy.fpgk.domain.dal.Guest;
 import com.musicocracy.fpgk.domain.dal.PlayRequest;
 import com.musicocracy.fpgk.domain.dal.Database;
@@ -17,18 +18,28 @@ import java.util.TreeMap;
 public class PlayRequestRepository {
     private Database database;
     private Dao<PlayRequest, Integer> dao;
+    private SongFilterRepository songFilterRepository;
 
     public PlayRequestRepository(Database database) {
         this.database = database;
+        songFilterRepository = new SongFilterRepository(database);
     }
 
-    public void add(PlayRequest playRequest) {
+    public void addWithFilter(PlayRequest playRequest, FilterMode filterMode) {
         try {
-            dao = database.getPlayRequestDao();
-            dao.createOrUpdate(playRequest);
+            if(songFilterRepository.isValidPlayRequest(playRequest, filterMode)){
+                dao = database.getPlayRequestDao();
+                dao.createOrUpdate(playRequest);
+            } else {
+                System.out.println("ERROR: Song is blacklisted by party host!");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void add(PlayRequest playRequest) {
+        addWithFilter(playRequest, FilterMode.NONE);
     }
 
     public List<String> getVotableSongIds(int count) {
