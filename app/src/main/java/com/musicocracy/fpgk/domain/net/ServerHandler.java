@@ -13,9 +13,13 @@ import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
 import com.musicocracy.fpgk.net.proto.ConnectRequest;
 import com.musicocracy.fpgk.net.proto.MessageType;
 import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
+import com.musicocracy.fpgk.net.proto.SendVoteRequest;
+import com.musicocracy.fpgk.net.proto.VotableSongsReply;
+import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
 import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
@@ -137,7 +141,38 @@ public class ServerHandler {
     }
 
     private Subscription createVotableSongsRequestSub() {
-        return null;
+        return eventBus.getObservable(MessageType.VOTABLE_SONGS_REQUEST)
+                .subscribe(new Action1<ProtoMessageBySender>() {
+                    @Override
+                    public void call(ProtoMessageBySender msgBySender) {
+                        VotableSongsRequest request;
+                        try {
+                            request = VotableSongsRequest.parseFrom(msgBySender.message.getBody());
+                        } catch (InvalidProtocolBufferException e) {
+                            request = VotableSongsRequest.getDefaultInstance();
+                            e.printStackTrace();
+                        }
+
+                        // TODO:Implement getting songs being voted on from database
+                        /*
+                        List<Track> voteTracks = new ArrayList<Track>();
+
+                        VotableSongsReply.Builder builder = VotableSongsReply.newBuilder();
+
+                        for (int i = 0; i < voteTracks.size(); i++) {
+                            builder .addSongs(VotableSongsReply.VotableSong.newBuilder()
+                                    .setArtist()
+                                    .setChoiceId()
+                                    .build());
+                        }
+                        VotableSongsReply reply = builder.build();
+
+                        log.info(TAG, "Sending msg " + reply);
+                        msgBySender.replyWith(reply);
+                        log.info(TAG, "Send complete. ~" + reply.toByteArray().length + " byte body");
+                        */
+                    }
+                });
     }
 
     private Subscription createPlayRequestSub() {
@@ -159,7 +194,21 @@ public class ServerHandler {
     }
 
     private Subscription createVoteRequestSub() {
-        return null;
+        return eventBus.getObservable(MessageType.SEND_VOTE_REQUEST)
+                .subscribe(new Action1<ProtoMessageBySender>() {
+                    @Override
+                    public void call(ProtoMessageBySender msgBySender) {
+                        SendVoteRequest request;
+                        try {
+                            request = SendVoteRequest.parseFrom(msgBySender.message.getBody());
+                        } catch (InvalidProtocolBufferException e) {
+                            request = SendVoteRequest.getDefaultInstance();
+                            e.printStackTrace();
+                        }
+
+                        // TODO:Implement adding vote to database
+                    }
+                });
     }
 
     public void onDestroy() {
