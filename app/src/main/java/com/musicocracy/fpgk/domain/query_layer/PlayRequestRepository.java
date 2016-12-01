@@ -60,7 +60,7 @@ public class PlayRequestRepository {
             int addCount = 0;
             do {
                 int listId = random.nextInt(4) + 1;
-                int index = random.nextInt(count-1);
+                int index = random.nextInt(count);
                 String nextId = new String();
                 switch(listId) {
                     case 1:
