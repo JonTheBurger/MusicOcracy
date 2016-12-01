@@ -33,20 +33,29 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                 .subscribe(new Action1<Metadata.Track>() {
                     @Override
                     public void call(Metadata.Track track) {
-                        if (track != null) {
-                            if (track.artistName != null) {
-                                view.updateArtist(track.artistName);
-                            }
-
-                            if (track.name != null) {
-                                view.updateSong(track.name);
-                            }
-                        }
+                        updateNowPlaying(track);
                     }
                 });
     }
 
     public void onDestroy() {
         newPlayRequest.unsubscribe();
+    }
+
+    public void updateCurrentPlayingTrack() {
+        // Update the Now Playing Artist and Song with the last received PlayRequest
+        updateNowPlaying(model.getCurrentPlayingTrack());
+    }
+
+    private void updateNowPlaying(Metadata.Track track) {
+        if (track != null) {
+            if (track.artistName != null) {
+                view.updateArtist(track.artistName);
+            }
+
+            if (track.name != null) {
+                view.updateSong(track.name);
+            }
+        }
     }
 }
