@@ -57,8 +57,8 @@ public class PlayRequestRepository {
             List<String> mostRequestedSongIdsList = getMostRequestedSongIds(count);
             List<String> leastRequestedSongIdsList = getLeastRequestedSongIds(count);
 
-            for(int i = 0; i < count; i++) {
-
+            int addCount = 0;
+            do {
                 int listId = random.nextInt(4) + 1;
                 int index = random.nextInt(count-1);
                 String nextId = new String();
@@ -76,12 +76,15 @@ public class PlayRequestRepository {
                         nextId = leastRequestedSongIdsList.get(index);
                         break;
                 }
-                returnList.add(nextId);
-            }
+                if(!lastVotableSongIds.contains(nextId)) {
+                    addCount++;
+                    returnList.add(nextId);
+                }
+            } while(addCount < count);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            lastVotableSongIds = returnList;
+            lastVotableSongIds = new ArrayList<>(returnList);
             return returnList;
         }
     }
