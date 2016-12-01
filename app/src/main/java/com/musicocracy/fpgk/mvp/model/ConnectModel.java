@@ -7,6 +7,10 @@ import com.musicocracy.fpgk.net.proto.ConnectRequest;
 import com.musicocracy.fpgk.net.proto.Envelope;
 import com.musicocracy.fpgk.net.proto.MessageType;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -21,8 +25,12 @@ public class ConnectModel {
         this.defaultPort = defaultPort;
     }
 
-    public void connect(String host) {
+    public void connect(String host) throws UnsupportedOperationException {
         client.start(host, defaultPort);
+        client.awaitNextIsRunningChanged(2500, TimeUnit.MILLISECONDS);
+        if (!client.isRunning()) {
+            throw new UnsupportedOperationException("Could not connect to host");
+        }
     }
 
     public Observable<Boolean> getIsRunningObservable() {
@@ -30,9 +38,6 @@ public class ConnectModel {
     }
 
     public void joinParty(String partyName, String partyCode) {
-//        if (!client.isRunning()) {
-//            throw new UnsupportedOperationException("Must be connected to request access");
-//        }
         ConnectRequest message = ConnectRequest.newBuilder()
                 .setRequesterId(uniqueAndroidId)
                 .setPartyName(partyName)
@@ -48,6 +53,7 @@ public class ConnectModel {
                         try {
                             return BasicReply.parseFrom(envelope.getBody());
                         } catch (InvalidProtocolBufferException e) {
+                            e.printStackTrace();
                             return BasicReply.getDefaultInstance();
                         }
                     }

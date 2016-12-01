@@ -5,6 +5,8 @@ import com.musicocracy.fpgk.mvp.model.ConnectModel;
 import com.musicocracy.fpgk.mvp.view.ConnectView;
 import com.musicocracy.fpgk.net.proto.BasicReply;
 
+import java.util.concurrent.TimeoutException;
+
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -14,49 +16,47 @@ import rx.schedulers.Schedulers;
 
 public class ConnectPresenter implements Presenter<ConnectView> {
     private final ConnectModel model;
-    private final Observable<BasicReply> joinObservable;
-    private Subscription joinSubscription = null;
+    private final Subscription joinSubscription;
     private ConnectView view;
 
     public ConnectPresenter(ConnectModel model) {
         this.model = model;
-        this.joinObservable = Observable.defer(new Func0<Observable<BasicReply>>() {
-            @Override
-            public Observable<BasicReply> call() {
-                String ip = NetworkUtils.base36ToIpAddress(view.getPartyCode().toLowerCase());
-                ConnectPresenter.this.model.connect(ip);
-                ConnectPresenter.this.model.joinParty(view.getPartyName(), view.getPartyCode());
-                return ConnectPresenter.this.model.getJoinResultObservable();
-            }
-        });
+        joinSubscription = model.getJoinResultObservable()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnError(new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    view.onJoinError(throwable.getMessage());
+                }
+            })
+            .subscribe(new Action1<BasicReply>() {
+                @Override
+                public void call(BasicReply reply) {
+                    if (reply != BasicReply.getDefaultInstance() && reply.getSuccess()) {
+                        view.onJoinSuccess();
+                    } else {
+                        view.onJoinError(reply.getMessage());
+                    }
+                }
+            });
     }
 
     public void joinParty() {
-        joinSubscription = joinObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        view.onJoinError(throwable.getMessage());
-                    }
-                })
-                .subscribe(new Action1<BasicReply>() {
-                    @Override
-                    public void call(BasicReply basicReply) {
-                        if (basicReply.getSuccess()) {
-                            view.onJoinSuccess();
-                        } else {
-                            view.onJoinError(basicReply.getMessage());
-                        }
-                    }
-                });
+        String ip = NetworkUtils.base36ToIpAddress(view.getPartyCode().toLowerCase());
+        try {
+            model.connect(ip);
+            model.joinParty(view.getPartyName(), view.getPartyCode());
+        } catch (UnsupportedOperationException e) {
+            view.onJoinError(e.getMessage());
+        } //catch (TimeoutException e) {
+            //view.onJoinError("Join timed out after " + ConnectModel.TIMEOUT_SECS + " seconds.");
+        //}
     }
 
     public void onDestroy() {
-        if (joinSubscription != null && !joinSubscription.isUnsubscribed()) {
+        if (!joinSubscription.isUnsubscribed()) {
             joinSubscription.unsubscribe();
-            joinSubscription = null;
         }
     }
 
