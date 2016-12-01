@@ -238,18 +238,19 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
         }
     }
 
+    public Metadata.Track getCurrentlyPlayingTrack() {
+        return newTrackPlayingSubject.getLast();
+    }
+
     @Override
     public void onPlaybackEvent(PlayerEvent playerEvent) {
         if (playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged) {
-            Metadata.Track test1 = player.getMetadata().currentTrack;
-            Metadata.Track test2 = player.getMetadata().prevTrack;
-            Metadata.Track test3 = player.getMetadata().nextTrack;
-            newTrackPlayingSubject.onNext(test1);
+            newTrackPlayingSubject.onNext(player.getMetadata().currentTrack);
         }
     }
 
     @Override
     public void onPlaybackError(Error error) {
-
+        log.error(TAG, "Error in Playback of Spotify Player.");
     }
 }
