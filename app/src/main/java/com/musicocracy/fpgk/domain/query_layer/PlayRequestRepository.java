@@ -22,11 +22,13 @@ public class PlayRequestRepository {
     private Dao<PlayRequest, Integer> dao;
     private SongFilterRepository songFilterRepository;
     private List<String> lastVotableSongIds;
+    private final Random random;
 
     public PlayRequestRepository(Database database) {
         this.database = database;
         songFilterRepository = new SongFilterRepository(database);
         lastVotableSongIds = new ArrayList<>();
+        random = new Random();
     }
 
     public void addWithFilter(PlayRequest playRequest, FilterMode filterMode) {
@@ -55,11 +57,10 @@ public class PlayRequestRepository {
             List<String> mostRequestedSongIdsList = getMostRequestedSongIds(count);
             List<String> leastRequestedSongIdsList = getLeastRequestedSongIds(count);
 
-            Random rand = new Random();
             for(int i = 0; i < count; i++) {
 
-                int listId = rand.nextInt(4) + 1;
-                int index = rand.nextInt(count-1);
+                int listId = random.nextInt(4) + 1;
+                int index = random.nextInt(count-1);
                 String nextId = new String();
                 switch(listId) {
                     case 1:
