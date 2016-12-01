@@ -2,6 +2,7 @@ package com.musicocracy.fpgk.ioc;
 
 import android.content.Context;
 
+import com.musicocracy.fpgk.domain.net.ServerHandler;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.domain.util.PartySettings;

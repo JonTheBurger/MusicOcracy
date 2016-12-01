@@ -16,8 +16,10 @@ import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
 import com.musicocracy.fpgk.net.proto.SendVoteRequest;
 import com.musicocracy.fpgk.net.proto.VotableSongsReply;
 import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
+import com.spotify.sdk.android.player.Error;
 import com.spotify.sdk.android.player.Metadata;
 import com.spotify.sdk.android.player.Player;
+import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.util.List;
@@ -29,7 +31,7 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 
-public class ServerHandler {
+public class ServerHandler implements SpotifyPlayer.NotificationCallback {
     private static final Subscription[] emptySubs = new Subscription[0];
     private static final String TAG = "ServerHandler";
     private static final int NUM_BROWSE_RESULTS = 10;
@@ -49,6 +51,8 @@ public class ServerHandler {
         this.api = api;
         this.log = log;
         this.player = player;
+
+        player.addNotificationCallback(this);
     }
 
     public void onCreate() {
@@ -192,8 +196,6 @@ public class ServerHandler {
                         }
 
                         player.playUri(null, request.getUri(), 0, 0);
-                        Metadata.Track test = player.getMetadata().currentTrack;
-                        newTrackPlayingSubject.onNext(test);
                     }
                 });
     }
@@ -222,6 +224,7 @@ public class ServerHandler {
 
     public void onDestroy() {
         newTrackPlayingSubject.onCompleted();
+        player.removeNotificationCallback(this);
 
         for (int i = 0; i < subscriptions.length; i++) {
             safeUnsubscribe(subscriptions[i]);
@@ -233,5 +236,20 @@ public class ServerHandler {
         if (sub != null && !sub.isUnsubscribed()) {
             sub.unsubscribe();
         }
+    }
+
+    @Override
+    public void onPlaybackEvent(PlayerEvent playerEvent) {
+        if (playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged) {
+            Metadata.Track test1 = player.getMetadata().currentTrack;
+            Metadata.Track test2 = player.getMetadata().prevTrack;
+            Metadata.Track test3 = player.getMetadata().nextTrack;
+            newTrackPlayingSubject.onNext(test1);
+        }
+    }
+
+    @Override
+    public void onPlaybackError(Error error) {
+
     }
 }
