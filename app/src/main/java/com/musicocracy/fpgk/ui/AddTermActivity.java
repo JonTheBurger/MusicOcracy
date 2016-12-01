@@ -37,7 +37,7 @@ public class AddTermActivity extends ActivityBase<AddTermView> implements AddTer
 
     @OnClick(R.id.add_term_forward_button)
     public void forwardClick() {
-        String newTerm = addTermText.getText().toString();
+        String newTerm = addTermText.getText().toString().trim();
     }
 
     @Override

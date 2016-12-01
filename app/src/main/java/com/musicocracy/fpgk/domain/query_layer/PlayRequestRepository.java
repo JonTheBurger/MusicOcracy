@@ -10,19 +10,23 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 public class PlayRequestRepository {
     private Database database;
     private Dao<PlayRequest, Integer> dao;
     private SongFilterRepository songFilterRepository;
+    private List<String> lastVotableSongIds;
 
     public PlayRequestRepository(Database database) {
         this.database = database;
         songFilterRepository = new SongFilterRepository(database);
+        lastVotableSongIds = new ArrayList<>();
     }
 
     public void addWithFilter(PlayRequest playRequest, FilterMode filterMode) {
@@ -46,9 +50,37 @@ public class PlayRequestRepository {
         List<String> returnList = new ArrayList<>();
         try {
             dao = database.getPlayRequestDao();
+            List<String> newestRequestedSongIdsList = getNewestRequestedSongIds(count);
+            List<String> oldestRequestedSongIdsList = getOldestRequestedSongIds(count);
+            List<String> mostRequestedSongIdsList = getMostRequestedSongIds(count);
+            List<String> leastRequestedSongIdsList = getLeastRequestedSongIds(count);
+
+            Random rand = new Random();
+            for(int i = 0; i < count; i++) {
+
+                int listId = rand.nextInt(4) + 1;
+                int index = rand.nextInt(count-1);
+                String nextId = new String();
+                switch(listId) {
+                    case 1:
+                        nextId = newestRequestedSongIdsList.get(index);
+                        break;
+                    case 2:
+                        nextId = oldestRequestedSongIdsList.get(index);
+                        break;
+                    case 3:
+                        nextId = mostRequestedSongIdsList.get(index);
+                        break;
+                    case 4:
+                        nextId = leastRequestedSongIdsList.get(index);
+                        break;
+                }
+                returnList.add(nextId);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            lastVotableSongIds = returnList;
             return returnList;
         }
     }
@@ -102,7 +134,7 @@ public class PlayRequestRepository {
                 requestHistogram.put(songId, newCount);
             }
 
-            Map<String, Integer> sortedHistogram = new LinkedHashMap<String, Integer>();
+            Map<String, Integer> sortedHistogram = new LinkedHashMap<>();
             sortedHistogram = sortByValue(requestHistogram);
 
             Object keySet[] = sortedHistogram.keySet().toArray();
@@ -111,11 +143,13 @@ public class PlayRequestRepository {
                     for(int i = 0; i < count; i++) {
                         returnList.add(keySet[i].toString());
                     }
+                    break;
                 case 1:
                     int start = keySet.length - 1;
                     for(int i = start; i > start - count; i--) {
                         returnList.add(keySet[i].toString());
                     }
+                    break;
             }
 
         } catch (SQLException e) {
@@ -142,7 +176,7 @@ public class PlayRequestRepository {
 
             }
 
-            Map<String, Integer> sortedHistogram = new LinkedHashMap<String, Integer>();
+            Map<String, Integer> sortedHistogram = new LinkedHashMap<>();
             sortedHistogram = sortByValue(requestHistogram);
 
             Object keySet[] = sortedHistogram.keySet().toArray();
@@ -151,11 +185,13 @@ public class PlayRequestRepository {
                     for(int i = 0; i < count; i++) {
                         returnList.add(keySet[i].toString());
                     }
+                    break;
                 case 1:
                     int start = keySet.length - 1;
                     for(int i = start; i > start - count; i--) {
                         returnList.add(keySet[i].toString());
                     }
+                    break;
             }
 
         } catch (SQLException e) {
