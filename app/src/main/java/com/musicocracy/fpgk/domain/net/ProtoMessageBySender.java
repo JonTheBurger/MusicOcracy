@@ -16,7 +16,8 @@ public class ProtoMessageBySender {
 
     public void replyWith(MessageLite message) {
         Envelope envelope = factory.createEnvelopeFor(message);
-        raw.sender.writeAndFlush(factory.envelopeToBase64(envelope));
+        String base64 = factory.envelopeToBase64(envelope);
+        raw.sender.writeAndFlush(base64);
     }
 
     public void closeConnection() {

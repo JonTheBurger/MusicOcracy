@@ -80,7 +80,7 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.6'
     // RX Netty - RX Networking
-    compile 'io.reactivex:rxnetty:0.4.19'
+    compile 'io.reactivex:rxnetty:0.4.20'
     // OrmLite - Database Object Relational Mapping
     compile 'com.j256.ormlite:ormlite-core:5.0'
     compile 'com.j256.ormlite:ormlite-android:5.0'
