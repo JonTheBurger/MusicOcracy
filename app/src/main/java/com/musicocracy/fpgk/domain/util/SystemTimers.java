@@ -13,16 +13,25 @@ public class SystemTimers implements SpotifyPlayer.NotificationCallback {
     private final Logger log;
     private SpotifyPlayer player;
     private Timer timer;
+    private boolean timerStarted = false;
 
     public SystemTimers(Logger log, SpotifyPlayer player) {
         this.log = log;
         this.player = player;
         timer = new Timer();
+
+        player.addNotificationCallback(this);
     }
 
     public void startPlayTimer(String uri) {
-        player.playUri(null, uri, 0, 0);
-        scheduleTimer();
+        if (!timerStarted) {
+            player.playUri(null, uri, 0, 0);
+            scheduleTimer();
+        }
+    }
+
+    public boolean isTimerStarted() {
+        return timerStarted;
     }
 
     @Override
@@ -47,4 +56,6 @@ public class SystemTimers implements SpotifyPlayer.NotificationCallback {
             }
         }, (currentTrackDuration - TIME_BEFORE_NEXT_SONG));
     }
+
+    // TODO: remove notification callback when SystemTimers is done being used
 }
