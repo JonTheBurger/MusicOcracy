@@ -23,6 +23,7 @@ public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.activity_now_playing, this);
 
+        presenter.updatePartyParameters();
         // Needs to be called after activity layout has been set
         presenter.updateCurrentPlayingTrack();
     }
@@ -48,21 +49,35 @@ public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements 
     @BindView(R.id.currentSongTextView)
     public TextView songText;
 
+    @BindView(R.id.nowPlayingPartyCode)
+    public TextView partyCodeText;
+
+    @BindView(R.id.nowPlayingPartyName)
+    public TextView partyNameText;
+
     @Override
     public void updateArtist(String artistName) {
         artistText.setText(artistName);
-        artistText.postInvalidate();
     }
 
     @Override
     public void updateSong(String songName) {
         songText.setText(songName);
-        songText.postInvalidate();
     }
 
     @Override
     public void updateVotableSongs(List<String> votableSongs) {
 
+    }
+
+    @Override
+    public void updatePartyCode(String partyCode) {
+        partyCodeText.setText("Party Code: " + partyCode);
+    }
+
+    @Override
+    public void updatePartyName(String partyName) {
+        partyNameText.setText("Party Name: " + partyName);
     }
 
     @Override

@@ -43,6 +43,11 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
         RxUtils.safeUnsubscribe(newPlayRequest);
     }
 
+    public void updatePartyParameters() {
+        view.updatePartyCode(model.getPartyCode());
+        view.updatePartyName(model.getPartyName());
+    }
+
     public void updateCurrentPlayingTrack() {
         // Update the Now Playing Artist and Song with the last received PlayRequest
         updateNowPlaying(model.getCurrentPlayingTrack());

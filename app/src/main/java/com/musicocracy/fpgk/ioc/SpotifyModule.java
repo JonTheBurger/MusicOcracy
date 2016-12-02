@@ -2,10 +2,9 @@ package com.musicocracy.fpgk.ioc;
 
 import android.content.Context;
 
-import com.musicocracy.fpgk.domain.net.ServerHandler;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
-import com.musicocracy.fpgk.domain.util.PartySettings;
+import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
 import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
@@ -44,7 +43,7 @@ public class SpotifyModule {
 
     @Provides
     @Singleton
-    public Config providePlayerConfig(Context context, PartySettings partySettings, @Named(CLIENT_ID) String clientID) {
+    public Config providePlayerConfig(Context context, ReadOnlyPartySettings partySettings, @Named(CLIENT_ID) String clientID) {
         return new Config(context, partySettings.getSpotifyToken(), clientID);
     }
 
