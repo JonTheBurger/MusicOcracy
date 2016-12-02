@@ -72,12 +72,12 @@ public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements 
 
     @Override
     public void updatePartyCode(String partyCode) {
-        partyCodeText.setText(partyCode);
+        partyCodeText.setText("Party Code: " + partyCode);
     }
 
     @Override
     public void updatePartyName(String partyName) {
-        partyNameText.setText(partyName);
+        partyNameText.setText("Party Name: " + partyName);
     }
 
     @Override
