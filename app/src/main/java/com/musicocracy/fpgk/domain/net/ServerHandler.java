@@ -3,7 +3,7 @@ package com.musicocracy.fpgk.domain.net;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
-import com.musicocracy.fpgk.domain.util.PartySettings;
+import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
 import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.net.proto.BasicReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
@@ -33,7 +33,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
     private static final String TAG = "ServerHandler";
     private static final int NUM_BROWSE_RESULTS = 10;
     private final ServerEventBus eventBus;
-    private final PartySettings partySettings;
+    private final ReadOnlyPartySettings partySettings;
     private final Browser browser;
     private final SpotifyApi api;
     private Player player;
@@ -41,7 +41,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
     private Subscription[] subscriptions = emptySubs;
     private final SharedSubject<Metadata.Track> newTrackPlayingSubject = SharedSubject.create();
 
-    public ServerHandler(ServerEventBus eventBus, PartySettings partySettings, Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log) {
+    public ServerHandler(ServerEventBus eventBus, ReadOnlyPartySettings partySettings, Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log) {
         this.eventBus = eventBus;
         this.partySettings = partySettings;
         this.browser = browser;
