@@ -20,6 +20,9 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
     public NowPlayingPresenter(NowPlayingModel model) {
         this.model = model;
         newPlayRequest = createPlayRequestSub();
+
+        view.updatePartyCode(model.getPartyCode());
+        view.updatePartyName(model.getPartyName());
     }
 
     @Override
