@@ -1,6 +1,7 @@
 package com.musicocracy.fpgk.mvp.presenter;
 
 import com.musicocracy.fpgk.domain.net.NetworkUtils;
+import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.mvp.model.ConnectModel;
 import com.musicocracy.fpgk.mvp.view.ConnectView;
 import com.musicocracy.fpgk.net.proto.BasicReply;
@@ -43,21 +44,17 @@ public class ConnectPresenter implements Presenter<ConnectView> {
     }
 
     public void joinParty() {
-        String ip = NetworkUtils.base36ToIpAddress(view.getPartyCode().toLowerCase());
         try {
+            String ip = NetworkUtils.base36ToIpAddress(view.getPartyCode().toLowerCase());
             model.connect(ip);
-            model.joinParty(view.getPartyName(), view.getPartyCode());
+            model.joinParty(view.getPartyName());
         } catch (UnsupportedOperationException e) {
             view.onJoinError(e.getMessage());
-        } //catch (TimeoutException e) {
-            //view.onJoinError("Join timed out after " + ConnectModel.TIMEOUT_SECS + " seconds.");
-        //}
+        }
     }
 
     public void onDestroy() {
-        if (!joinSubscription.isUnsubscribed()) {
-            joinSubscription.unsubscribe();
-        }
+        RxUtils.safeUnsubscribe(joinSubscription);
     }
 
     @Override

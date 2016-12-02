@@ -1,20 +1,17 @@
 package com.musicocracy.fpgk.domain.net;
 
-import android.util.Log;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.domain.util.PartySettings;
+import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.net.proto.BasicReply;
-import com.musicocracy.fpgk.net.proto.BasicReplyOrBuilder;
 import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
 import com.musicocracy.fpgk.net.proto.ConnectRequest;
 import com.musicocracy.fpgk.net.proto.MessageType;
 import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
 import com.musicocracy.fpgk.net.proto.SendVoteRequest;
-import com.musicocracy.fpgk.net.proto.VotableSongsReply;
 import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
 import com.spotify.sdk.android.player.Error;
 import com.spotify.sdk.android.player.Metadata;
@@ -57,14 +54,16 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
 
     public void onCreate() {
         api.setAccessToken(partySettings.getSpotifyToken());
-        subscriptions = new Subscription[] {
-                createLogSub(),
-                createClientConnectSub(),
-                createBrowseRequestSub(),
-                createVotableSongsRequestSub(),
-                createPlayRequestSub(),
-                createVoteRequestSub()
-        };
+        if (subscriptions == emptySubs) {
+            subscriptions = new Subscription[] {
+                    createLogSub(),
+                    createClientConnectSub(),
+                    createBrowseRequestSub(),
+                    createVotableSongsRequestSub(),
+                    createPlayRequestSub(),
+                    createVoteRequestSub()
+            };
+        }
     }
 
     private Subscription createLogSub() {
@@ -72,7 +71,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String s) {
-                        log.info(TAG, s);
+                        log.verbose(TAG, s);
                     }
                 });
     }
@@ -105,6 +104,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                                 .setReplyingTo(msgBySender.message.getHeader().getType())
                                 .build();
                         }
+                        log.verbose(TAG, "Sent: " + reply);
                         msgBySender.replyWith(reply);
                     }
                 });
@@ -118,7 +118,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                         BrowseSongsRequest request;
                         try {
                             request = BrowseSongsRequest.parseFrom(msgBySender.message.getBody());
-                            log.info(TAG, "Successful parse");
+                            log.verbose(TAG, "Successful parse");
                         } catch (InvalidProtocolBufferException e) {
                             log.error(TAG, e.toString());
                             request = BrowseSongsRequest.getDefaultInstance();
@@ -126,7 +126,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                         }
 
                         List<Track> browseTracks = browser.browseTracks(request.getSongTitle());
-                        log.info(TAG, browseTracks.size() + " songs found");
+                        log.verbose(TAG, browseTracks.size() + " songs found");
                         BrowseSongsReply.Builder builder = BrowseSongsReply.newBuilder();
 
                         for (int i = 0; i < browseTracks.size() && i < NUM_BROWSE_RESULTS; i++) {
@@ -140,9 +140,8 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                         }
                         BrowseSongsReply reply = builder.build();
 
-                        log.info(TAG, "Sending msg " + reply);
+                        log.verbose(TAG, "Sent (BrowseReply): " + reply);
                         msgBySender.replyWith(reply);
-                        log.info(TAG, "Send complete. ~" + reply.toByteArray().length + " byte body");
                     }
                 });
     }
@@ -174,9 +173,9 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                         }
                         VotableSongsReply reply = builder.build();
 
-                        log.info(TAG, "Sending msg " + reply);
+                        log.verbose(TAG, "Sending msg " + reply);
                         msgBySender.replyWith(reply);
-                        log.info(TAG, "Send complete. ~" + reply.toByteArray().length + " byte body");
+                        log.verbose(TAG, "Send complete. ~" + reply.toByteArray().length + " byte body");
                         */
                     }
                 });
@@ -227,15 +226,9 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
         player.removeNotificationCallback(this);
 
         for (int i = 0; i < subscriptions.length; i++) {
-            safeUnsubscribe(subscriptions[i]);
+            RxUtils.safeUnsubscribe(subscriptions[i]);
         }
         subscriptions = emptySubs;
-    }
-
-    private static void safeUnsubscribe(Subscription sub) {
-        if (sub != null && !sub.isUnsubscribed()) {
-            sub.unsubscribe();
-        }
     }
 
     public Metadata.Track getCurrentlyPlayingTrack() {

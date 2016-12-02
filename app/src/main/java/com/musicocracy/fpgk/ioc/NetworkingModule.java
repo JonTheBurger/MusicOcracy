@@ -1,6 +1,7 @@
 package com.musicocracy.fpgk.ioc;
 
 import com.musicocracy.fpgk.domain.net.ClientEventBus;
+import com.musicocracy.fpgk.domain.net.ClientHandler;
 import com.musicocracy.fpgk.domain.net.ProtoEnvelopeFactory;
 import com.musicocracy.fpgk.domain.net.RxTcpClient;
 import com.musicocracy.fpgk.domain.net.RxTcpServer;
@@ -44,6 +45,12 @@ public class NetworkingModule {
     @Singleton
     public ClientEventBus provideClientEventBus(RxTcpClient client, ProtoEnvelopeFactory factory) {
         return new ClientEventBus(client, factory);
+    }
+
+    @Provides
+    @Singleton
+    public ClientHandler provideClientHandler(ClientEventBus eventBus, Logger log) {
+        return new ClientHandler(eventBus, log);
     }
 
     @Provides

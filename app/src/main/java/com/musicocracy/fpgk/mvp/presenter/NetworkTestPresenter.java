@@ -1,6 +1,7 @@
 package com.musicocracy.fpgk.mvp.presenter;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.mvp.model.NetworkTestModel;
 import com.musicocracy.fpgk.domain.net.ProtoMessageBySender;
 import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
@@ -140,12 +141,12 @@ public class NetworkTestPresenter implements Presenter<NetworkTestView> {
     }
 
     public void destroy() throws InterruptedException {
-        clientSub.unsubscribe();
-        serverSub.unsubscribe();
-        clientLogSub.unsubscribe();
-        serverLogSub.unsubscribe();
-        clientConnectedSub.unsubscribe();
-        serverRunningSub.unsubscribe();
+        RxUtils.safeUnsubscribe(clientSub);
+        RxUtils.safeUnsubscribe(serverSub);
+        RxUtils.safeUnsubscribe(clientLogSub);
+        RxUtils.safeUnsubscribe(serverLogSub);
+        RxUtils.safeUnsubscribe(clientConnectedSub);
+        RxUtils.safeUnsubscribe(serverRunningSub);
         model.stopClient();
         model.stopServer();
     }

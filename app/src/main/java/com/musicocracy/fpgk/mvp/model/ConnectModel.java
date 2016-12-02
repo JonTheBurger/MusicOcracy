@@ -2,6 +2,7 @@ package com.musicocracy.fpgk.mvp.model;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.domain.net.ClientEventBus;
+import com.musicocracy.fpgk.domain.net.ClientHandler;
 import com.musicocracy.fpgk.net.proto.BasicReply;
 import com.musicocracy.fpgk.net.proto.ConnectRequest;
 import com.musicocracy.fpgk.net.proto.Envelope;
@@ -16,11 +17,13 @@ import rx.functions.Func1;
 
 public class ConnectModel {
     private final ClientEventBus client;
+    private final ClientHandler clientHandler;
     private final String uniqueAndroidId;
     private final int defaultPort;
 
-    public ConnectModel(ClientEventBus client, String uniqueAndroidId, int defaultPort) {
+    public ConnectModel(ClientEventBus client, ClientHandler clientHandler, String uniqueAndroidId, int defaultPort) {
         this.client = client;
+        this.clientHandler = clientHandler;
         this.uniqueAndroidId = uniqueAndroidId;
         this.defaultPort = defaultPort;
     }
@@ -31,13 +34,14 @@ public class ConnectModel {
         if (!client.isRunning()) {
             throw new UnsupportedOperationException("Could not connect to host");
         }
+        clientHandler.onCreate();
     }
 
     public Observable<Boolean> getIsRunningObservable() {
         return client.getIsRunningObservable();
     }
 
-    public void joinParty(String partyName, String partyCode) {
+    public void joinParty(String partyName) {
         ConnectRequest message = ConnectRequest.newBuilder()
                 .setRequesterId(uniqueAndroidId)
                 .setPartyName(partyName)
@@ -67,6 +71,7 @@ public class ConnectModel {
     }
 
     public void stopClient() {
+        clientHandler.onDestroy();
         client.stop();
     }
 }

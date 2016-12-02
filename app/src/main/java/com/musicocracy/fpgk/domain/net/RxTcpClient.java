@@ -1,6 +1,7 @@
 package com.musicocracy.fpgk.domain.net;
 
 import com.musicocracy.fpgk.domain.util.Box;
+import com.musicocracy.fpgk.domain.util.RxUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -135,7 +136,7 @@ public class RxTcpClient {
         if (client != null) {
             logStream.onNext("Disconnecting client...");
             isRunningStream.onNext(false);
-            clientSubscription.unsubscribe();
+            RxUtils.safeUnsubscribe(clientSubscription);
             if (connection != null) {
                 connection.getChannel().close();
                 connection.close();

@@ -1,6 +1,7 @@
 package com.musicocracy.fpgk.mvp.presenter;
 
 import com.musicocracy.fpgk.domain.dal.PlayRequest;
+import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.mvp.model.SongSelectModel;
 import com.musicocracy.fpgk.mvp.view.SongSelectView;
 import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
@@ -105,9 +106,7 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     }
 
     public void onDestroy() {
-        if (browseSubscription != null && !browseSubscription.isUnsubscribed()) {
-            browseSubscription.unsubscribe();
-        }
+        RxUtils.safeUnsubscribe(browseSubscription);
     }
 
     @Override
