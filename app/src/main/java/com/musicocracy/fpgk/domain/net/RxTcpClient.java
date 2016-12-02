@@ -1,5 +1,10 @@
 package com.musicocracy.fpgk.domain.net;
 
+import com.musicocracy.fpgk.domain.util.Box;
+import com.musicocracy.fpgk.domain.util.RxUtils;
+
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.channel.ObservableConnection;
 import io.reactivex.netty.client.RxClient;
@@ -7,7 +12,6 @@ import io.reactivex.netty.pipeline.PipelineConfigurators;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -74,8 +78,7 @@ public class RxTcpClient {
                             connection = serverConnection;
                             isRunningStream.onNext(true);
 
-                            Observable<String> receiver = serverConnection
-                                    .getInput();
+                            Observable<String> receiver = serverConnection.getInput();
 
                             Observable<String> transmitter = transmitStream.getObservable()
                                     .flatMap(new Func1<String, Observable<String>>() {
@@ -133,7 +136,7 @@ public class RxTcpClient {
         if (client != null) {
             logStream.onNext("Disconnecting client...");
             isRunningStream.onNext(false);
-            clientSubscription.unsubscribe();
+            RxUtils.safeUnsubscribe(clientSubscription);
             if (connection != null) {
                 connection.getChannel().close();
                 connection.close();
@@ -155,6 +158,29 @@ public class RxTcpClient {
      */
     public boolean isRunning() {
         return isRunningStream.getLast();
+    }
+
+    /**
+     * Waits until the isRunning status has changed for a duration.
+     * @param timeSpan How long to wait for the isRunning status to change.
+     * @param timeUnit How to interpret timeSpan.
+     * @return The latest change to isRunning status.
+     */
+    public boolean awaitNextIsRunningChanged(long timeSpan, TimeUnit timeUnit) {
+        final Box<Boolean> timedOut = new Box<>(false);
+        final boolean isRunningNow = isRunningStream.getLast();
+        getIsRunningObservable()
+            .timeout(timeSpan, timeUnit)
+            .onErrorResumeNext(new Func1<Throwable, Observable<Boolean>>() {
+                @Override
+                public Observable<Boolean> call(Throwable e) {
+                    timedOut.value = true;
+                    return Observable.just(isRunningNow);
+                }
+            })
+            .toBlocking()
+            .first();
+        return timedOut.value;
     }
 
     /**

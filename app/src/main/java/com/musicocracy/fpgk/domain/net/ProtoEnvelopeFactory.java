@@ -86,7 +86,7 @@ public class ProtoEnvelopeFactory {
         try {
             byte[] bytes = BaseEncoding.base64().decode(base64.trim());
             return Envelope.parseFrom(bytes);
-        } catch (InvalidProtocolBufferException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return Envelope.getDefaultInstance();
         }

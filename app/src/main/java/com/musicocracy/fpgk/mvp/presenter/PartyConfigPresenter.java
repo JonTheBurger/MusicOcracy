@@ -2,6 +2,7 @@ package com.musicocracy.fpgk.mvp.presenter;
 
 import android.content.Context;
 
+import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.mvp.model.PartyConfigModel;
 import com.musicocracy.fpgk.domain.net.NetworkUtils;
 import com.musicocracy.fpgk.mvp.view.PartyConfigView;
@@ -54,9 +55,7 @@ public class PartyConfigPresenter implements Presenter<PartyConfigView> {
     }
 
     public void onDestroy() {
-        if (globalIpSub != null && !globalIpSub.isUnsubscribed()) {
-            globalIpSub.unsubscribe();
-        }
+        RxUtils.safeUnsubscribe(globalIpSub);
     }
 
     @Override

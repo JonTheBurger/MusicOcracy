@@ -11,6 +11,10 @@ public class RequestPresenter implements Presenter<RequestView> {
         this.model = model;
     }
 
+    public void stopClient() {
+        model.stopClient();
+    }
+
     @Override
     public void setView(RequestView view) {
         this.view = view;
