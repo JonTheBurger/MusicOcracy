@@ -21,9 +21,6 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
     public NowPlayingPresenter(NowPlayingModel model) {
         this.model = model;
         newPlayRequest = createPlayRequestSub();
-
-        view.updatePartyCode(model.getPartyCode());
-        view.updatePartyName(model.getPartyName());
     }
 
     @Override
@@ -44,6 +41,11 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
 
     public void onDestroy() {
         RxUtils.safeUnsubscribe(newPlayRequest);
+    }
+
+    public void updatePartyParameters() {
+        view.updatePartyCode(model.getPartyCode());
+        view.updatePartyName(model.getPartyName());
     }
 
     public void updateCurrentPlayingTrack() {

@@ -4,7 +4,6 @@ import com.musicocracy.fpgk.domain.net.ServerHandler;
 import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
 import com.musicocracy.fpgk.mvp.model.NowPlayingModel;
 import com.musicocracy.fpgk.mvp.presenter.NowPlayingPresenter;
-import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import dagger.Module;
 import dagger.Provides;

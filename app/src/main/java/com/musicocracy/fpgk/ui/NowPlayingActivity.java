@@ -23,6 +23,7 @@ public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.activity_now_playing, this);
 
+        presenter.updatePartyParameters();
         // Needs to be called after activity layout has been set
         presenter.updateCurrentPlayingTrack();
     }

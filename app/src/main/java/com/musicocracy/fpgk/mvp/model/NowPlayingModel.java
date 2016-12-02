@@ -12,6 +12,7 @@ public class NowPlayingModel {
 
     public NowPlayingModel(ServerHandler serverHandler, ReadOnlyPartySettings partySettings) {
         this.serverHandler = serverHandler;
+        this.partySettings = partySettings;
     }
 
     public ServerHandler getServerHandler() { return serverHandler; }
