@@ -4,10 +4,12 @@ import com.musicocracy.fpgk.domain.util.Box;
 
 import java.util.concurrent.TimeUnit;
 
+import io.netty.channel.DefaultChannelPipeline;
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.channel.ConnectionHandler;
 import io.reactivex.netty.channel.ObservableConnection;
 import io.reactivex.netty.pipeline.PipelineConfigurators;
+import io.reactivex.netty.pipeline.StringMessageConfigurator;
 import io.reactivex.netty.server.RxServer;
 import rx.Observable;
 import rx.functions.Action0;
@@ -87,10 +89,8 @@ public class RxTcpServer {
                                 @Override
                                 public void call() {
                                     logStream.onNext("Terminating connection...");
-                                    if (newConnection != null) {
-                                        newConnection.getChannel().close();
-                                        newConnection.close();
-                                    }
+                                    newConnection.getChannel().close();
+                                    newConnection.close();
                                 }
                             });
 

@@ -1,6 +1,5 @@
 package com.musicocracy.fpgk.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,6 +18,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnItemClick;
 
 public class SongSelectActivity extends ActivityBase<SongSelectView> implements SongSelectView {
     private static final String TAG = "SongSelectActivity";
@@ -69,7 +69,6 @@ public class SongSelectActivity extends ActivityBase<SongSelectView> implements 
         };
         listView.setOnItemClickListener(listener);
     }
-
 
     @OnClick(R.id.selectBackButton)
     public void backClick() {
