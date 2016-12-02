@@ -5,6 +5,7 @@ import android.content.Context;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.musicocracy.fpgk.domain.dal.Database;
 import com.musicocracy.fpgk.domain.query_layer.PlayRequestRepository;
+import com.musicocracy.fpgk.domain.query_layer.SongFilterRepository;
 
 import javax.inject.Singleton;
 
@@ -23,5 +24,11 @@ public class DatabaseModule {
     @Singleton
     public PlayRequestRepository providePlayRequestRepository(Database database) {
         return new PlayRequestRepository(database);
+    }
+
+    @Provides
+    @Singleton
+    public SongFilterRepository provideSongRequestRepository(Database database) {
+        return new SongFilterRepository(database);
     }
 }
