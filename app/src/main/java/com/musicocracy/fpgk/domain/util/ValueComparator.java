@@ -1,4 +1,4 @@
-package com.musicocracy.fpgk.domain.query_layer;
+package com.musicocracy.fpgk.domain.util;
 
 import java.util.Comparator;
 import java.util.Map;

@@ -12,4 +12,8 @@
     <string name="filters">Filters</string>
     <string name="back_button_description">back button</string>
     <string name="forward_button_description">forward button</string>
+    <string name="add_a_song_title_or_artist_to_filter_from_records">Add a Song Title or Artist to Filter From Records</string>
+    <string name="or_use_cj_s_curate_song_list">Or Use CJ\'s Curate Song List</string>
+    <string name="song_artist">Song/Artist</string>
+    <string name="use_list">Use List!</string>
 </resources>
