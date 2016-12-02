@@ -4,6 +4,8 @@ import com.musicocracy.fpgk.domain.util.AndroidLogger;
 import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.domain.util.PartySettings;
 import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
+import com.musicocracy.fpgk.domain.util.SystemTimers;
+import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import javax.inject.Singleton;
 
@@ -29,4 +31,8 @@ public class UtilityModule {
     public Logger provideLogger() {
         return new AndroidLogger();
     }
+
+    @Provides
+    @Singleton
+    public SystemTimers provideSystemTimers(Logger log, SpotifyPlayer player) { return new SystemTimers(log, player);}
 }
