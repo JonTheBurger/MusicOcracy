@@ -1,7 +1,5 @@
 package com.musicocracy.fpgk.ioc;
 
-import android.content.Context;
-
 import com.musicocracy.fpgk.CyberJukeboxApplication;
 import com.musicocracy.fpgk.ioc.activity.AddTermModule;
 import com.musicocracy.fpgk.ioc.activity.BlacklistModule;
@@ -35,6 +33,7 @@ modules = {  // The dependency injection endpoints require class instances provi
         // Business Logic
         ApplicationModule.class,
         DatabaseModule.class,
+        DjModule.class,
         NetworkingModule.class,
         SpotifyModule.class,
         UtilityModule.class,
