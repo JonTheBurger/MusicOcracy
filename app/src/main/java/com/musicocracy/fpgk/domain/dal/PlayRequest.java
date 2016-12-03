@@ -50,6 +50,8 @@ public class PlayRequest {
     @DatabaseField(foreign = true) private Party party;
     @DatabaseField(foreign = true) private Guest requester;
     @DatabaseField private MusicService service;
-    @DatabaseField private String songId;
+    @DatabaseField(columnName = SONG_ID_COL_NAME) private String songId;
     @DatabaseField private Timestamp requestTime;
+
+    public static final String SONG_ID_COL_NAME = "songId";
 }
