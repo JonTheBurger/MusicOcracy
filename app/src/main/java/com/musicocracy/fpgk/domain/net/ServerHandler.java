@@ -1,7 +1,5 @@
 package com.musicocracy.fpgk.domain.net;
 
-import android.util.Log;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.domain.dal.Database;
 import com.musicocracy.fpgk.domain.dal.Guest;
@@ -20,11 +18,6 @@ import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
 import com.musicocracy.fpgk.net.proto.SendVoteRequest;
 import com.musicocracy.fpgk.net.proto.VotableSongsReply;
 import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
-import com.spotify.sdk.android.player.Error;
-import com.spotify.sdk.android.player.Metadata;
-import com.spotify.sdk.android.player.Player;
-import com.spotify.sdk.android.player.PlayerEvent;
-import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,11 +26,10 @@ import java.util.List;
 import kaaes.spotify.webapi.android.SpotifyApi;
 
 import kaaes.spotify.webapi.android.models.Track;
-import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 
-public class ServerHandler implements SpotifyPlayer.NotificationCallback {
+public class ServerHandler {
     private static final Subscription[] emptySubs = new Subscription[0];
     private static final String TAG = "ServerHandler";
     private static final int NUM_BROWSE_RESULTS = 10;
@@ -46,15 +38,13 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
     private final Browser browser;
     private final SpotifyApi api;
     private final Logger log;
-    private final SharedSubject<Metadata.Track> newTrackPlayingSubject = SharedSubject.create();
     private final DjAlgorithm djAlgorithm;
     private final Database database;
     private SpotifyPlayerHandler spotifyPlayerHandler;
     private Subscription[] subscriptions = emptySubs;
-    private Player player;
 
     public ServerHandler(ServerEventBus eventBus, ReadOnlyPartySettings partySettings,
-                         Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log,
+                         Browser browser, SpotifyApi api, Logger log,
                          SpotifyPlayerHandler spotifyPlayerHandler, DjAlgorithm djAlgorithm,
                          Database database) {
         this.eventBus = eventBus;
@@ -62,12 +52,9 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
         this.browser = browser;
         this.api = api;
         this.log = log;
-        this.player = player;
         this.spotifyPlayerHandler = spotifyPlayerHandler;
         this.djAlgorithm = djAlgorithm;
         this.database = database;
-
-        player.addNotificationCallback(this);
     }
 
     public void onCreate() {
@@ -186,7 +173,8 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
 
                         VotableSongsReply.Builder builder = VotableSongsReply.newBuilder();
 
-                        List<Track> votableTracks = getVotableTracks();
+                        List<String> votableURIs = getVotableURIs();
+                        List<Track> votableTracks = getVotableTracks(votableURIs);
                         for (int i = 0; i < votableTracks.size(); i++) {
                             Track track = votableTracks.get(i);
                             builder .addSongs(VotableSongsReply.VotableSong.newBuilder()
@@ -226,7 +214,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                     } catch (SQLException e) {
                         log.error(TAG, e.toString());
                     }
-                    spotifyPlayerHandler.play(request.getUri());
+                    spotifyPlayerHandler.play();
 
                     // TODO: Add Basic Reply
                 }
@@ -261,10 +249,6 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                 });
     }
 
-    public Observable<Metadata.Track> newSongPlaying() {
-        return newTrackPlayingSubject.asObservable();
-    }
-
     public List<String> getVotableURIs() {
         List<String> votableSongURIs = null;
         try {
@@ -275,8 +259,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
         return votableSongURIs;
     }
 
-    public List<Track> getVotableTracks() {
-        List<String> votableSongURIs = getVotableURIs();
+    public List<Track> getVotableTracks(List<String> votableSongURIs) {
         List<Track> votableTracks = new ArrayList<>();
         for (String uri : votableSongURIs) {
             Track track = browser.getTrackByURI(uri);
@@ -286,30 +269,11 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
     }
 
     public void onDestroy() {
-        newTrackPlayingSubject.onCompleted();
-        player.removeNotificationCallback(this);
         spotifyPlayerHandler.onDestroy();
 
         for (int i = 0; i < subscriptions.length; i++) {
             RxUtils.safeUnsubscribe(subscriptions[i]);
         }
         subscriptions = emptySubs;
-    }
-
-    // TODO: Move this to the SpotifyPlayerHandler
-    public Metadata.Track getCurrentlyPlayingTrack() {
-        return newTrackPlayingSubject.getLast();
-    }
-
-    @Override
-    public void onPlaybackEvent(PlayerEvent playerEvent) {
-        if (playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged) {
-            newTrackPlayingSubject.onNext(player.getMetadata().currentTrack);
-        }
-    }
-
-    @Override
-    public void onPlaybackError(Error error) {
-        log.error(TAG, "Error in Playback of Spotify Player.");
     }
 }

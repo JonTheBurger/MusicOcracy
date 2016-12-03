@@ -66,10 +66,10 @@ public class NetworkingModule {
     @Singleton
     public ServerHandler provideServerHandler(ServerEventBus eventBus,
                                               ReadOnlyPartySettings partySettings, Browser browser,
-                                              SpotifyApi api, SpotifyPlayer player, Logger log,
-                                              SpotifyPlayerHandler playerTimer,
+                                              SpotifyApi api, Logger log,
+                                              SpotifyPlayerHandler playerHandler,
                                               DjAlgorithm djAlgorithm, Database database) {
-        return new ServerHandler(eventBus, partySettings, browser, api, player, log, playerTimer,
+        return new ServerHandler(eventBus, partySettings, browser, api, log, playerHandler,
                 djAlgorithm, database);
     }
 

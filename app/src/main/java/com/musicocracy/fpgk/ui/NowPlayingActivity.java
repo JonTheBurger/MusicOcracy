@@ -12,6 +12,7 @@ import com.musicocracy.fpgk.mvp.presenter.NowPlayingPresenter;
 import com.musicocracy.fpgk.mvp.presenter.Presenter;
 import com.musicocracy.fpgk.mvp.view.NowPlayingView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,6 +29,8 @@ public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.activity_now_playing, this);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
+        listView.setAdapter(adapter);
 
         presenter.updatePartyParameters();
         // Needs to be called after activity layout has been set
@@ -76,8 +79,9 @@ public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements 
 
     @Override
     public void updateVotableSongs(List<String> votableSongs) {
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, votableSongs);
-        listView.setAdapter(adapter);
+        adapter.clear();
+        adapter.addAll(votableSongs);
+        adapter.notifyDataSetChanged();
     }
 
     @Override

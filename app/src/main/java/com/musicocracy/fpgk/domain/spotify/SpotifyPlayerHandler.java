@@ -1,8 +1,10 @@
 package com.musicocracy.fpgk.domain.spotify;
 
 import com.musicocracy.fpgk.domain.dj.DjAlgorithm;
+import com.musicocracy.fpgk.domain.net.SharedSubject;
 import com.musicocracy.fpgk.domain.util.Logger;
 import com.spotify.sdk.android.player.Error;
+import com.spotify.sdk.android.player.Metadata;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
@@ -18,6 +20,7 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
     private final DjAlgorithm djAlgorithm;
     private SpotifyPlayer player;
     private boolean playerStarted = false;
+    private final SharedSubject<Metadata.Track> newTrackPlayingSubject = SharedSubject.create();
 
     public SpotifyPlayerHandler(Logger log, SpotifyPlayer player, DjAlgorithm djAlgorithm) {
         this.log = log;
@@ -27,7 +30,7 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
         player.addNotificationCallback(this);
     }
 
-    public void play(String uri) {
+    public void play() {
         if (!playerStarted) {
             try {
                 player.playUri(null, djAlgorithm.dequeueNextSongUri(), 0, 0);
@@ -41,6 +44,7 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
     @Override
     public void onPlaybackEvent(PlayerEvent playerEvent) {
         if (playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged) {
+            newTrackPlayingSubject.onNext(player.getMetadata().currentTrack);
             scheduleTimer();
         }
     }
@@ -79,7 +83,16 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
             });
     }
 
+    public Observable<Metadata.Track> newSongPlaying() {
+        return newTrackPlayingSubject.asObservable();
+    }
+
+    public Metadata.Track getCurrentlyPlayingTrack() {
+        return newTrackPlayingSubject.getLast();
+    }
+
     public void onDestroy() {
+        newTrackPlayingSubject.onCompleted();
         player.removeNotificationCallback(this);
         playerStarted = false;
     }
