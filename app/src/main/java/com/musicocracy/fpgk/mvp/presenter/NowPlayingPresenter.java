@@ -20,12 +20,14 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
     private final NowPlayingModel model;
     private final Subscription newNowPlayingUpdate;
     private final Subscription newVotableUpdate;
+    private final Subscription newPlayRequest;
     private NowPlayingView view;
 
     public NowPlayingPresenter(NowPlayingModel model) {
         this.model = model;
         newNowPlayingUpdate = createPlayEventNowPlayingSub();
         newVotableUpdate = createPlayEventVotableSongsSub();
+        newPlayRequest = createPlayRequestSub();
     }
 
     @Override
@@ -44,7 +46,6 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                 });
     }
 
-    // TODO: When song is play requested update votable songs
     public Subscription createPlayEventVotableSongsSub() {
         return model.getPlayerHandler().newSongPlaying()
                 .map(new Func1<Metadata.Track, List<String>>() {
@@ -53,9 +54,27 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                         return getVotableTrackStrings();
                     }
                 })
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<String>>() {
+                    @Override
+                    public void call(List<String> votableSongs) {
+                        view.updateVotableSongs(votableSongs);
+                    }
+                });
+    }
+
+    public Subscription createPlayRequestSub() {
+        return model.getServerHandler().newPlayRequest()
+                .map(new Func1<String, List<String>>() {
+                        @Override
+                        public List<String> call(String ignored) {
+                            return getVotableTrackStrings();
+                        }
+                    })
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Action1<List<String>>() {
                     @Override
                     public void call(List<String> votableSongs) {
                         view.updateVotableSongs(votableSongs);
@@ -81,6 +100,7 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
     public void onDestroy() {
         RxUtils.safeUnsubscribe(newNowPlayingUpdate);
         RxUtils.safeUnsubscribe(newVotableUpdate);
+        RxUtils.safeUnsubscribe(newPlayRequest);
     }
 
     public void updatePartyParameters() {
@@ -91,6 +111,10 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
     public void updateCurrentPlayingTrack() {
         // Update the Now Playing Artist and Song with the last received PlayRequest
         updateNowPlaying(model.getCurrentPlayingTrack());
+        updateVotableSongs();
+    }
+
+    public void updateVotableSongs() {
         Observable.just(null)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())

@@ -18,6 +18,7 @@ import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
 import com.musicocracy.fpgk.net.proto.SendVoteRequest;
 import com.musicocracy.fpgk.net.proto.VotableSongsReply;
 import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
+import com.spotify.sdk.android.player.Metadata;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.List;
 import kaaes.spotify.webapi.android.SpotifyApi;
 
 import kaaes.spotify.webapi.android.models.Track;
+import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 
@@ -40,6 +42,7 @@ public class ServerHandler {
     private final Logger log;
     private final DjAlgorithm djAlgorithm;
     private final Database database;
+    private final SharedSubject<String> newPlayRequest = SharedSubject.create();
     private SpotifyPlayerHandler spotifyPlayerHandler;
     private Subscription[] subscriptions = emptySubs;
 
@@ -211,6 +214,7 @@ public class ServerHandler {
 
                     try {
                         djAlgorithm.request(request.getUri(), request.getRequesterId());
+                        newPlayRequest.onNext(request.getUri());
                     } catch (SQLException e) {
                         log.error(TAG, e.toString());
                     }
@@ -266,6 +270,10 @@ public class ServerHandler {
             votableTracks.add(track);
         }
         return votableTracks;
+    }
+
+    public Observable<String> newPlayRequest() {
+        return newPlayRequest.asObservable();
     }
 
     public void onDestroy() {

@@ -22,6 +22,8 @@ public class NowPlayingModel {
 
     public SpotifyPlayerHandler getPlayerHandler() { return playerHandler; }
 
+    public ServerHandler getServerHandler() { return serverHandler; }
+
     public Metadata.Track getCurrentPlayingTrack() {
         return playerHandler.getCurrentlyPlayingTrack();
     }
