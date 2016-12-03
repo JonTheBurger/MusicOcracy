@@ -5,7 +5,9 @@ import com.musicocracy.fpgk.domain.dal.Guest;
 import com.musicocracy.fpgk.domain.dal.MusicService;
 import com.musicocracy.fpgk.domain.dal.Party;
 import com.musicocracy.fpgk.domain.dal.PlayRequest;
+import com.musicocracy.fpgk.domain.dal.PlayedVote;
 import com.musicocracy.fpgk.domain.query_layer.PlayRequestRepository;
+import com.musicocracy.fpgk.domain.query_layer.PlayedVoteRepository;
 
 import org.junit.Test;
 
@@ -23,13 +25,14 @@ public class PlayRequestRepositoryTests {
     private PlayRequest pr1 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Don't Stop Me Now", new Timestamp((int)System.currentTimeMillis()));
     private PlayRequest pr2 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Bicycle",  new Timestamp((int)System.currentTimeMillis() - 25000));
     private PlayRequest pr3 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Bicycle",  new Timestamp((int)System.currentTimeMillis() - 10000));
-
-
+    private PlayRequest pr4 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Don't Stop Believing",  new Timestamp((int)System.currentTimeMillis() - 100));
+    private PlayedVote pv1 = new PlayedVote(party, MusicService.SPOTIFY, "Don't Stop Believing", new Timestamp((int)System.currentTimeMillis() - 15000));
     private PlayRequestRepository setUpMocks() throws SQLException {
         // Setup mocks
         System.out.println("\nEVENT: Initializing mocks...");
         Database databaseMock = mock(Database.class);
-        Dao<PlayRequest, Integer> daoMock = mock(Dao.class);
+        Dao<PlayRequest, Integer> playRequestDaoMock = mock(Dao.class);
+        Dao<PlayedVote, Integer> playedVoteDaoMock = mock(Dao.class);
         System.out.println("SUCCESS: Mocks initialized.\n");
 
         // "Mock" for dao query
@@ -38,14 +41,35 @@ public class PlayRequestRepositoryTests {
         playRequestList.add(pr2);
         playRequestList.add(pr3);
 
+        List<PlayedVote> playedVoteList = new ArrayList<>();
+        playedVoteList.add(pv1);
+
         // Setup custom behaviour
         System.out.println("EVENT: Teaching custom mock behaviour...");
-        when(databaseMock.getPlayRequestDao()).thenReturn(daoMock);
-        when(daoMock.queryForAll()).thenReturn(playRequestList);
+        when(databaseMock.getPlayRequestDao()).thenReturn(playRequestDaoMock);
+        when(playRequestDaoMock.queryForAll()).thenReturn(playRequestList);
+        when(databaseMock.getPlayedVoteDao()).thenReturn(playedVoteDaoMock);
+        when(playedVoteDaoMock.queryForAll()).thenReturn(playedVoteList);
         System.out.println("SUCCESS: Custom mock behaviour taught.\n");
 
         // Setup class to be tested
         return new PlayRequestRepository(databaseMock);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testRepositoryBlocksPlayedVotePlayRequest() throws SQLException {
+
+        String fakeSongId = "Don't Stop Believing";
+
+        PlayRequestRepository playRequestRepository = setUpMocks();
+
+        // Perform test
+        System.out.println("EVENT: Running test...");
+        playRequestRepository.add(pr4);
+        // Exception thrown on add. Anything below does not get run.
+        // Test passes because of expected key/value pair in decorator.
+         assertFalse(playRequestRepository.getAllRequestedSongIds().contains(fakeSongId));
+         System.out.println("SUCCESS: Test complete.");
     }
 
     @Test

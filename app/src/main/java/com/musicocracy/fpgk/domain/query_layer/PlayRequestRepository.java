@@ -21,23 +21,29 @@ public class PlayRequestRepository {
     private Database database;
     private Dao<PlayRequest, Integer> dao;
     private SongFilterRepository songFilterRepository;
+    private PlayedVoteRepository playedVoteRepository;
     private List<String> lastVotableSongIds;
     private final Random random;
 
     public PlayRequestRepository(Database database) {
         this.database = database;
         songFilterRepository = new SongFilterRepository(database);
+        playedVoteRepository = new PlayedVoteRepository(database);
         lastVotableSongIds = new ArrayList<>();
         random = new Random();
     }
 
     public void addWithFilter(PlayRequest playRequest, FilterMode filterMode) {
         try {
-            if(songFilterRepository.isValidPlayRequest(playRequest, filterMode)){
-                dao = database.getPlayRequestDao();
-                dao.createOrUpdate(playRequest);
+            if(playedVoteRepository.getAllPlayedVoteSongIds().contains(playRequest.getSongId())) {
+                throw new IllegalArgumentException("The requested song has been played too recently.");
             } else {
-                System.out.println("ERROR: Song is blacklisted by party host!");
+                if(songFilterRepository.isValidPlayRequest(playRequest, filterMode)){
+                    dao = database.getPlayRequestDao();
+                    dao.createOrUpdate(playRequest);
+                } else {
+                    throw new IllegalArgumentException("The party's filter has rejected your song request.");
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -46,6 +52,22 @@ public class PlayRequestRepository {
 
     public void add(PlayRequest playRequest) {
         addWithFilter(playRequest, FilterMode.NONE);
+    }
+
+    public List<String> getAllRequestedSongIds() {
+        List<String> returnList = new ArrayList<>();
+        try {
+            dao = database.getPlayRequestDao();
+            List<PlayRequest> playRequestList = dao.queryForAll();
+            for(PlayRequest playRequest : playRequestList) {
+                returnList.add(playRequest.getSongId());
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            return returnList;
+        }
     }
 
     public List<String> getVotableSongIds(int count) {
