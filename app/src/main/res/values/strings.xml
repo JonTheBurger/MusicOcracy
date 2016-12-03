@@ -9,6 +9,7 @@
     <string name="receive">Receive</string>
     <string name="result_string">RESULT_STRING</string>
     <string name="request_string">REQUEST_STRING</string>
+    <string name="term_string">TERM_STRING</string>
     <string name="filters">Filters</string>
     <string name="back_button_description">back button</string>
     <string name="forward_button_description">forward button</string>

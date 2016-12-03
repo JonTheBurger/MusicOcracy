@@ -8,6 +8,7 @@ import com.musicocracy.fpgk.domain.dal.PlayRequest;
 import com.musicocracy.fpgk.domain.dal.SongFilter;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SongFilterRepository {
@@ -25,6 +26,68 @@ public class SongFilterRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<SongFilter> getAllNonelistedSongFilters() {
+        List<SongFilter> returnList = new ArrayList<>();
+        try {
+            dao = database.getSongFilterDao();
+            returnList =
+                    dao.query(
+                            dao.queryBuilder().where()
+                                    .eq("filterMode", FilterMode.NONE)
+                                    .prepare());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            return returnList;
+        }
+    }
+
+
+    public List<SongFilter> getAllWhitelistedSongFilters() {
+        List<SongFilter> returnList = new ArrayList<>();
+        try {
+            dao = database.getSongFilterDao();
+            returnList =
+                    dao.query(
+                            dao.queryBuilder().where()
+                                    .eq("filterMode", FilterMode.WHITE_LIST)
+                                    .prepare());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            return returnList;
+        }
+    }
+
+    public List<SongFilter> getAllBlacklistedSongFilters() {
+        List<SongFilter> returnList = new ArrayList<>();
+        try {
+            dao = database.getSongFilterDao();
+            returnList =
+                    dao.query(
+                            dao.queryBuilder().where()
+                                    .eq("filterMode", FilterMode.BLACK_LIST)
+                                    .prepare());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            return returnList;
+        }
+    }
+
+    public List<SongFilter> getAllSongFilters() {
+        List<SongFilter> returnList = new ArrayList<>();
+        try {
+            dao = database.getSongFilterDao();
+            returnList = dao.queryForAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            return returnList;
+        }
+
     }
 
     public boolean isBlacklistedSongId(String songId) {

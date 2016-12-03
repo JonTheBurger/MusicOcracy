@@ -1,5 +1,6 @@
 package com.musicocracy.fpgk.ioc.activity;
 
+import com.musicocracy.fpgk.domain.query_layer.SongFilterRepository;
 import com.musicocracy.fpgk.mvp.model.BlacklistModel;
 import com.musicocracy.fpgk.mvp.presenter.BlacklistPresenter;
 
@@ -9,8 +10,8 @@ import dagger.Provides;
 @Module
 public class BlacklistModule {
     @Provides
-    public BlacklistModel provideBlacklistModel() {
-        return new BlacklistModel();
+    public BlacklistModel provideBlacklistModel(SongFilterRepository songFilterRepository) {
+        return new BlacklistModel(songFilterRepository);
     }
 
     @Provides
