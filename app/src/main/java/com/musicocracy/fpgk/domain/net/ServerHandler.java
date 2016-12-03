@@ -5,7 +5,7 @@ import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
 import com.musicocracy.fpgk.domain.util.RxUtils;
-import com.musicocracy.fpgk.domain.util.SystemTimers;
+import com.musicocracy.fpgk.domain.spotify.SpotifyPlayerHandler;
 import com.musicocracy.fpgk.net.proto.BasicReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
@@ -39,20 +39,20 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
     private final SpotifyApi api;
     private final Logger log;
     private final SharedSubject<Metadata.Track> newTrackPlayingSubject = SharedSubject.create();
-    private SystemTimers playerTimer;
+    private SpotifyPlayerHandler spotifyPlayerHandler;
     private Subscription[] subscriptions = emptySubs;
     private Player player;
 
     public ServerHandler(ServerEventBus eventBus, ReadOnlyPartySettings partySettings,
                          Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log,
-                         SystemTimers playerTimer) {
+                         SpotifyPlayerHandler spotifyPlayerHandler) {
         this.eventBus = eventBus;
         this.partySettings = partySettings;
         this.browser = browser;
         this.api = api;
         this.log = log;
         this.player = player;
-        this.playerTimer = playerTimer;
+        this.spotifyPlayerHandler = spotifyPlayerHandler;
 
         player.addNotificationCallback(this);
     }
@@ -199,8 +199,8 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                             e.printStackTrace();
                         }
 
-                        if (!playerTimer.isTimerStarted()) {
-                            playerTimer.startPlayTimer(request.getUri());
+                        if (!spotifyPlayerHandler.isTimerStarted()) {
+                            spotifyPlayerHandler.startPlayTimer(request.getUri());
                         }
 
                         //TODO: Send Play Request to DJ algorithm
@@ -233,6 +233,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
     public void onDestroy() {
         newTrackPlayingSubject.onCompleted();
         player.removeNotificationCallback(this);
+        spotifyPlayerHandler.stopTimer();
 
         for (int i = 0; i < subscriptions.length; i++) {
             RxUtils.safeUnsubscribe(subscriptions[i]);
@@ -240,7 +241,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
         subscriptions = emptySubs;
     }
 
-    // TODO: Move this to the SystemTimers
+    // TODO: Move this to the SpotifyPlayerHandler
     public Metadata.Track getCurrentlyPlayingTrack() {
         return newTrackPlayingSubject.getLast();
     }

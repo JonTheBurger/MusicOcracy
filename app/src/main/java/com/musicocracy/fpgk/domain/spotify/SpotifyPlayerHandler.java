@@ -1,5 +1,6 @@
-package com.musicocracy.fpgk.domain.util;
+package com.musicocracy.fpgk.domain.spotify;
 
+import com.musicocracy.fpgk.domain.util.Logger;
 import com.spotify.sdk.android.player.Error;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.SpotifyPlayer;
@@ -7,26 +8,31 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class SystemTimers implements SpotifyPlayer.NotificationCallback {
-    private static final String TAG = "SystemTimers";
-    private static final int TIME_BEFORE_NEXT_SONG = 10;
+public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback {
+    private static final String TAG = "SpotifyPlayerHandler";
+    private static final int TIME_BEFORE_NEXT_SONG = 10000; //ms
     private final Logger log;
     private SpotifyPlayer player;
-    private Timer timer;
+    private Timer nextSongTimer;
+    private Timer playTimer;
     private boolean timerStarted = false;
+    private String nextURI;
 
-    public SystemTimers(Logger log, SpotifyPlayer player) {
+    public SpotifyPlayerHandler(Logger log, SpotifyPlayer player) {
         this.log = log;
         this.player = player;
-        timer = new Timer();
+        nextSongTimer = new Timer();
+        playTimer = new Timer();
 
         player.addNotificationCallback(this);
     }
 
     public void startPlayTimer(String uri) {
-        if (!timerStarted) {
+        nextURI = uri;
+        if (!isTimerStarted()) {
             player.playUri(null, uri, 0, 0);
             scheduleTimer();
+            timerStarted = true;
         }
     }
 
@@ -50,12 +56,15 @@ public class SystemTimers implements SpotifyPlayer.NotificationCallback {
         long currentTrackDuration = player.getMetadata().currentTrack.durationMs;
 
         // Timer will execute task before the song is done playing
-        timer.schedule(new TimerTask() {
+        nextSongTimer.schedule(new TimerTask() {
             public void run() {
-                // TODO: retrieve song from DJ algorithm, queue the song, clear votes for previously played song
+                // TODO: retrieve song from DJ algorithm, clear votes for previously played song
+                player.queue(null, nextURI);
             }
         }, (currentTrackDuration - TIME_BEFORE_NEXT_SONG));
     }
 
-    // TODO: remove notification callback when SystemTimers is done being used
+    public void stopTimer() {
+        player.removeNotificationCallback(this);
+    }
 }
