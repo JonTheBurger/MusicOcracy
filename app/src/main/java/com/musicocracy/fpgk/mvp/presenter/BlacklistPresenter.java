@@ -19,6 +19,7 @@ public class BlacklistPresenter implements Presenter<BlacklistView> {
         this.view = view;
     }
 
+
     public List<SongFilter> getAllBlacklistedSongFilters() {
         return model.getAllBlacklistedSongFilters();
     }

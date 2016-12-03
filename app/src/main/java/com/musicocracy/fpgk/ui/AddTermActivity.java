@@ -7,9 +7,7 @@ import android.widget.EditText;
 import com.musicocracy.fpgk.CyberJukeboxApplication;
 import com.musicocracy.fpgk.domain.dal.FilterMode;
 import com.musicocracy.fpgk.domain.dal.MusicService;
-import com.musicocracy.fpgk.domain.query_layer.SongFilterRepository;
 import com.musicocracy.fpgk.mvp.presenter.AddTermPresenter;
-import com.musicocracy.fpgk.mvp.presenter.BlacklistPresenter;
 import com.musicocracy.fpgk.mvp.presenter.Presenter;
 import com.musicocracy.fpgk.mvp.view.AddTermView;
 
@@ -44,7 +42,7 @@ public class AddTermActivity extends ActivityBase<AddTermView> implements AddTer
     public void forwardClick() {
         Intent intent = new Intent(this, BlacklistActivity.class);
         String addTermString = getAddTermString();
-        // presenter.addSongFilter(MusicService.SPOTIFY, addTermString, party, FilterMode.BLACK_LIST);
+        addSongFilter(addTermString);
 
         AddTermActivity.this.startActivity(intent);
     }
@@ -62,6 +60,11 @@ public class AddTermActivity extends ActivityBase<AddTermView> implements AddTer
     @Override
     protected void daggerInject() {
         CyberJukeboxApplication.getComponent(this).inject(this);
+    }
+
+    @Override
+    public void addSongFilter(String songId) {
+        presenter.addSongFilter(MusicService.SPOTIFY, songId, null, FilterMode.BLACK_LIST);
     }
 
     @Override
