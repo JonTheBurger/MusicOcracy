@@ -1,6 +1,10 @@
 package com.musicocracy.fpgk.ui;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
@@ -17,6 +21,8 @@ import butterknife.ButterKnife;
 
 public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements NowPlayingView {
     private static final String TAG = "NowPlayingActivity";
+    private ArrayAdapter<String> adapter;
+
     @Inject NowPlayingPresenter presenter;
 
     @Override
@@ -55,6 +61,9 @@ public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements 
     @BindView(R.id.nowPlayingPartyName)
     public TextView partyNameText;
 
+    @BindView(R.id.voteableSongsListView)
+    public ListView listView;
+
     @Override
     public void updateArtist(String artistName) {
         artistText.setText(artistName);
@@ -67,7 +76,8 @@ public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements 
 
     @Override
     public void updateVotableSongs(List<String> votableSongs) {
-
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, votableSongs);
+        listView.setAdapter(adapter);
     }
 
     @Override
