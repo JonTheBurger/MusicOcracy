@@ -4,6 +4,8 @@ import com.google.protobuf.MessageLite;
 import com.musicocracy.fpgk.net.proto.Envelope;
 import com.musicocracy.fpgk.net.proto.MessageType;
 
+import java.util.concurrent.TimeUnit;
+
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -56,6 +58,16 @@ public class ServerEventBus {
      */
     public boolean isRunning() {
         return server.isRunning();
+    }
+
+    /**
+     * Waits until the isRunning status has changed for a duration.
+     * @param timeSpan How long to wait for the isRunning status to change.
+     * @param timeUnit How to interpret timeSpan.
+     * @return If a timeout has occurred.
+     */
+    public boolean awaitNextIsRunningChanged(long timeSpan, TimeUnit timeUnit) {
+        return server.awaitNextIsRunningChanged(timeSpan, timeUnit);
     }
 
     /**

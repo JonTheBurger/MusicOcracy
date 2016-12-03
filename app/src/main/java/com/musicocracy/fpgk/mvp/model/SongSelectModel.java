@@ -29,20 +29,24 @@ public class SongSelectModel {
         client.send(msg);
     }
 
-    InvalidProtocolBufferException exc;
-
     public Observable<BrowseSongsReply> getBrowseReply() {
-        return client.getObservable(MessageType.BROWSE_SONGS_REPLY)
-                .map(new Func1<Envelope, BrowseSongsReply>() {
+        return client.getObservable()
+                .flatMap(new Func1<Envelope, Observable<BrowseSongsReply>>() {
                     @Override
-                    public BrowseSongsReply call(Envelope Envelope) {
-                        try {
-                            return BrowseSongsReply.parseFrom(Envelope.getBody());
-                        } catch (InvalidProtocolBufferException e) {
-                            e.printStackTrace();
-                            log.error(TAG, e.toString());
-                            SongSelectModel.this.exc = e;
-                            return BrowseSongsReply.getDefaultInstance();
+                    public Observable<BrowseSongsReply> call(Envelope envelope) {
+                        if (envelope == Envelope.getDefaultInstance()) {
+                            return Observable.just(BrowseSongsReply.getDefaultInstance());
+                        } else if (envelope.getHeader().getType() == MessageType.BROWSE_SONGS_REPLY) {
+                            BrowseSongsReply reply = BrowseSongsReply.getDefaultInstance();
+                            try {
+                                reply = BrowseSongsReply.parseFrom(envelope.getBody());
+                            } catch (InvalidProtocolBufferException e) {
+                                e.printStackTrace();
+                                log.error(TAG, e.toString());
+                            }
+                            return Observable.just(reply);
+                        } else {
+                            return Observable.empty();
                         }
                     }
                 });

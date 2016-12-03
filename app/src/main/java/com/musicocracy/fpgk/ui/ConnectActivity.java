@@ -51,6 +51,7 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
     public void backClick() {
         super.onBackPressed();
         presenter.leaveParty();
+        presenter.onDestroy();
     }
 
     @OnClick(R.id.connect_forward_btn)
@@ -73,7 +74,6 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
     public void onJoinSuccess() {
         Intent intent = new Intent(ConnectActivity.this, RequestActivity.class);
         startActivity(intent);
-        presenter.onDestroy();
     }
 
     @Override

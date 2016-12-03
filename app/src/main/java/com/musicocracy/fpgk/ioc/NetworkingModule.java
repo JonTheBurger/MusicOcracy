@@ -1,6 +1,7 @@
 package com.musicocracy.fpgk.ioc;
 
 import com.musicocracy.fpgk.domain.net.ClientEventBus;
+import com.musicocracy.fpgk.domain.net.ClientHandler;
 import com.musicocracy.fpgk.domain.net.ProtoEnvelopeFactory;
 import com.musicocracy.fpgk.domain.net.RxTcpClient;
 import com.musicocracy.fpgk.domain.net.RxTcpServer;
@@ -8,7 +9,7 @@ import com.musicocracy.fpgk.domain.net.ServerEventBus;
 import com.musicocracy.fpgk.domain.net.ServerHandler;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
-import com.musicocracy.fpgk.domain.util.PartySettings;
+import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import javax.inject.Named;
@@ -48,13 +49,19 @@ public class NetworkingModule {
 
     @Provides
     @Singleton
+    public ClientHandler provideClientHandler(ClientEventBus eventBus, Logger log) {
+        return new ClientHandler(eventBus, log);
+    }
+
+    @Provides
+    @Singleton
     public ServerEventBus provideServerEventBus(RxTcpServer server, ProtoEnvelopeFactory factory) {
         return new ServerEventBus(server, factory);
     }
 
     @Provides
     @Singleton
-    public ServerHandler provideServerHandler(ServerEventBus eventBus, PartySettings partySettings, Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log) {
+    public ServerHandler provideServerHandler(ServerEventBus eventBus, ReadOnlyPartySettings partySettings, Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log) {
         return new ServerHandler(eventBus, partySettings, browser, api, player, log);
     }
 

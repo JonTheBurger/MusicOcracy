@@ -4,6 +4,9 @@ import com.google.protobuf.MessageLite;
 import com.musicocracy.fpgk.net.proto.Envelope;
 import com.musicocracy.fpgk.net.proto.MessageType;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -63,6 +66,16 @@ public class ClientEventBus {
     }
 
     /**
+     * Waits until the isRunning status has changed for a duration.
+     * @param timeSpan How long to wait for the isRunning status to change.
+     * @param timeUnit How to interpret timeSpan.
+     * @return If a timeout has occurred.
+     */
+    public boolean awaitNextIsRunningChanged(long timeSpan, TimeUnit timeUnit) {
+        return client.awaitNextIsRunningChanged(timeSpan, timeUnit);
+    }
+
+    /**
      * An observable stream of all possible events from the server.
      * @return An observable stream of all possible events from the server.
      */
@@ -71,7 +84,7 @@ public class ClientEventBus {
             .map(new Func1<String, Envelope>() {
                 @Override
                 public Envelope call(String base64) {
-                    return factory.envelopeFromBase64(base64);
+                return factory.envelopeFromBase64(base64);
                 }
             });
     }

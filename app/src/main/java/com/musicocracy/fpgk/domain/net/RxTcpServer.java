@@ -1,5 +1,9 @@
 package com.musicocracy.fpgk.domain.net;
 
+import com.musicocracy.fpgk.domain.util.Box;
+
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.channel.ConnectionHandler;
 import io.reactivex.netty.channel.ObservableConnection;
@@ -83,10 +87,8 @@ public class RxTcpServer {
                                 @Override
                                 public void call() {
                                     logStream.onNext("Terminating connection...");
-                                    if (newConnection != null) {
-                                        newConnection.getChannel().close();
-                                        newConnection.close();
-                                    }
+                                    newConnection.getChannel().close();
+                                    newConnection.close();
                                 }
                             });
 
@@ -143,6 +145,29 @@ public class RxTcpServer {
      */
     public boolean isRunning() {
         return isRunningStream.getLast();
+    }
+
+    /**
+     * Waits until the isRunning status has changed for a duration.
+     * @param timeSpan How long to wait for the isRunning status to change.
+     * @param timeUnit How to interpret timeSpan.
+     * @return If a timeout has occurred.
+     */
+    public boolean awaitNextIsRunningChanged(long timeSpan, TimeUnit timeUnit) {
+        final Box<Boolean> timedOut = new Box<>(false);
+        final boolean isRunningNow = isRunningStream.getLast();
+        getIsRunningObservable()
+                .timeout(timeSpan, timeUnit)
+                .onErrorResumeNext(new Func1<Throwable, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(Throwable e) {
+                        timedOut.value = true;
+                        return Observable.just(isRunningNow);
+                    }
+                })
+                .toBlocking()
+                .first();
+        return timedOut.value;
     }
 
     /**

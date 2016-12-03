@@ -2,6 +2,7 @@ package com.musicocracy.fpgk.mvp.presenter;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.domain.net.ProtoMessageBySender;
+import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.mvp.model.NowPlayingModel;
 import com.musicocracy.fpgk.mvp.view.NowPlayingView;
 import com.musicocracy.fpgk.net.proto.MessageType;
@@ -39,7 +40,12 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
     }
 
     public void onDestroy() {
-        newPlayRequest.unsubscribe();
+        RxUtils.safeUnsubscribe(newPlayRequest);
+    }
+
+    public void updatePartyParameters() {
+        view.updatePartyCode(model.getPartyCode());
+        view.updatePartyName(model.getPartyName());
     }
 
     public void updateCurrentPlayingTrack() {

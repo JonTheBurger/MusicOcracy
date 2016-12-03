@@ -24,6 +24,12 @@ public class RequestActivity extends ActivityBase<RequestView> implements Reques
         super.onCreate(savedInstanceState, R.layout.activity_request, this);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        presenter.stopClient();
+    }
+
     @OnClick(R.id.requestButton)
     public void requestClick() {
         Intent intent = new Intent(this, SongSelectActivity.class);
