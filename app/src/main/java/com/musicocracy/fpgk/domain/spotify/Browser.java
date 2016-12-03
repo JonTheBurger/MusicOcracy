@@ -31,4 +31,14 @@ public class Browser {
 
         return track;
     }
+
+    public List<Track> getTopTracks(int numTopTracks) {
+        List<Track> topTracks = spotify.getTopTracks().items;
+
+        if(topTracks.size() > numTopTracks) {
+            topTracks = topTracks.subList(0, numTopTracks);
+        }
+
+        return topTracks;
+    }
 }
