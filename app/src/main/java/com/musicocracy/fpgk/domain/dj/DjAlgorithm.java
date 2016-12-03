@@ -30,7 +30,8 @@ public class DjAlgorithm {
     private final SongFilterRepository songFilterRepository;
     private final ReadOnlyPartySettings partySettings;
 
-    public DjAlgorithm(Database database, PlayRequestRepository playRequestRepository, SongFilterRepository songFilterRepository, ReadOnlyPartySettings partySettings) throws SQLException {
+    public DjAlgorithm(Database database, PlayRequestRepository playRequestRepository, SongFilterRepository songFilterRepository, ReadOnlyPartySettings partySettings) {
+        if (database == null || playRequestRepository == null || songFilterRepository == null || partySettings == null) { throw new IllegalArgumentException("No dependencies may be null"); }
         this.database = database;
         this.playRequestRepository = playRequestRepository;
         this.songFilterRepository = songFilterRepository;
@@ -72,7 +73,7 @@ public class DjAlgorithm {
     }
 
     private static Party addPartyToDatabase(Dao<Party, Integer> dao, ReadOnlyPartySettings partySettings) throws SQLException {
-        return dao.createIfNotExists(new Party(partySettings.getPartyName(), partySettings.getPartyCode(), now(), null, null, true));
+        return dao.createIfNotExists(new Party(partySettings.getPartyName(), partySettings.getPartyCode(), now(), null, FilterMode.NONE, true));
     }
 
     private static Timestamp now() {
@@ -117,7 +118,7 @@ public class DjAlgorithm {
         throw new IllegalArgumentException("You do not appear to be on the guest list.");
     }
 
-    public void request(String uri, String requesterId) throws IllegalAccessException, SQLException {
+    public void request(String uri, String requesterId) throws IllegalArgumentException, SQLException {
         // Check if user is allowed to make requests
         Guest guest = getGuest(requesterId);
         List<PlayRequest> requests = playRequestRepository.getRequestsMadeByGuest(guest);
