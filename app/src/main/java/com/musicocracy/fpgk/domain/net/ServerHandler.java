@@ -194,16 +194,15 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                         PlayRequestRequest request;
                         try {
                             request = PlayRequestRequest.parseFrom(msgBySender.message.getBody());
+                            log.verbose(TAG, "Successful parse");
                         } catch (InvalidProtocolBufferException e) {
+                            log.error(TAG, e.toString());
                             request = PlayRequestRequest.getDefaultInstance();
                             e.printStackTrace();
                         }
 
-                        if (!spotifyPlayerHandler.isTimerStarted()) {
-                            spotifyPlayerHandler.startPlayTimer(request.getUri());
-                        }
-
-                        //TODO: Send Play Request to DJ algorithm
+                        //TODO: Send Play Request to database
+                        spotifyPlayerHandler.play(request.getUri());
                     }
                 });
     }
