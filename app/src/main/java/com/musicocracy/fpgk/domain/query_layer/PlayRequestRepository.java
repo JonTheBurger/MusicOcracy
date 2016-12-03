@@ -1,9 +1,11 @@
 package com.musicocracy.fpgk.domain.query_layer;
 
 import com.j256.ormlite.dao.Dao;
+import com.musicocracy.fpgk.domain.dal.FilterMode;
 import com.musicocracy.fpgk.domain.dal.Guest;
 import com.musicocracy.fpgk.domain.dal.PlayRequest;
 import com.musicocracy.fpgk.domain.dal.Database;
+import com.musicocracy.fpgk.domain.util.ValueComparator;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -12,21 +14,78 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 public class PlayRequestRepository {
     private Database database;
     private Dao<PlayRequest, Integer> dao;
+    private SongFilterRepository songFilterRepository;
+    private List<String> lastVotableSongIds;
+    private final Random random;
 
     public PlayRequestRepository(Database database) {
         this.database = database;
+        songFilterRepository = new SongFilterRepository(database);
+        lastVotableSongIds = new ArrayList<>();
+        random = new Random();
     }
 
-    public void addRequestToQueue(PlayRequest playRequest) {
+    public void addWithFilter(PlayRequest playRequest, FilterMode filterMode) {
         try {
-            dao.createOrUpdate(playRequest);
+            if(songFilterRepository.isValidPlayRequest(playRequest, filterMode)){
+                dao = database.getPlayRequestDao();
+                dao.createOrUpdate(playRequest);
+            } else {
+                System.out.println("ERROR: Song is blacklisted by party host!");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void add(PlayRequest playRequest) {
+        addWithFilter(playRequest, FilterMode.NONE);
+    }
+
+    public List<String> getVotableSongIds(int count) {
+        List<String> returnList = new ArrayList<>();
+        try {
+            dao = database.getPlayRequestDao();
+            List<String> newestRequestedSongIdsList = getNewestRequestedSongIds(count);
+            List<String> oldestRequestedSongIdsList = getOldestRequestedSongIds(count);
+            List<String> mostRequestedSongIdsList = getMostRequestedSongIds(count);
+            List<String> leastRequestedSongIdsList = getLeastRequestedSongIds(count);
+
+            int addCount = 0;
+            do {
+                int listId = random.nextInt(4) + 1;
+                int index = random.nextInt(count);
+                String nextId = new String();
+                switch(listId) {
+                    case 1:
+                        nextId = newestRequestedSongIdsList.get(index);
+                        break;
+                    case 2:
+                        nextId = oldestRequestedSongIdsList.get(index);
+                        break;
+                    case 3:
+                        nextId = mostRequestedSongIdsList.get(index);
+                        break;
+                    case 4:
+                        nextId = leastRequestedSongIdsList.get(index);
+                        break;
+                }
+                if(!lastVotableSongIds.contains(nextId)) {
+                    addCount++;
+                    returnList.add(nextId);
+                }
+            } while(addCount < count);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            lastVotableSongIds = new ArrayList<>(returnList);
+            return returnList;
         }
     }
 
@@ -79,7 +138,7 @@ public class PlayRequestRepository {
                 requestHistogram.put(songId, newCount);
             }
 
-            Map<String, Integer> sortedHistogram = new LinkedHashMap<String, Integer>();
+            Map<String, Integer> sortedHistogram = new LinkedHashMap<>();
             sortedHistogram = sortByValue(requestHistogram);
 
             Object keySet[] = sortedHistogram.keySet().toArray();
@@ -88,11 +147,13 @@ public class PlayRequestRepository {
                     for(int i = 0; i < count; i++) {
                         returnList.add(keySet[i].toString());
                     }
+                    break;
                 case 1:
                     int start = keySet.length - 1;
                     for(int i = start; i > start - count; i--) {
                         returnList.add(keySet[i].toString());
                     }
+                    break;
             }
 
         } catch (SQLException e) {
@@ -119,7 +180,7 @@ public class PlayRequestRepository {
 
             }
 
-            Map<String, Integer> sortedHistogram = new LinkedHashMap<String, Integer>();
+            Map<String, Integer> sortedHistogram = new LinkedHashMap<>();
             sortedHistogram = sortByValue(requestHistogram);
 
             Object keySet[] = sortedHistogram.keySet().toArray();
@@ -128,11 +189,13 @@ public class PlayRequestRepository {
                     for(int i = 0; i < count; i++) {
                         returnList.add(keySet[i].toString());
                     }
+                    break;
                 case 1:
                     int start = keySet.length - 1;
                     for(int i = start; i > start - count; i--) {
                         returnList.add(keySet[i].toString());
                     }
+                    break;
             }
 
         } catch (SQLException e) {

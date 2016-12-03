@@ -48,7 +48,7 @@ public class ConnectPresenter implements Presenter<ConnectView> {
             String ip = NetworkUtils.base36ToIpAddress(view.getPartyCode().toLowerCase());
             model.connect(ip);
             model.joinParty(view.getPartyName());
-        } catch (UnsupportedOperationException e) {
+        } catch (Exception e) {
             view.onJoinError(e.getMessage());
         }
     }

@@ -28,9 +28,12 @@ public class ConnectModel {
         this.defaultPort = defaultPort;
     }
 
-    public void connect(String host) throws UnsupportedOperationException {
+    public void connect(String host) throws UnsupportedOperationException, TimeoutException {
         client.start(host, defaultPort);
-        client.awaitNextIsRunningChanged(2500, TimeUnit.MILLISECONDS);
+        boolean timeoutOccurred = client.awaitNextIsRunningChanged(2500, TimeUnit.MILLISECONDS);
+        if (timeoutOccurred) {
+            throw new TimeoutException("Connection timed out");
+        }
         if (!client.isRunning()) {
             throw new UnsupportedOperationException("Could not connect to host");
         }

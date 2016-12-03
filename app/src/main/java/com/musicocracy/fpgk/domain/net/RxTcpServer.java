@@ -4,12 +4,10 @@ import com.musicocracy.fpgk.domain.util.Box;
 
 import java.util.concurrent.TimeUnit;
 
-import io.netty.channel.DefaultChannelPipeline;
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.channel.ConnectionHandler;
 import io.reactivex.netty.channel.ObservableConnection;
 import io.reactivex.netty.pipeline.PipelineConfigurators;
-import io.reactivex.netty.pipeline.StringMessageConfigurator;
 import io.reactivex.netty.server.RxServer;
 import rx.Observable;
 import rx.functions.Action0;
@@ -153,7 +151,7 @@ public class RxTcpServer {
      * Waits until the isRunning status has changed for a duration.
      * @param timeSpan How long to wait for the isRunning status to change.
      * @param timeUnit How to interpret timeSpan.
-     * @return The latest change to isRunning status.
+     * @return If a timeout has occurred.
      */
     public boolean awaitNextIsRunningChanged(long timeSpan, TimeUnit timeUnit) {
         final Box<Boolean> timedOut = new Box<>(false);

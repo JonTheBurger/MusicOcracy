@@ -69,7 +69,7 @@ public class ClientEventBus {
      * Waits until the isRunning status has changed for a duration.
      * @param timeSpan How long to wait for the isRunning status to change.
      * @param timeUnit How to interpret timeSpan.
-     * @return The latest change to isRunning status.
+     * @return If a timeout has occurred.
      */
     public boolean awaitNextIsRunningChanged(long timeSpan, TimeUnit timeUnit) {
         return client.awaitNextIsRunningChanged(timeSpan, timeUnit);
