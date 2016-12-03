@@ -21,14 +21,9 @@ import java.util.TreeMap;
 public class PlayedVoteRepository {
     private Database database;
     private Dao<PlayedVote, Integer> dao;
-    private SongFilterRepository songFilterRepository;
-    private List<String> lastVotableSongIds;
-    private final Random random;
 
     public PlayedVoteRepository(Database database) {
         this.database = database;
-        lastVotableSongIds = new ArrayList<>();
-        random = new Random();
     }
 
     public void add(PlayedVote playedVote) {

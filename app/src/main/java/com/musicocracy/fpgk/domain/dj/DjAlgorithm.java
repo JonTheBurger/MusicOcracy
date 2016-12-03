@@ -8,7 +8,10 @@ import com.musicocracy.fpgk.domain.dal.Guest;
 import com.musicocracy.fpgk.domain.dal.MusicService;
 import com.musicocracy.fpgk.domain.dal.Party;
 import com.musicocracy.fpgk.domain.dal.PlayRequest;
+import com.musicocracy.fpgk.domain.dal.PlayedVote;
+import com.musicocracy.fpgk.domain.dal.SongFilter;
 import com.musicocracy.fpgk.domain.query_layer.PlayRequestRepository;
+import com.musicocracy.fpgk.domain.query_layer.PlayedVoteRepository;
 import com.musicocracy.fpgk.domain.query_layer.SongFilterRepository;
 import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
 
@@ -28,12 +31,14 @@ public class DjAlgorithm {
     private final Database database;
     private final PlayRequestRepository playRequestRepository;
     private final SongFilterRepository songFilterRepository;
+    private final PlayedVoteRepository playedVoteRepository;
     private final ReadOnlyPartySettings partySettings;
 
-    public DjAlgorithm(Database database, PlayRequestRepository playRequestRepository, SongFilterRepository songFilterRepository, ReadOnlyPartySettings partySettings) {
-        if (database == null || playRequestRepository == null || songFilterRepository == null || partySettings == null) { throw new IllegalArgumentException("No dependencies may be null"); }
+    public DjAlgorithm(Database database, PlayRequestRepository playRequestRepository, PlayedVoteRepository playedVoteRepository, SongFilterRepository songFilterRepository, ReadOnlyPartySettings partySettings) {
+        if (database == null || playRequestRepository == null || playedVoteRepository == null || songFilterRepository == null || partySettings == null) { throw new IllegalArgumentException("No dependencies may be null"); }
         this.database = database;
         this.playRequestRepository = playRequestRepository;
+        this.playedVoteRepository = playedVoteRepository;
         this.songFilterRepository = songFilterRepository;
         this.partySettings = partySettings;
     }
@@ -83,6 +88,8 @@ public class DjAlgorithm {
     public String dequeueNextSongUri() throws SQLException {
         // Get top voted song in database
         String topUri = playRequestRepository.getMostRequestedSongIds(1).get(0);
+        PlayedVote playedVote = new PlayedVote(getParty(), MusicService.SPOTIFY, topUri, now());
+        playedVoteRepository.add(playedVote);
 
         // Delete requests for top voted song from database
         Dao<PlayRequest, Integer> dao = database.getPlayRequestDao();
