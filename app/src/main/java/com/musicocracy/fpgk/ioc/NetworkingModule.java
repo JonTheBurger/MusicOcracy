@@ -1,5 +1,6 @@
 package com.musicocracy.fpgk.ioc;
 
+import com.musicocracy.fpgk.domain.dj.DjAlgorithm;
 import com.musicocracy.fpgk.domain.net.ClientEventBus;
 import com.musicocracy.fpgk.domain.net.ClientHandler;
 import com.musicocracy.fpgk.domain.net.ProtoEnvelopeFactory;
@@ -62,8 +63,13 @@ public class NetworkingModule {
 
     @Provides
     @Singleton
-    public ServerHandler provideServerHandler(ServerEventBus eventBus, ReadOnlyPartySettings partySettings, Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log, SpotifyPlayerHandler playerTimer) {
-        return new ServerHandler(eventBus, partySettings, browser, api, player, log, playerTimer);
+    public ServerHandler provideServerHandler(ServerEventBus eventBus,
+                                              ReadOnlyPartySettings partySettings, Browser browser,
+                                              SpotifyApi api, SpotifyPlayer player, Logger log,
+                                              SpotifyPlayerHandler playerTimer,
+                                              DjAlgorithm djAlgorithm) {
+        return new ServerHandler(eventBus, partySettings, browser, api, player, log, playerTimer,
+                djAlgorithm);
     }
 
     @Provides

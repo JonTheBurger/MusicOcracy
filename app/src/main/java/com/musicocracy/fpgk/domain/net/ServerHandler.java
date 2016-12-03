@@ -1,6 +1,9 @@
 package com.musicocracy.fpgk.domain.net;
 
+import android.util.Log;
+
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.musicocracy.fpgk.domain.dj.DjAlgorithm;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
@@ -13,6 +16,7 @@ import com.musicocracy.fpgk.net.proto.ConnectRequest;
 import com.musicocracy.fpgk.net.proto.MessageType;
 import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
 import com.musicocracy.fpgk.net.proto.SendVoteRequest;
+import com.musicocracy.fpgk.net.proto.VotableSongsReply;
 import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
 import com.spotify.sdk.android.player.Error;
 import com.spotify.sdk.android.player.Metadata;
@@ -20,6 +24,7 @@ import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
@@ -39,13 +44,14 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
     private final SpotifyApi api;
     private final Logger log;
     private final SharedSubject<Metadata.Track> newTrackPlayingSubject = SharedSubject.create();
+    private final DjAlgorithm djAlgorithm;
     private SpotifyPlayerHandler spotifyPlayerHandler;
     private Subscription[] subscriptions = emptySubs;
     private Player player;
 
     public ServerHandler(ServerEventBus eventBus, ReadOnlyPartySettings partySettings,
                          Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log,
-                         SpotifyPlayerHandler spotifyPlayerHandler) {
+                         SpotifyPlayerHandler spotifyPlayerHandler, DjAlgorithm djAlgorithm) {
         this.eventBus = eventBus;
         this.partySettings = partySettings;
         this.browser = browser;
@@ -53,6 +59,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
         this.log = log;
         this.player = player;
         this.spotifyPlayerHandler = spotifyPlayerHandler;
+        this.djAlgorithm = djAlgorithm;
 
         player.addNotificationCallback(this);
     }
@@ -164,24 +171,31 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                             e.printStackTrace();
                         }
 
-                        // TODO:Implement getting songs being voted on from database
-                        /*
-                        List<Track> voteTracks = new ArrayList<Track>();
-
                         VotableSongsReply.Builder builder = VotableSongsReply.newBuilder();
 
-                        for (int i = 0; i < voteTracks.size(); i++) {
-                            builder .addSongs(VotableSongsReply.VotableSong.newBuilder()
-                                    .setArtist()
-                                    .setChoiceId()
-                                    .build());
+                        try {
+                            List<String> votableSongURIs = djAlgorithm.getVotableSongUris();
+                            for (String uri : votableSongURIs) {
+
+                                Track track = browser.getTrackByURI(uri);
+
+                                for (int i = 0; i < votableSongURIs.size(); i++) {
+                                    builder .addSongs(VotableSongsReply.VotableSong.newBuilder()
+                                            .setArtist(track.artists.get(0).name)
+                                            .setChoiceId(i)
+                                            .build());
+                                }
+                            }
+                        } catch (SQLException e) {
+                            log.error(TAG, e.toString());
                         }
+
                         VotableSongsReply reply = builder.build();
 
                         log.verbose(TAG, "Sending msg " + reply);
                         msgBySender.replyWith(reply);
                         log.verbose(TAG, "Send complete. ~" + reply.toByteArray().length + " byte body");
-                        */
+
                     }
                 });
     }
@@ -220,7 +234,16 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                             e.printStackTrace();
                         }
 
-                        // TODO:Implement adding vote to DJ Algorithm
+                        try {
+                            List<String> votableSongURIs = djAlgorithm.getVotableSongUris();
+
+                            String voteURI = votableSongURIs.get(request.getChoiceId());
+
+                            djAlgorithm.voteFor(voteURI, request.getRequesterId());
+
+                        } catch (SQLException e) {
+                            log.error(TAG, e.toString());
+                        }
                     }
                 });
     }
