@@ -17,7 +17,7 @@ import dagger.Provides;
 public class DjModule {
     @Provides
     @Singleton
-    DjAlgorithm provideDjAlgorithm(Database database, PlayRequestRepository playRequestRepository, SongFilterRepository songFilterRepository, ReadOnlyPartySettings partySettings) throws SQLException {
+    DjAlgorithm provideDjAlgorithm(Database database, PlayRequestRepository playRequestRepository, SongFilterRepository songFilterRepository, ReadOnlyPartySettings partySettings) {
         return new DjAlgorithm(database, playRequestRepository, songFilterRepository, partySettings);
     }
 }

@@ -112,6 +112,7 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     public void voteRequest(int songId) {
         VotableSongsReply.VotableSong song = currentVotableReply.getSongs(songId);
         SendVoteRequest msg = SendVoteRequest.newBuilder()
+                .setRequesterId(uniqueAndroidId)
                 .setChoiceId(song.getChoiceId())
                 .build();
 

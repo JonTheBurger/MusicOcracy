@@ -182,6 +182,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                                 for (int i = 0; i < votableSongURIs.size(); i++) {
                                     builder .addSongs(VotableSongsReply.VotableSong.newBuilder()
                                             .setArtist(track.artists.get(0).name)
+                                            .setTitle(track.name)
                                             .setChoiceId(i)
                                             .build());
                                 }
@@ -215,7 +216,11 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                             e.printStackTrace();
                         }
 
-                        //TODO: Send Play Request to database
+                        try {
+                            djAlgorithm.request(request.getUri(), request.getRequesterId());
+                        } catch (SQLException e) {
+                            log.error(TAG, e.toString());
+                        }
                         spotifyPlayerHandler.play(request.getUri());
                     }
                 });

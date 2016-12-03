@@ -1,40 +1,39 @@
 package com.musicocracy.fpgk.domain.spotify;
 
+import com.musicocracy.fpgk.domain.dj.DjAlgorithm;
 import com.musicocracy.fpgk.domain.util.Logger;
-import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.spotify.sdk.android.player.Error;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
-
 import rx.Observable;
-import rx.Subscription;
-import rx.functions.Action0;
 import rx.functions.Action1;
-import rx.functions.Func0;
-import rx.schedulers.Schedulers;
 
 public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback {
     private static final String TAG = "SpotifyPlayerHandler";
     private static final int TIME_BEFORE_NEXT_SONG = 10000; //ms
     private final Logger log;
+    private final DjAlgorithm djAlgorithm;
     private SpotifyPlayer player;
     private boolean playerStarted = false;
 
-    public SpotifyPlayerHandler(Logger log, SpotifyPlayer player) {
+    public SpotifyPlayerHandler(Logger log, SpotifyPlayer player, DjAlgorithm djAlgorithm) {
         this.log = log;
         this.player = player;
+        this.djAlgorithm = djAlgorithm;
 
         player.addNotificationCallback(this);
     }
 
     public void play(String uri) {
         if (!playerStarted) {
-            // TODO: Load uri from algorithm
-            player.playUri(null, uri, 0, 0);
+            try {
+                player.playUri(null, djAlgorithm.dequeueNextSongUri(), 0, 0);
+            } catch (SQLException e) {
+                log.error(TAG, e.toString());
+            }
             playerStarted = true;
         }
     }
@@ -63,8 +62,12 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
             .subscribe(new Action1<Long>() {
                 @Override
                 public void call(Long aLong) {
-                    // TODO: retrieve song from DJ algorithm, clear votes for previously played song
                     String nextURI = null;
+                    try {
+                        nextURI = djAlgorithm.dequeueNextSongUri();
+                    } catch (SQLException e) {
+                        log.error(TAG, e.toString());
+                    }
                     if (nextURI != null) {
                         player.queue(null, nextURI);
                         log.info(TAG, "Song Queued(URI): " + nextURI);

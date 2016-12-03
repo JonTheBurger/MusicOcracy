@@ -2,7 +2,9 @@ package com.musicocracy.fpgk.ioc;
 
 import android.content.Context;
 
+import com.musicocracy.fpgk.domain.dj.DjAlgorithm;
 import com.musicocracy.fpgk.domain.spotify.Browser;
+import com.musicocracy.fpgk.domain.spotify.SpotifyPlayerHandler;
 import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
 import com.spotify.sdk.android.player.Config;
@@ -67,5 +69,12 @@ public class SpotifyModule {
     @Provides @Named(CLIENT_ID) @Singleton
     public String provideSpotifyClientID () {
         return "4becf88681f74bda9e38baac3bcf66d6";
+    }
+
+    @Provides
+    @Singleton
+    public SpotifyPlayerHandler provideSpotifyPlayerHandler(Logger log, SpotifyPlayer player,
+                                                            DjAlgorithm djAlgorithm) {
+        return new SpotifyPlayerHandler(log, player, djAlgorithm);
     }
 }
