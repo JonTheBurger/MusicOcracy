@@ -4,8 +4,8 @@ public class PartySettings implements ReadOnlyPartySettings {
     private String partyCode = "";
     private String partyName = "";
     private String SpotifyToken = "";
-    private int tokens;
-    private long tokenRefillMillis;
+    private int coins;
+    private long coinRefillMillis;
 
     public PartySettings() {
         int x = 5;
@@ -16,8 +16,9 @@ public class PartySettings implements ReadOnlyPartySettings {
         return partyCode;
     }
 
-    public void setPartyCode(String code) {
+    public PartySettings setPartyCode(String code) {
         partyCode = code;
+        return this;
     }
 
     @Override
@@ -25,30 +26,38 @@ public class PartySettings implements ReadOnlyPartySettings {
         return partyName;
     }
 
-    public void setPartyName(String partyName) {
+    public PartySettings setPartyName(String partyName) {
         this.partyName = partyName;
+        return this;
     }
 
     @Override
-    public int getTokens() {
-        return tokens;
+    public int getCoinAllowance() {
+        return coins;
     }
 
-    public void setTokens(int tokens) {
-        this.tokens = tokens;
-    }
-
-    @Override
-    public long getTokenRefillMillis() {
-        return tokenRefillMillis;
-    }
-
-    public void setTokenRefillMillis(long tokenRefillMillis) {
-        this.tokenRefillMillis = tokenRefillMillis;
+    public PartySettings setCoinAllowance(int coins) {
+        this.coins = coins;
+        return this;
     }
 
     @Override
-    public String getSpotifyToken() { return SpotifyToken;}
+    public long getCoinRefillMillis() {
+        return coinRefillMillis;
+    }
 
-    public void setSpotifyToken(String token) {this.SpotifyToken = token;}
+    public PartySettings setCoinRefillMillis(long coinRefillMillis) {
+        this.coinRefillMillis = coinRefillMillis;
+        return this;
+    }
+
+    @Override
+    public String getSpotifyToken() {
+        return SpotifyToken;
+    }
+
+    public PartySettings setSpotifyToken(String token) {
+        this.SpotifyToken = token;
+        return this;
+    }
 }

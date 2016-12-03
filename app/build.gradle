@@ -15,6 +15,10 @@ android {
         //multiDexEnabled true  // Uncomment if DatabaseConfigUtil complains about dex limit
     }
     buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-DEBUG'
+        }
         release {
             shrinkResources true
             minifyEnabled true
@@ -65,33 +69,49 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
-    compile 'com.android.support:appcompat-v7:24.2.0'
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile 'org.mockito:mockito-core:1.9.5'
+//    testCompile "com.crittercism.dexmaker:dexmaker:1.4"
+//    testCompile "com.crittercism.dexmaker:dexmaker-dx:1.4"
+//    testCompile "com.crittercism.dexmaker:dexmaker-mockito:1.4"
+
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
+
     // Dagger 2 - Dependency Injection Framework
     compile 'com.google.dagger:dagger:2.7'
     apt "com.google.dagger:dagger-compiler:2.7"
+
     // Butter Knife - View Injection Framework
     compile 'com.jakewharton:butterknife:8.4.0'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
+
     // RX Java - Functional Reactive Java
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.6'
+
     // RX Netty - RX Networking
     compile 'io.reactivex:rxnetty:0.4.20'
+
     // OrmLite - Database Object Relational Mapping
     compile 'com.j256.ormlite:ormlite-core:5.0'
     compile 'com.j256.ormlite:ormlite-android:5.0'
+
     // Google Guava - Google Core Libraries for Java
     compile 'com.google.guava:guava:19.0'
+
     // Google Protocol Buffers - Binary Serializable Class Generation
     compile 'com.google.protobuf:protobuf-lite:3.0.0'
+
     // This library handles authentication and authorization
     compile 'com.spotify.sdk:spotify-auth:beta22-noconnect-2.20b@aar'
+
     // This library handles music playback
     compile 'com.spotify.sdk:spotify-player:beta22-noconnect-2.20b@aar'
+
     // Spotify web API wrapper
     compile 'com.github.kaaes:spotify-web-api-android:0.4.1'
     compile 'org.slf4j:slf4j-simple:1.7.21'
