@@ -25,6 +25,7 @@ import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
@@ -173,22 +174,14 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
 
                         VotableSongsReply.Builder builder = VotableSongsReply.newBuilder();
 
-                        try {
-                            List<String> votableSongURIs = djAlgorithm.getVotableSongUris();
-                            for (String uri : votableSongURIs) {
-
-                                Track track = browser.getTrackByURI(uri);
-
-                                for (int i = 0; i < votableSongURIs.size(); i++) {
-                                    builder .addSongs(VotableSongsReply.VotableSong.newBuilder()
-                                            .setArtist(track.artists.get(0).name)
-                                            .setTitle(track.name)
-                                            .setChoiceId(i)
-                                            .build());
-                                }
-                            }
-                        } catch (SQLException e) {
-                            log.error(TAG, e.toString());
+                        List<Track> votableTracks = getVotableTracks();
+                        for (int i = 0; i < votableTracks.size(); i++) {
+                            Track track = votableTracks.get(i);
+                            builder .addSongs(VotableSongsReply.VotableSong.newBuilder()
+                                    .setArtist(track.artists.get(0).name)
+                                    .setTitle(track.name)
+                                    .setChoiceId(i)
+                                    .build());
                         }
 
                         VotableSongsReply reply = builder.build();
@@ -239,9 +232,8 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                             e.printStackTrace();
                         }
 
+                        List<String> votableSongURIs = getVotableURIs();
                         try {
-                            List<String> votableSongURIs = djAlgorithm.getVotableSongUris();
-
                             String voteURI = votableSongURIs.get(request.getChoiceId());
 
                             djAlgorithm.voteFor(voteURI, request.getRequesterId());
@@ -255,6 +247,26 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
 
     public Observable<Metadata.Track> newSongPlaying() {
         return newTrackPlayingSubject.asObservable();
+    }
+
+    public List<String> getVotableURIs() {
+        List<String> votableSongURIs = null;
+        try {
+            votableSongURIs = djAlgorithm.getVotableSongUris();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return votableSongURIs;
+    }
+
+    public List<Track> getVotableTracks() {
+        List<String> votableSongURIs = getVotableURIs();
+        List<Track> votableTracks = new ArrayList<>();
+        for (String uri : votableSongURIs) {
+            Track track = browser.getTrackByURI(uri);
+            votableTracks.add(track);
+        }
+        return votableTracks;
     }
 
     public void onDestroy() {

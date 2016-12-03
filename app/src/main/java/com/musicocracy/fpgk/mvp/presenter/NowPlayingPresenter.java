@@ -9,6 +9,10 @@ import com.musicocracy.fpgk.net.proto.MessageType;
 import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
 import com.spotify.sdk.android.player.Metadata;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import kaaes.spotify.webapi.android.models.Track;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -35,6 +39,7 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                     @Override
                     public void call(Metadata.Track track) {
                         updateNowPlaying(track);
+                        updateVotableSongs();
                     }
                 });
     }
@@ -63,5 +68,15 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                 view.updateSong(track.name);
             }
         }
+    }
+
+    private void updateVotableSongs() {
+        List<Track> votableTracks = model.getVotableTracks();
+        List<String> voteList = new ArrayList<>();
+        for (int i = 0; i < votableTracks.size(); i++) {
+            voteList.add(Integer.toString(i + 1) + ") Title: " + votableTracks.get(i).name
+                    + "\nArtist: " + votableTracks.get(i).artists.get(0).name);
+        }
+        view.updateVotableSongs(voteList);
     }
 }

@@ -1,6 +1,5 @@
 package com.musicocracy.fpgk.mvp.presenter;
 
-import com.musicocracy.fpgk.domain.util.Box;
 import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.mvp.model.SongSelectModel;
 import com.musicocracy.fpgk.mvp.view.SongSelectView;
@@ -14,7 +13,6 @@ import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
