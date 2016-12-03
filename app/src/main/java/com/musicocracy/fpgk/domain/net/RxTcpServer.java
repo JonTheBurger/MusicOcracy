@@ -12,6 +12,7 @@ import io.reactivex.netty.server.RxServer;
 import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * A functional reactive TCP server. Allows users to respond to events asynchronously.
@@ -102,7 +103,7 @@ public class RxTcpServer {
                             });
 
                     // Events must be merged and subscribed to in order to actually run. i.e. these are cold observables.
-                    return Observable.merge(receiver, transmitter);
+                    return Observable.merge(receiver, transmitter).subscribeOn(Schedulers.io());
                 }
             });
             server.start();
