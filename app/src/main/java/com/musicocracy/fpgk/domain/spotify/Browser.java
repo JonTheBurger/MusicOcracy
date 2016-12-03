@@ -1,17 +1,7 @@
 package com.musicocracy.fpgk.domain.spotify;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.spotify.sdk.android.player.Config;
-import com.spotify.sdk.android.player.Player;
-import com.spotify.sdk.android.player.Spotify;
-import com.spotify.sdk.android.player.SpotifyPlayer;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Track;
 
@@ -28,10 +18,17 @@ public class Browser {
         List<Track> resultTracks = spotify.searchTracks(trackName).tracks.items;
         //If result tracks are found
         if (resultTracks.size() != 0) {
-
             resultTracks = resultTracks.subList(0, NUM_RESULTS);
         }
 
         return resultTracks;
+    }
+
+    public Track getTrackByURI(String uri) {
+        String spotifyID = uri.split(":")[2];
+
+        Track track = spotify.getTrack(spotifyID);
+
+        return track;
     }
 }
