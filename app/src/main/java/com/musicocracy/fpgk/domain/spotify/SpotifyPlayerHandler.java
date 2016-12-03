@@ -53,23 +53,31 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
 
     private void scheduleTimer() {
         long timerDelay = player.getMetadata().currentTrack.durationMs - TIME_BEFORE_NEXT_SONG;
-        // If timer delay is negative, start the observable now
+
+        // If timer delay is negative, start the timer now
         if (timerDelay < 0) {
             timerDelay = 0;
         }
+
         Observable.timer(timerDelay , TimeUnit.MILLISECONDS)
             .subscribe(new Action1<Long>() {
                 @Override
                 public void call(Long aLong) {
                     // TODO: retrieve song from DJ algorithm, clear votes for previously played song
                     String nextURI = null;
-                    player.queue(null, nextURI);
-                    log.info(TAG, "Song Queued(URI): " + nextURI);
+                    if (nextURI != null) {
+                        player.queue(null, nextURI);
+                        log.info(TAG, "Song Queued(URI): " + nextURI);
+                    } else {
+                        log.error(TAG, "Next song from DJ algorithm is null.");
+                        scheduleTimer();
+                    }
                 }
             });
     }
 
-    public void stopTimer() {
+    public void onDestroy() {
         player.removeNotificationCallback(this);
+        playerStarted = false;
     }
 }

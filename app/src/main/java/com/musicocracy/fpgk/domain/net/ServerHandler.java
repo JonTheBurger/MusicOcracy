@@ -232,7 +232,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
     public void onDestroy() {
         newTrackPlayingSubject.onCompleted();
         player.removeNotificationCallback(this);
-        spotifyPlayerHandler.stopTimer();
+        spotifyPlayerHandler.onDestroy();
 
         for (int i = 0; i < subscriptions.length; i++) {
             RxUtils.safeUnsubscribe(subscriptions[i]);
