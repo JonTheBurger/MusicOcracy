@@ -3,6 +3,8 @@ package com.musicocracy.fpgk.domain.net;
 import android.util.Log;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.musicocracy.fpgk.domain.dal.Database;
+import com.musicocracy.fpgk.domain.dal.Guest;
 import com.musicocracy.fpgk.domain.dj.DjAlgorithm;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
@@ -46,13 +48,15 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
     private final Logger log;
     private final SharedSubject<Metadata.Track> newTrackPlayingSubject = SharedSubject.create();
     private final DjAlgorithm djAlgorithm;
+    private final Database database;
     private SpotifyPlayerHandler spotifyPlayerHandler;
     private Subscription[] subscriptions = emptySubs;
     private Player player;
 
     public ServerHandler(ServerEventBus eventBus, ReadOnlyPartySettings partySettings,
                          Browser browser, SpotifyApi api, SpotifyPlayer player, Logger log,
-                         SpotifyPlayerHandler spotifyPlayerHandler, DjAlgorithm djAlgorithm) {
+                         SpotifyPlayerHandler spotifyPlayerHandler, DjAlgorithm djAlgorithm,
+                         Database database) {
         this.eventBus = eventBus;
         this.partySettings = partySettings;
         this.browser = browser;
@@ -61,6 +65,7 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
         this.player = player;
         this.spotifyPlayerHandler = spotifyPlayerHandler;
         this.djAlgorithm = djAlgorithm;
+        this.database = database;
 
         player.addNotificationCallback(this);
     }
@@ -110,6 +115,13 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                                 .setMessage("")
                                 .setReplyingTo(msgBySender.message.getHeader().getType())
                                 .build();
+
+                            // TODO Fill in party name and join time.
+                            try {
+                                database.getGuestDao().createOrUpdate(new Guest(null, "guest", request.getRequesterId(), null, false));
+                            } catch (SQLException e) {
+                                log.error(TAG, e.toString());
+                            }
                         } else {
                             reply = BasicReply.newBuilder()
                                 .setSuccess(false)
@@ -196,27 +208,29 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
 
     private Subscription createPlayRequestSub() {
         return eventBus.getObservable(MessageType.PLAY_REQUEST_REQUEST)
-                .subscribe(new Action1<ProtoMessageBySender>() {
-                    @Override
-                    public void call(ProtoMessageBySender msgBySender) {
-                        PlayRequestRequest request;
-                        try {
-                            request = PlayRequestRequest.parseFrom(msgBySender.message.getBody());
-                            log.verbose(TAG, "Successful parse");
-                        } catch (InvalidProtocolBufferException e) {
-                            log.error(TAG, e.toString());
-                            request = PlayRequestRequest.getDefaultInstance();
-                            e.printStackTrace();
-                        }
-
-                        try {
-                            djAlgorithm.request(request.getUri(), request.getRequesterId());
-                        } catch (SQLException e) {
-                            log.error(TAG, e.toString());
-                        }
-                        spotifyPlayerHandler.play(request.getUri());
+            .subscribe(new Action1<ProtoMessageBySender>() {
+                @Override
+                public void call(ProtoMessageBySender msgBySender) {
+                    PlayRequestRequest request;
+                    try {
+                        request = PlayRequestRequest.parseFrom(msgBySender.message.getBody());
+                        log.verbose(TAG, "Successful parse");
+                    } catch (InvalidProtocolBufferException e) {
+                        log.error(TAG, e.toString());
+                        request = PlayRequestRequest.getDefaultInstance();
+                        e.printStackTrace();
                     }
-                });
+
+                    try {
+                        djAlgorithm.request(request.getUri(), request.getRequesterId());
+                    } catch (SQLException e) {
+                        log.error(TAG, e.toString());
+                    }
+                    spotifyPlayerHandler.play(request.getUri());
+
+                    // TODO: Add Basic Reply
+                }
+            });
     }
 
     private Subscription createVoteRequestSub() {
@@ -241,6 +255,8 @@ public class ServerHandler implements SpotifyPlayer.NotificationCallback {
                         } catch (SQLException e) {
                             log.error(TAG, e.toString());
                         }
+
+                        // TODO: Add Basic Reply
                     }
                 });
     }
