@@ -52,8 +52,12 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
     }
 
     private void scheduleTimer() {
-        long currentTrackDuration = player.getMetadata().currentTrack.durationMs;
-        Observable.timer(currentTrackDuration - TIME_BEFORE_NEXT_SONG, TimeUnit.MILLISECONDS)
+        long timerDelay = player.getMetadata().currentTrack.durationMs - TIME_BEFORE_NEXT_SONG;
+        // If timer delay is negative, start the observable now
+        if (timerDelay < 0) {
+            timerDelay = 0;
+        }
+        Observable.timer(timerDelay , TimeUnit.MILLISECONDS)
             .subscribe(new Action1<Long>() {
                 @Override
                 public void call(Long aLong) {
