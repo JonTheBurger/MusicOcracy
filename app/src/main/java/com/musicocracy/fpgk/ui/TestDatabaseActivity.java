@@ -46,7 +46,8 @@ public class TestDatabaseActivity extends AppCompatActivity {
         setContentView(R.layout.test_activity_database);
         ButterKnife.bind(this);
 
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         listView.setAdapter(adapter);
 
         // Add the tables that can be viewed from the test activity
