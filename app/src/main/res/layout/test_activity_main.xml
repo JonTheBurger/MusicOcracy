@@ -11,38 +11,6 @@
     tools:context="com.musicocracy.fpgk.ui.TestMainActivity">
 
     <Button
-        android:text="@string/button_send"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/sender_button"
-        android:onClick="gotoBroadcastSender"
-        android:layout_marginTop="80dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignLeft="@+id/button_receive"
-        android:layout_alignStart="@+id/button_receive" />
-
-    <Button
-        android:text="@string/receive"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/button_receive"
-        android:onClick="gotoBroadcastReceiver"
-        android:layout_marginTop="20dp"
-        android:layout_above="@+id/browse_button"
-        android:layout_centerHorizontal="true" />
-
-    <Button
-        android:text="@string/browse"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/browse_button"
-        android:onClick="launchBrowseActivity"
-        android:layout_marginTop="20dp"
-        android:layout_centerVertical="true"
-        android:layout_alignLeft="@+id/button_receive"
-        android:layout_alignStart="@+id/button_receive" />
-
-    <Button
         android:text="Database"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

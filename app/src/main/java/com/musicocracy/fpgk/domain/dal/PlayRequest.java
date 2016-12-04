@@ -43,7 +43,7 @@ public class PlayRequest {
 
     @Override
     public String toString() {
-        return getId() + ": " + getService().toString() + " - " + getSongId() + " from "  + getRequester().getId() + " at " + getRequestTime().toString();
+        return getId() + ": " + getSongId() + " from "  + getRequester().getId() + " at " + getRequestTime().toString();
     }
 
     @DatabaseField(generatedId = true) private int id;
