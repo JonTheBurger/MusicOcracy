@@ -3,6 +3,7 @@ package com.musicocracy.fpgk.mvp.presenter;
 import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.mvp.model.SongSelectModel;
 import com.musicocracy.fpgk.mvp.view.SongSelectView;
+import com.musicocracy.fpgk.net.proto.BasicReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
 import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
@@ -22,6 +23,8 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     private final SongSelectModel model;
     private final Subscription browseSubscription;
     private final Subscription voteSubscription;
+    private final Subscription playRequestSub;
+    private final Subscription voteRequestSub;
     private final String uniqueAndroidId;
     private SongSelectView view;
     private BrowseSongsReply currentBrowseReply;
@@ -67,6 +70,33 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
                         onVotableSongsReceived(VotableSongsReply);
                     }
                 });
+
+        playRequestSub = model.getPlayRequestReply()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<BasicReply>() {
+                    @Override
+                    public void call(BasicReply basicReply) {
+                        if (basicReply != BasicReply.getDefaultInstance() && basicReply.getSuccess()) {
+                            view.onPlayRequestSuccess();
+                        } else {
+                            view.onPlayRequestError(basicReply.getMessage());
+                        }
+                    }
+                });
+
+        voteRequestSub = model.getVoteRequestReply()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<BasicReply>() {
+                    @Override
+                    public void call(BasicReply basicReply) {
+                        if (basicReply != BasicReply.getDefaultInstance() && basicReply.getSuccess()) {
+                            view.onVoteRequestSuccess();
+                        } else {
+                            view.onVoteRequestError(basicReply.getMessage());
+                        }
+                    }
+                });
+
         this.uniqueAndroidId = uniqueAndroidId;
     }
 
