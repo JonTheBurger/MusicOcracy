@@ -46,6 +46,11 @@ public class Party {
         return isHosting;
     }
 
+    @Override
+    public String toString() {
+        return getId() + ": Party: " + getName() + ", PartyId: "  + getPassword() + ", Started at " + getStartTime().toString();
+    }
+
     @DatabaseField(generatedId = true) private int id;
     @DatabaseField private String name;
     @DatabaseField private String password;

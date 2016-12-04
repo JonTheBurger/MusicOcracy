@@ -106,7 +106,7 @@ public class TestDatabaseActivity extends AppCompatActivity {
 
     public void loadTable() {
         adapter.clear();
-        List<? extends Object> loaded = new ArrayList<>();
+        List<?> loaded = new ArrayList<>();
         try{
             switch(currentTable) {
                 case PARTY :
@@ -127,6 +127,5 @@ public class TestDatabaseActivity extends AppCompatActivity {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 }
