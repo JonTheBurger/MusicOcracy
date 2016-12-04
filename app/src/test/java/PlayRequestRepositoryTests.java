@@ -16,7 +16,6 @@ import com.musicocracy.fpgk.domain.util.Timestamper;
 import org.junit.Test;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +42,6 @@ public class PlayRequestRepositoryTests {
         Dao<PlayRequest, Integer> playRequestDaoMock = mock(Dao.class);
         Dao<PlayedVote, Integer> playedVoteDaoMock = mock(Dao.class);
         Dao<SongFilter,Integer> songFilterDaoMock = mock(Dao.class);
-        QueryBuilder<PlayedVote, Integer> playedVoteQueryBuilderMock = mock(QueryBuilder.class);
         SongFilterRepository songFilterRepository = new SongFilterRepository(databaseMock);
         PlayedVoteRepository playedVoteRepository = mock(PlayedVoteRepository.class);
         System.out.println("SUCCESS: Mocks initialized.\n");
@@ -68,9 +66,6 @@ public class PlayRequestRepositoryTests {
         when(playedVoteDaoMock.queryForAll()).thenReturn(playedVoteList);
         when(songFilterDaoMock.queryForAll()).thenReturn(new ArrayList<SongFilter>());
         when(playedVoteRepository.getAllPlayedVotes()).thenReturn(playedVoteList);
-        when(playedVoteRepository.getLatestTimestampOfPlayedVoteBySongId("Don't Stop Believing")).thenReturn(pv2.getVoteTime());
-        when(playedVoteDaoMock.queryBuilder()).thenReturn(playedVoteQueryBuilderMock);
-        when(playedVoteDaoMock.query(playedVoteQueryBuilderMock.prepare())).thenReturn(playedVoteList);
         when(playedVoteRepository.getMillisSincePlayedVoteSongId(pv2.getSongId())).thenReturn(ts.now().getTime() - pv2.getVoteTime().getTime());
         when(playedVoteRepository.getMillisSincePlayedVoteSongId(pv1.getSongId())).thenReturn(ts.now().getTime() - pv1.getVoteTime().getTime());
         System.out.println("SUCCESS: Custom mock behaviour taught.\n");
