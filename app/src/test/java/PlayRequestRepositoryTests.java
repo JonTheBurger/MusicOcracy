@@ -11,6 +11,7 @@ import com.musicocracy.fpgk.domain.dal.SongFilter;
 import com.musicocracy.fpgk.domain.query_layer.PlayRequestRepository;
 import com.musicocracy.fpgk.domain.query_layer.PlayedVoteRepository;
 import com.musicocracy.fpgk.domain.query_layer.SongFilterRepository;
+import com.musicocracy.fpgk.domain.util.Timestamper;
 
 import org.junit.Test;
 
@@ -23,16 +24,17 @@ import static junit.framework.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class PlayRequestRepositoryTests {
-    private Party party = new Party("MySweetParty", "#Party",fakeTimestamp(getHoursInMillis(5)), null, FilterMode.NONE, true);
-    private Guest guest = new Guest(party, "Bob", "74:29:20:05:12", fakeTimestamp(getHoursInMillis(5)), false);
-    private PlayRequest pr1 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Bicycle",  fakeTimestamp(getHoursInMillis(3)));
-    private PlayRequest pr2 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Bicycle",  fakeTimestamp(getHoursInMillis(2)));
-    private PlayRequest pr3 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Don't Stop Me Now", fakeTimestamp(getHoursInMillis(1)));
-    private PlayRequest pr4 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Don't Stop Believing", now());
-    private PlayRequest pr5 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Jump", now());
-    private PlayedVote pv1 = new PlayedVote(party, MusicService.SPOTIFY, "Jump", fakeTimestamp(getHoursInMillis(2)));
-    private PlayedVote pv2 = new PlayedVote(party, MusicService.SPOTIFY, "Don't Stop Believing", fakeTimestamp(getHoursInMillis(1) - 100000));
+    private Timestamper ts = new Timestamper();
+    private Party party = new Party("MySweetParty", "#Party",ts.fakeTimestamp(ts.getHoursInMillis(5)), null, FilterMode.NONE, true);
+    private Guest guest = new Guest(party, "Bob", "74:29:20:05:12", ts.fakeTimestamp(ts.getHoursInMillis(5)), false);
+    private PlayRequest pr1 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Bicycle",  ts.fakeTimestamp(ts.getHoursInMillis(3)));
+    private PlayRequest pr2 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Bicycle",  ts.fakeTimestamp(ts.getHoursInMillis(2)));
+    private PlayRequest pr3 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Don't Stop Me Now", ts.fakeTimestamp(ts.getHoursInMillis(1)));
+    private PlayRequest pr4 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Don't Stop Believing", ts.now());
+    private PlayRequest pr5 = new PlayRequest(party, guest, MusicService.SPOTIFY, "Jump", ts.now());
+    private PlayedVote pv1 = new PlayedVote(party, MusicService.SPOTIFY, "Jump", ts.fakeTimestamp(ts.getHoursInMillis(2)));
 
+    private PlayedVote pv2 = new PlayedVote(party, MusicService.SPOTIFY, "Don't Stop Believing", ts.fakeTimestamp(ts.getHoursInMillis(1) - 100000));
     private Database databaseMock = mock(Database.class);
 
     private PlayRequestRepository setUpMocks() throws SQLException {
@@ -69,31 +71,13 @@ public class PlayRequestRepositoryTests {
         when(playedVoteRepository.getLatestTimestampOfPlayedVoteBySongId("Don't Stop Believing")).thenReturn(pv2.getVoteTime());
         when(playedVoteDaoMock.queryBuilder()).thenReturn(playedVoteQueryBuilderMock);
         when(playedVoteDaoMock.query(playedVoteQueryBuilderMock.prepare())).thenReturn(playedVoteList);
-        when(playedVoteRepository.getMillisSincePlayedVoteSongId(pv2.getSongId())).thenReturn(now().getTime() - pv2.getVoteTime().getTime());
-        when(playedVoteRepository.getMillisSincePlayedVoteSongId(pv1.getSongId())).thenReturn(now().getTime() - pv1.getVoteTime().getTime());
+        when(playedVoteRepository.getMillisSincePlayedVoteSongId(pv2.getSongId())).thenReturn(ts.now().getTime() - pv2.getVoteTime().getTime());
+        when(playedVoteRepository.getMillisSincePlayedVoteSongId(pv1.getSongId())).thenReturn(ts.now().getTime() - pv1.getVoteTime().getTime());
         System.out.println("SUCCESS: Custom mock behaviour taught.\n");
 
         // Setup class to be tested
         PlayRequestRepository playRequestRepository = new PlayRequestRepository(databaseMock, songFilterRepository, playedVoteRepository);
         return playRequestRepository;
-    }
-
-    private Timestamp now() {
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-        return now;
-    }
-
-    private Timestamp fakeTimestamp(long millisOffset) {
-        Timestamp now = new Timestamp(System.currentTimeMillis() - millisOffset);
-        return now;
-    }
-
-    private Timestamp hourBefore() {
-        return fakeTimestamp(3600000);
-    }
-
-    private long getHoursInMillis(long hours) {
-        return hours * 3600000;
     }
 
     @Test (expected=IllegalArgumentException.class)

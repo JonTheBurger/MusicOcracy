@@ -6,6 +6,7 @@ import com.musicocracy.fpgk.domain.dal.Guest;
 import com.musicocracy.fpgk.domain.dal.PlayRequest;
 import com.musicocracy.fpgk.domain.dal.Database;
 import com.musicocracy.fpgk.domain.dal.PlayedVote;
+import com.musicocracy.fpgk.domain.util.Timestamper;
 import com.musicocracy.fpgk.domain.util.ValueComparator;
 
 import java.sql.SQLException;
@@ -21,6 +22,7 @@ import java.util.TreeMap;
 public class PlayedVoteRepository {
     private Database database;
     private Dao<PlayedVote, Integer> dao;
+    private Timestamper ts = new Timestamper();
 
     public PlayedVoteRepository(Database database) {
         this.database = database;
@@ -35,15 +37,9 @@ public class PlayedVoteRepository {
         }
     }
 
-    public long getMillisSinceTimestamp(Timestamp timestamp) {
-        long timestampMillis = timestamp.getTime();
-        long currTimeMillis = now().getTime();
-        return (currTimeMillis - timestampMillis);
-    }
-
     public long getMillisSincePlayedVoteSongId(String songId) {
         Timestamp timestamp = getLatestTimestampOfPlayedVoteBySongId(songId);
-        return getMillisSinceTimestamp(timestamp);
+        return ts.getMillisSinceTimestamp(timestamp);
     }
 
     public List<PlayedVote> getAllPlayedVotes() {
@@ -101,12 +97,6 @@ public class PlayedVoteRepository {
         }
         return latest;
     }
-
-    // TODO Extract all now() methods from all classes
-    private Timestamp now() {
-        return new Timestamp(System.currentTimeMillis());
-    }
-
 }
 
 

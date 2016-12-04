@@ -77,10 +77,6 @@ public class PlayRequestRepository {
         }
     }
 
-    private Timestamp now() {
-        return new Timestamp(System.currentTimeMillis());
-    }
-
     public List<String> getAllRequestedSongIds() {
         List<String> returnList = new ArrayList<>();
         try {
