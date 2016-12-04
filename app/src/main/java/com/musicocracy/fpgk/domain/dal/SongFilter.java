@@ -30,6 +30,11 @@ public class SongFilter {
         return filterMode;
     }
 
+    @Override
+    public String toString() {
+        return "SongId: " + getSongId() + ",Party: " + getParty() + ", FilterMode: "  + getFilterMode();
+    }
+
     @DatabaseField private MusicService service;
     @DatabaseField private String songId;
     @DatabaseField(foreign = true) private Party party;

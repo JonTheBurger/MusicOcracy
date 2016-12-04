@@ -17,6 +17,7 @@ import com.musicocracy.fpgk.domain.dal.Database;
 import com.musicocracy.fpgk.domain.dal.Guest;
 import com.musicocracy.fpgk.domain.dal.Party;
 import com.musicocracy.fpgk.domain.dal.PlayRequest;
+import com.musicocracy.fpgk.domain.dal.SongFilter;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,11 +34,13 @@ public class TestDatabaseActivity extends AppCompatActivity {
     private Dao<Party, Integer> partyDao;
     private Dao<Guest, Integer> guestDao;
     private Dao<PlayRequest, Integer> playRequestDao;
+    private Dao<SongFilter, Integer> songFlterDao;
     private List<String> tableList = Arrays.asList(PARTY, GUEST, PLAYREQUEST);
     private ArrayAdapter<Object> adapter;
     private static final String PARTY = "Party";
     private static final String GUEST = "Guest";
     private static final String PLAYREQUEST = "PlayRequest";
+    private static final String SONGFILTER = "SongFilter";
     private String currentTable;
 
     @Override
@@ -55,6 +58,7 @@ public class TestDatabaseActivity extends AppCompatActivity {
         tableList.add(PARTY);
         tableList.add(GUEST);
         tableList.add(PLAYREQUEST);
+        tableList.add(SONGFILTER);
 
         tableSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tableList));
 
@@ -63,6 +67,7 @@ public class TestDatabaseActivity extends AppCompatActivity {
             partyDao = database.getPartyDao();
             guestDao = database.getGuestDao();
             playRequestDao = database.getPlayRequestDao();
+            songFlterDao = database.getSongFilterDao();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -95,6 +100,11 @@ public class TestDatabaseActivity extends AppCompatActivity {
                 case PLAYREQUEST :
                     playRequestDao.delete(playRequestDao.queryForAll());
                     break;
+
+                case SONGFILTER :
+                    songFlterDao.delete(songFlterDao.queryForAll());
+                    break;
+
                 default :
                     break;
             }
@@ -110,7 +120,7 @@ public class TestDatabaseActivity extends AppCompatActivity {
         try{
             switch(currentTable) {
                 case PARTY :
-                    loaded = new ArrayList<>(partyDao.queryForAll());
+                    loaded = partyDao.queryForAll();
                     break;
 
                 case GUEST :
@@ -118,8 +128,12 @@ public class TestDatabaseActivity extends AppCompatActivity {
                     break;
 
                 case PLAYREQUEST :
-                    loaded = new ArrayList<>(playRequestDao.queryForAll());
+                    loaded = playRequestDao.queryForAll();
                     break;
+
+                case SONGFILTER :
+                    loaded = songFlterDao.queryForAll();
+
                 default :
                     break;
             }
