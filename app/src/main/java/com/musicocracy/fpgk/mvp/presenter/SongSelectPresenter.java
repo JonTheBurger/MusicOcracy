@@ -154,6 +154,9 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
 
     public void onDestroy() {
         RxUtils.safeUnsubscribe(browseSubscription);
+        RxUtils.safeUnsubscribe(voteSubscription);
+        RxUtils.safeUnsubscribe(playRequestSub);
+        RxUtils.safeUnsubscribe(voteRequestSub);
     }
 
     @Override
