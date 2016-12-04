@@ -2,6 +2,7 @@ package com.musicocracy.fpgk.ioc;
 
 import com.musicocracy.fpgk.domain.dal.Database;
 import com.musicocracy.fpgk.domain.dj.DjAlgorithm;
+import com.musicocracy.fpgk.domain.net.Base64Encoder;
 import com.musicocracy.fpgk.domain.net.ClientEventBus;
 import com.musicocracy.fpgk.domain.net.ClientHandler;
 import com.musicocracy.fpgk.domain.net.ProtoEnvelopeFactory;
@@ -13,7 +14,6 @@ import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
 import com.musicocracy.fpgk.domain.spotify.SpotifyPlayerHandler;
-import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -28,8 +28,14 @@ public class NetworkingModule {
 
     @Provides
     @Singleton
-    public ProtoEnvelopeFactory provideProtoEnvelopeFactory() {
-        return new ProtoEnvelopeFactory();
+    public Base64Encoder provideBase64Encoder() {
+        return new Base64Encoder();
+    }
+
+    @Provides
+    @Singleton
+    public ProtoEnvelopeFactory provideProtoEnvelopeFactory(Base64Encoder encoder) {
+        return new ProtoEnvelopeFactory(encoder);
     }
 
     @Provides

@@ -12,7 +12,6 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        //multiDexEnabled true  // Uncomment if DatabaseConfigUtil complains about dex limit
     }
     buildTypes {
         debug {
@@ -99,9 +98,6 @@ dependencies {
     // OrmLite - Database Object Relational Mapping
     compile 'com.j256.ormlite:ormlite-core:5.0'
     compile 'com.j256.ormlite:ormlite-android:5.0'
-
-    // Google Guava - Google Core Libraries for Java
-    compile 'com.google.guava:guava:19.0'
 
     // Google Protocol Buffers - Binary Serializable Class Generation
     compile 'com.google.protobuf:protobuf-lite:3.0.0'

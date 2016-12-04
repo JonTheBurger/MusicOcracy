@@ -1,6 +1,5 @@
 package com.musicocracy.fpgk.domain.dj;
 
-import com.google.common.collect.EvictingQueue;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.musicocracy.fpgk.domain.dal.Database;
@@ -17,6 +16,7 @@ import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
@@ -31,7 +31,7 @@ import rx.schedulers.Schedulers;
 
 public class DjAlgorithm {
     private static final int BACKUP_SONG_COUNT = 10;
-    private final Queue<String> backupSongs = EvictingQueue.create(BACKUP_SONG_COUNT);
+    private final Queue<String> backupSongs = new LinkedList<>();//EvictingQueue.create(BACKUP_SONG_COUNT); TODO: Implement Circular Queue
     private final Set<String> idsOfVoters = new HashSet<>();  // uniqueIds of guests that have voted for a song this iteration (you can vote for a new song once per song)
     private final Database database;
     private final PlayRequestRepository playRequestRepository;
