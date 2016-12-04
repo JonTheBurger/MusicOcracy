@@ -38,6 +38,7 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
     public Subscription createPlayEventNowPlayingSub() {
         return model.getPlayerHandler().newSongPlaying()
                 .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
                 .subscribe(new Action1<Metadata.Track>() {
                     @Override
                     public void call(Metadata.Track track) {
@@ -56,6 +57,7 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                 })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
                 .subscribe(new Action1<List<String>>() {
                     @Override
                     public void call(List<String> votableSongs) {
@@ -74,6 +76,7 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                     })
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
                     .subscribe(new Action1<List<String>>() {
                     @Override
                     public void call(List<String> votableSongs) {
@@ -125,6 +128,7 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
                 .subscribe(new Action1<List<String>>() {
                     @Override
                     public void call(List<String> votableSongs) {
