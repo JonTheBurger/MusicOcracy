@@ -10,18 +10,18 @@ import com.musicocracy.fpgk.domain.dal.PlayRequest;
 import com.musicocracy.fpgk.domain.query_layer.PlayRequestRepository;
 import com.musicocracy.fpgk.domain.query_layer.SongFilterRepository;
 import com.musicocracy.fpgk.domain.spotify.Browser;
+import com.musicocracy.fpgk.domain.util.CircularQueue;
 import com.musicocracy.fpgk.domain.util.PartySettings;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 import kaaes.spotify.webapi.android.models.Track;
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
@@ -29,44 +29,30 @@ import rx.schedulers.Schedulers;
 
 public class DjAlgorithm {
     private static final int BACKUP_SONG_COUNT = 10;
-    private final Queue<String> backupSongs = new LinkedList<>();   // TODO: CircularQueue BACKUP_SONG_COUNT
+    private final CircularQueue<String> backupSongs = new CircularQueue<>(BACKUP_SONG_COUNT);
     private final Set<String> idsOfVoters = new HashSet<>();  // uniqueIds of guests that have voted for a song this iteration (you can vote for a new song once per song)
     private final Database database;
     private final PlayRequestRepository playRequestRepository;
     private final SongFilterRepository songFilterRepository;
     private final PartySettings partySettings;
+    private final Observable<String> mostRequestedObservable;
 
-    public DjAlgorithm(Database database, PlayRequestRepository playRequestRepository, SongFilterRepository songFilterRepository, PartySettings partySettings, final Browser browser) {
+    public DjAlgorithm(Database database, PlayRequestRepository playRequestRepository, SongFilterRepository songFilterRepository, PartySettings partySettings) {
         if (database == null || playRequestRepository == null || songFilterRepository == null || partySettings == null) { throw new IllegalArgumentException("No dependencies may be null"); }
         this.database = database;
         this.playRequestRepository = playRequestRepository;
         this.songFilterRepository = songFilterRepository;
         this.partySettings = partySettings;
-        Observable.from(DjAlgorithm.this.playRequestRepository.getMostRequestedSongIds(BACKUP_SONG_COUNT))
-                .concatWith(
-                        Observable.defer(new Func0<Observable<Track>>() {
-                            @Override
-                            public Observable<Track> call() {
-                                return Observable.from(browser.getTopTracks(BACKUP_SONG_COUNT));
-                            }
-                        })
-                        .subscribeOn(Schedulers.io())
-                        .unsubscribeOn(Schedulers.io())
-                        .map(new Func1<Track, String>() {
-                            @Override
-                            public String call(Track track) {
-                                return track.uri;
-                            }
-                        })
-                )
+        this.mostRequestedObservable = Observable
+                .from(DjAlgorithm.this.playRequestRepository.getMostRequestedSongIds(BACKUP_SONG_COUNT))
                 .take(BACKUP_SONG_COUNT)
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Action1<String>() {
-                @Override
-                public void call(String uri) {
-                    backupSongs.add(uri);
-                }
-            });
+                .subscribeOn(Schedulers.io());
+        mostRequestedObservable.subscribe(new Action1<String>() {
+            @Override
+            public void call(String uri) {
+                backupSongs.enqueue(uri);
+            }
+        });
     }
 
     private static Timestamp now() {
@@ -76,7 +62,10 @@ public class DjAlgorithm {
     public String dequeueNextSongUri() throws SQLException {
         // Get top voted song in database
         List<String> topUriList = playRequestRepository.getMostRequestedSongIds(1);
-        if (topUriList.size() < 1) { return backupSongs.remove(); }
+        if (topUriList.size() < 1) {
+            mostRequestedObservable.toBlocking().first();
+            return backupSongs.dequeue();
+        }
         String topUri = topUriList.get(0);
 
         // Delete requests for top voted song from database
