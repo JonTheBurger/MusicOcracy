@@ -35,6 +35,17 @@ public class PlayedVoteRepository {
         }
     }
 
+    public long getMillisSinceTimestamp(Timestamp timestamp) {
+        long timestampMillis = timestamp.getTime();
+        long currTimeMillis = now().getTime();
+        return (currTimeMillis - timestampMillis);
+    }
+
+    public long getMillisSincePlayedVoteSongId(String songId) {
+        Timestamp timestamp = getLatestTimestampOfPlayedVoteBySongId(songId);
+        return getMillisSinceTimestamp(timestamp);
+    }
+
     public List<PlayedVote> getAllPlayedVotes() {
         List<PlayedVote> returnList = new ArrayList<>();
         try {
@@ -57,7 +68,44 @@ public class PlayedVoteRepository {
         return returnList;
     }
 
+    public List<PlayedVote> getPlayedVoteBySongId(String songId){
+        List<PlayedVote> returnList = new ArrayList<>();
+        try {
+            dao = database.getPlayedVoteDao();
 
+            returnList =
+                    dao.query(
+                            dao.queryBuilder().where()
+                                    .eq(PlayedVote.SONG_ID_COL_NAME, songId)
+                                    .prepare());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            System.out.println(returnList.size());
+            return returnList;
+        }
+    }
+
+    public Timestamp getLatestTimestampOfPlayedVoteBySongId(String songId) {
+        System.out.println("In PlayedVoteRepo\n" + songId);
+        List<PlayedVote> playedVoteList = getPlayedVoteBySongId(songId);
+        Timestamp latest = new Timestamp(0);
+        Timestamp newStamp;
+        for(PlayedVote playedVote : playedVoteList) {
+            newStamp = playedVote.getVoteTime();
+            System.out.println(latest.getTime());
+            System.out.println(newStamp.getTime());
+            if(newStamp.after(latest)) {
+                latest = newStamp;
+            }
+        }
+        return latest;
+    }
+
+    // TODO Extract all now() methods from all classes
+    private Timestamp now() {
+        return new Timestamp(System.currentTimeMillis());
+    }
 
 }
 
