@@ -10,6 +10,16 @@
 
         <item name="android:buttonStyle">@style/ButtonTheme</item>
         <item name="android:listViewStyle">@style/ListViewTheme</item>
+
+        <!-- For the resting Spinner style -->
+        <item name="android:spinnerItemStyle">
+            @style/spinnerItemStyle
+        </item>
+
+        <!-- For each individual Spinner list item once clicked on -->
+        <item name="android:spinnerDropDownItemStyle">
+            @style/spinnerDropDownItemStyle
+        </item>
     </style>
 
     <style name="ButtonTheme" parent="@android:style/Widget.Button">
@@ -55,4 +65,15 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="spinnerItemStyle">
+        <item name="android:padding">10dp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="spinnerDropDownItemStyle">
+        <item name="android:padding">20dp</item>
+        <item name="android:textSize">300sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
 </resources>

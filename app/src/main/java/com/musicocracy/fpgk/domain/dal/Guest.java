@@ -41,6 +41,11 @@ public class Guest {
         return isBanned;
     }
 
+    @Override
+    public String toString() {
+        return getId() + ": " + getName() + ", Joined at "  + getJoinTime() + ", isBanned: " + isBanned();
+    }
+
     @DatabaseField(generatedId = true) private int id;
     @DatabaseField(foreign = true) private Party party;
     @DatabaseField private String name;

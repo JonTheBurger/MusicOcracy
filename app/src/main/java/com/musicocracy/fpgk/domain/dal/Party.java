@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 
 @DatabaseTable(tableName = "Party")
 public class Party {
+    public static final String END_TIME_COLUMN = "endTime";
     Party() {}    // OrmLite requires a default constructor
 
     public Party(String name, String password, Timestamp startTime, Timestamp endTime, FilterMode filterMode, boolean isHosting) {
@@ -26,8 +27,16 @@ public class Party {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Timestamp getStartTime() {
@@ -38,19 +47,36 @@ public class Party {
         return endTime;
     }
 
+    public void setEndTime(Timestamp endTime) {
+        this.endTime = endTime;
+    }
+
     public FilterMode getFilterMode() {
         return filterMode;
+    }
+
+    public void setFilterMode(FilterMode filterMode) {
+        this.filterMode = filterMode;
     }
 
     public boolean isHosting() {
         return isHosting;
     }
 
+    public void setIsHosting(boolean isHosting) {
+        this.isHosting = isHosting;
+    }
+
+    @Override
+    public String toString() {
+        return getId() + ": Party: " + getName() + ", PartyId: "  + getPassword() + ", Started at " + getStartTime().toString();
+    }
+
     @DatabaseField(generatedId = true) private int id;
     @DatabaseField private String name;
     @DatabaseField private String password;
     @DatabaseField private Timestamp startTime;
-    @DatabaseField private Timestamp endTime;
+    @DatabaseField(columnName = END_TIME_COLUMN) private Timestamp endTime;
     @DatabaseField private FilterMode filterMode;
     @DatabaseField private boolean isHosting;
 }

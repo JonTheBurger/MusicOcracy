@@ -23,12 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".TestMainActivity" />
-        <activity android:name=".TestBrowseActivity" />
         <activity android:name=".TestDatabaseActivity" />
-        <activity
-            android:name=".TestBroadcastReceiverActivity"
-            android:launchMode="standard" />
-        <activity android:name=".TestBroadcastSenderActivity" />
         <activity android:name=".AuthenticationActivity" />
         <!-- Needed for LoginActivity to work -->
         <activity

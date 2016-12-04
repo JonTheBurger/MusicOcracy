@@ -20,11 +20,9 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnItemClick;
 
 public class SongSelectActivity extends ActivityBase<SongSelectView> implements SongSelectView {
     private static final String TAG = "SongSelectActivity";
-    private static final int AUTHENTICATION_REQUEST_CODE = 1001;
     private ArrayAdapter<String> adapter;
 
     @Inject SongSelectPresenter presenter;

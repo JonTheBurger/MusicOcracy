@@ -3,55 +3,58 @@ package com.musicocracy.fpgk.domain.net;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 
-import com.google.common.collect.Lists;
-import com.google.common.net.InetAddresses;
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Arrays;
+import java.nio.ByteBuffer;
 
 import static android.content.Context.WIFI_SERVICE;
 
 public class NetworkUtils {
     //region IP Address
     public static String ipAddressToBase36(String ipAddress) {
-        InetAddress inetAddress = InetAddresses.forString(ipAddress);
-        return inetAddressToBase36(inetAddress);
+        byte[] ipBytes = ipv4ToBytes(ipAddress);
+        return Long.toString(bytesToLong(ipBytes), 36);
     }
 
-    public static String inetAddressToBase36(InetAddress inetAddress) {
-        int addressAsInt = InetAddresses.coerceToInteger(inetAddress);
-        byte[] intBytes = Ints.toByteArray(addressAsInt);
-        byte[] bytes = new byte[8];
+    private static byte[] ipv4ToBytes(String ip) {
+        String[] bStr = ip.split("\\.");    // If ip string does not have a length of 4, we throw
+        byte[] b = new byte[8];
         for (int i = 4; i < 8; i++) {
-            bytes[i] = intBytes[i - 4];
+            b[i] = (byte)((0xFF) & Integer.parseInt(bStr[i - 4]));
         }
-        return Long.toString(Longs.fromByteArray(bytes), 36);
+        return b;
+    }
+
+    private static long bytesToLong(byte[] b) {  // MSB first
+        return ByteBuffer.wrap(b).getLong();
     }
 
     public static String base36ToIpAddress(String base36) {
-        return base36ToInetAddress(base36.toLowerCase()).getHostAddress();
+        long addressAsLong = Long.parseLong(base36, 36);
+        byte[] bytes = longToBytes(addressAsLong);
+        return ipv4FromBytes(bytes);
     }
 
-    public static InetAddress base36ToInetAddress(String base36) {
-        long addressAsLong = Long.parseLong(base36, 36);
-        byte[] bytes = Longs.toByteArray(addressAsLong);
-        int addressAsInt = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
-        return InetAddresses.fromInteger(addressAsInt);
+    private static byte[] longToBytes(long l) {  // MSB first
+        return ByteBuffer.allocate(8).putLong(l).array();
+    }
+
+    private static String ipv4FromBytes(byte[] b) { // MSB first
+        return "" + ((0xFF) & b[b.length - 4]) + '.' + ((0xFF) & b[b.length - 3]) + '.' + ((0xFF) & b[b.length - 2]) + '.' + ((0xFF) & b[b.length - 1]);
     }
 
     public static String getLocalIpAddress(Context context) {
         WifiManager wifi = (WifiManager)context.getSystemService(WIFI_SERVICE);
         int raw = wifi.getConnectionInfo().getIpAddress();
-        InetAddress inet = InetAddresses.fromInteger(raw);
-        String[] bytes = inet.getHostAddress().split("\\.");
-        return bytes[3] + '.' + bytes[2] + '.' + bytes[1] + '.' + bytes[0]; // For some reason Android gives the ip address bytes in reverse
+        byte[] bytes = intToBytes(raw);
+        return "" + bytes[3] + '.' + bytes[2] + '.' + bytes[1] + '.' + bytes[0];
+    }
+
+    private static byte[] intToBytes(int i) {
+        return ByteBuffer.allocate(4).putInt(i).array();
     }
 
     public static String getPublicIpAddress() {
