@@ -91,7 +91,7 @@ public class RxTcpClient {
                                     });
 
                             // Events must be merged and subscribed to in order to actually run. i.e. these are cold observables.
-                            return Observable.merge(receiver, transmitter);
+                            return Observable.merge(receiver, transmitter).subscribeOn(Schedulers.io());
                         }
                     })
                     .subscribeOn(Schedulers.io())

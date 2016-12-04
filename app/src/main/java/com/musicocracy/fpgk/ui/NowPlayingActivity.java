@@ -81,7 +81,6 @@ public class NowPlayingActivity extends ActivityBase<NowPlayingView> implements 
     public void updateVotableSongs(List<String> votableSongs) {
         adapter.clear();
         adapter.addAll(votableSongs);
-        adapter.notifyDataSetChanged();
     }
 
     @Override

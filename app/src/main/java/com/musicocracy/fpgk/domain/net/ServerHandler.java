@@ -18,6 +18,7 @@ import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
 import com.musicocracy.fpgk.net.proto.SendVoteRequest;
 import com.musicocracy.fpgk.net.proto.VotableSongsReply;
 import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
+import com.spotify.sdk.android.player.Metadata;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.List;
 import kaaes.spotify.webapi.android.SpotifyApi;
 
 import kaaes.spotify.webapi.android.models.Track;
+import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 
@@ -40,6 +42,7 @@ public class ServerHandler {
     private final Logger log;
     private final DjAlgorithm djAlgorithm;
     private final Database database;
+    private final SharedSubject<String> newPlayRequest = SharedSubject.create();
     private SpotifyPlayerHandler spotifyPlayerHandler;
     private Subscription[] subscriptions = emptySubs;
 
@@ -209,14 +212,31 @@ public class ServerHandler {
                         e.printStackTrace();
                     }
 
-                    try {
-                        djAlgorithm.request(request.getUri(), request.getRequesterId());
-                    } catch (SQLException e) {
-                        log.error(TAG, e.toString());
-                    }
-                    spotifyPlayerHandler.play();
+                    BasicReply reply;
+                    if (request != PlayRequestRequest.getDefaultInstance()) {
+                        try {
+                            djAlgorithm.request(request.getUri(), request.getRequesterId());
+                            newPlayRequest.onNext(request.getUri());
+                        } catch (SQLException e) {
+                            log.error(TAG, e.toString());
+                        }
+                        spotifyPlayerHandler.play();
 
-                    // TODO: Add Basic Reply
+                        reply = BasicReply.newBuilder()
+                                .setSuccess(true)
+                                .setMessage("")
+                                .setReplyingTo(msgBySender.message.getHeader().getType())
+                                .build();
+
+                    } else {
+                        reply = BasicReply.newBuilder()
+                                .setSuccess(false)
+                                .setMessage("Invalid Play Request")
+                                .setReplyingTo(msgBySender.message.getHeader().getType())
+                                .build();
+                    }
+                    log.verbose(TAG, "Sent: " + reply);
+                    msgBySender.replyWith(reply);
                 }
             });
     }
@@ -234,17 +254,33 @@ public class ServerHandler {
                             e.printStackTrace();
                         }
 
-                        List<String> votableSongURIs = getVotableURIs();
-                        try {
-                            String voteURI = votableSongURIs.get(request.getChoiceId());
+                        BasicReply reply;
+                        if (request != SendVoteRequest.getDefaultInstance()) {
+                            List<String> votableSongURIs = getVotableURIs();
+                            try {
+                                String voteURI = votableSongURIs.get(request.getChoiceId());
 
-                            djAlgorithm.voteFor(voteURI, request.getRequesterId());
+                                djAlgorithm.voteFor(voteURI, request.getRequesterId());
 
-                        } catch (SQLException e) {
-                            log.error(TAG, e.toString());
+                            } catch (SQLException e) {
+                                log.error(TAG, e.toString());
+                            }
+
+                            reply = BasicReply.newBuilder()
+                                    .setSuccess(true)
+                                    .setMessage("")
+                                    .setReplyingTo(msgBySender.message.getHeader().getType())
+                                    .build();
+
+                        } else {
+                            reply = BasicReply.newBuilder()
+                                    .setSuccess(false)
+                                    .setMessage("Invalid Vote Request")
+                                    .setReplyingTo(msgBySender.message.getHeader().getType())
+                                    .build();
                         }
-
-                        // TODO: Add Basic Reply
+                        log.verbose(TAG, "Sent: " + reply);
+                        msgBySender.replyWith(reply);
                     }
                 });
     }
@@ -266,6 +302,10 @@ public class ServerHandler {
             votableTracks.add(track);
         }
         return votableTracks;
+    }
+
+    public Observable<String> newPlayRequest() {
+        return newPlayRequest.asObservable();
     }
 
     public void onDestroy() {

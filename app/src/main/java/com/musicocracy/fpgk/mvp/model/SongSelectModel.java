@@ -3,6 +3,7 @@ package com.musicocracy.fpgk.mvp.model;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.domain.net.ClientEventBus;
 import com.musicocracy.fpgk.domain.util.Logger;
+import com.musicocracy.fpgk.net.proto.BasicReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
 import com.musicocracy.fpgk.net.proto.Envelope;
@@ -64,6 +65,48 @@ public class SongSelectModel {
                         } catch (InvalidProtocolBufferException e) {
                             return VotableSongsReply.getDefaultInstance();
                         }
+                    }
+                });
+    }
+
+    public Observable<BasicReply> getVoteRequestReply() {
+        return client.getObservable(MessageType.BASIC_REPLY)
+                .map(new Func1<Envelope, BasicReply>() {
+                    @Override
+                    public BasicReply call(Envelope envelope) {
+                        try {
+                            return BasicReply.parseFrom(envelope.getBody());
+                        } catch (InvalidProtocolBufferException e) {
+                            e.printStackTrace();
+                            return BasicReply.getDefaultInstance();
+                        }
+                    }
+                })
+                .filter(new Func1<BasicReply, Boolean>() {
+                    @Override
+                    public Boolean call(BasicReply basicReply) {
+                        return basicReply.getReplyingTo() == MessageType.PLAY_REQUEST_REQUEST;
+                    }
+                });
+    }
+
+    public Observable<BasicReply> getPlayRequestReply() {
+        return client.getObservable(MessageType.BASIC_REPLY)
+                .map(new Func1<Envelope, BasicReply>() {
+                    @Override
+                    public BasicReply call(Envelope envelope) {
+                        try {
+                            return BasicReply.parseFrom(envelope.getBody());
+                        } catch (InvalidProtocolBufferException e) {
+                            e.printStackTrace();
+                            return BasicReply.getDefaultInstance();
+                        }
+                    }
+                })
+                .filter(new Func1<BasicReply, Boolean>() {
+                    @Override
+                    public Boolean call(BasicReply basicReply) {
+                        return basicReply.getReplyingTo() == MessageType.PLAY_REQUEST_REQUEST;
                     }
                 });
     }
