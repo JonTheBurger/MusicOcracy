@@ -25,6 +25,7 @@ import java.util.Set;
 import kaaes.spotify.webapi.android.models.Track;
 import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
@@ -38,24 +39,32 @@ public class DjAlgorithm {
     private final SongFilterRepository songFilterRepository;
     private final ReadOnlyPartySettings partySettings;
 
-    public DjAlgorithm(Database database, PlayRequestRepository playRequestRepository, SongFilterRepository songFilterRepository, ReadOnlyPartySettings partySettings, Browser browser) {
+    public DjAlgorithm(Database database, PlayRequestRepository playRequestRepository, SongFilterRepository songFilterRepository, ReadOnlyPartySettings partySettings, final Browser browser) {
         if (database == null || playRequestRepository == null || songFilterRepository == null || partySettings == null) { throw new IllegalArgumentException("No dependencies may be null"); }
         this.database = database;
         this.playRequestRepository = playRequestRepository;
         this.songFilterRepository = songFilterRepository;
         this.partySettings = partySettings;
-        Observable.from(playRequestRepository.getMostRequestedSongIds(BACKUP_SONG_COUNT))
-        .subscribeOn(Schedulers.io())
-        .concatWith(Observable.from(browser.getTopTracks(BACKUP_SONG_COUNT))
-                .map(new Func1<Track, String>() {
-                    @Override
-                    public String call(Track track) {
-                        return track.uri;
-                    }
-                })
-        )
-        .take(BACKUP_SONG_COUNT)
-        .subscribe(new Action1<String>() {
+        Observable.from(DjAlgorithm.this.playRequestRepository.getMostRequestedSongIds(BACKUP_SONG_COUNT))
+                .concatWith(
+                        Observable.defer(new Func0<Observable<Track>>() {
+                            @Override
+                            public Observable<Track> call() {
+                                return Observable.from(browser.getTopTracks(BACKUP_SONG_COUNT));
+                            }
+                        })
+                        .subscribeOn(Schedulers.io())
+                        .unsubscribeOn(Schedulers.io())
+                        .map(new Func1<Track, String>() {
+                            @Override
+                            public String call(Track track) {
+                                return track.uri;
+                            }
+                        })
+                )
+                .take(BACKUP_SONG_COUNT)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Action1<String>() {
                 @Override
                 public void call(String uri) {
                     backupSongs.add(uri);

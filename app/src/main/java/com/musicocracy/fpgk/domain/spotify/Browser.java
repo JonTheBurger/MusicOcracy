@@ -1,5 +1,6 @@
 package com.musicocracy.fpgk.domain.spotify;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyService;
@@ -33,10 +34,14 @@ public class Browser {
     }
 
     public List<Track> getTopTracks(int numTopTracks) {
-        List<Track> topTracks = spotify.getTopTracks().items;
-
-        if(topTracks.size() > numTopTracks) {
-            topTracks = topTracks.subList(0, numTopTracks);
+        List<Track> topTracks = new ArrayList<>();
+        try {
+            topTracks = spotify.getTopTracks().items;
+            if(topTracks.size() > numTopTracks) {
+                topTracks = topTracks.subList(0, numTopTracks);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return topTracks;

@@ -14,10 +14,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
-        debug {
-            applicationIdSuffix '.debug'
-            versionNameSuffix '-DEBUG'
-        }
         release {
             shrinkResources true
             minifyEnabled true
