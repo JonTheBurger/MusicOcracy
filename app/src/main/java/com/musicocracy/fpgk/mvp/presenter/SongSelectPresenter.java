@@ -18,6 +18,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class SongSelectPresenter implements Presenter<SongSelectView> {
     private final SongSelectModel model;
@@ -55,6 +56,7 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
                 .subscribe(new Action1<List<String>>() {
                     @Override
                     public void call(List<String> browseList) {
@@ -64,6 +66,7 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
 
         voteSubscription = model.getVotableSongsReply()
                 .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
                 .subscribe(new Action1<VotableSongsReply>() {
                     @Override
                     public void call(VotableSongsReply VotableSongsReply) {
@@ -73,6 +76,7 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
 
         playRequestSub = model.getPlayRequestReply()
                 .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
                 .subscribe(new Action1<BasicReply>() {
                     @Override
                     public void call(BasicReply basicReply) {
@@ -86,6 +90,7 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
 
         voteRequestSub = model.getVoteRequestReply()
                 .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
                 .subscribe(new Action1<BasicReply>() {
                     @Override
                     public void call(BasicReply basicReply) {
