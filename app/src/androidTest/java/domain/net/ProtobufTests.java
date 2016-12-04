@@ -1,5 +1,8 @@
+package domain.net;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.musicocracy.fpgk.domain.dal.MusicService;
+import com.musicocracy.fpgk.domain.net.Base64Encoder;
 import com.musicocracy.fpgk.domain.net.ProtoEnvelopeFactory;
 import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsRequest;
@@ -11,7 +14,7 @@ import org.junit.Test;
 import static junit.framework.Assert.assertEquals;
 
 public class ProtobufTests {
-    private static final ProtoEnvelopeFactory factory = new ProtoEnvelopeFactory();
+    private static final ProtoEnvelopeFactory factory = new ProtoEnvelopeFactory(new Base64Encoder());
 
     private static PlayRequestRequest createPlayRequestRequest() {
         return PlayRequestRequest.newBuilder()

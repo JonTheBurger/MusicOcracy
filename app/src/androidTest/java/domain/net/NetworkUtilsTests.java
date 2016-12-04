@@ -1,10 +1,12 @@
+package domain.net;
+
 import com.musicocracy.fpgk.domain.net.NetworkUtils;
 
 import org.junit.Test;
 
 import static junit.framework.Assert.*;
 
-public class Ipv4ToBase36Tests {
+public class NetworkUtilsTests {
     @Test
     public void Base36IpAddress_SerializeDeserialize_SameReturns() {
         String[] expected = {

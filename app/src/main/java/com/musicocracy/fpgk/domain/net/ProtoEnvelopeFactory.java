@@ -1,10 +1,5 @@
 package com.musicocracy.fpgk.domain.net;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Maps;
-import com.google.common.io.BaseEncoding;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.MessageLite;
 import com.musicocracy.fpgk.net.proto.BasicReply;
 import com.musicocracy.fpgk.net.proto.BrowseSongsReply;
@@ -20,28 +15,36 @@ import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
 import com.musicocracy.fpgk.net.proto.VotableSongsReply;
 import com.musicocracy.fpgk.net.proto.SendVoteRequest;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 public class ProtoEnvelopeFactory {
     private static final int CURRENT_VERSION = 0;
-    private static final BiMap<MessageType, Class> messageTypeMap;
+    private static final Map<Class, MessageType> messageTypeMap;
+    private final Base64Encoder encoder;
     static {
-        BiMap<MessageType, Class> map = HashBiMap.create(MessageType.values().length);
+        Map<Class, MessageType> map = new HashMap<>(MessageType.values().length);
 
-        map.put(MessageType.UNKNOWN, null);
-        map.put(MessageType.BASIC_REPLY, BasicReply.class);
-        map.put(MessageType.CONNECT_REQUEST, ConnectRequest.class);
-        map.put(MessageType.PLAY_REQUEST_REQUEST, PlayRequestRequest.class);
-        map.put(MessageType.SEND_VOTE_REQUEST, SendVoteRequest.class);
-        map.put(MessageType.VOTABLE_SONGS_REQUEST, VotableSongsRequest.class);
-        map.put(MessageType.VOTABLE_SONGS_REPLY, VotableSongsReply.class);
-        map.put(MessageType.BROWSE_SONGS_REQUEST, BrowseSongsRequest.class);
-        map.put(MessageType.BROWSE_SONGS_REPLY, BrowseSongsReply.class);
-        map.put(MessageType.COIN_STATUS_REQUEST, CoinStatusRequest.class);
-        map.put(MessageType.COIN_STATUS_REPLY, CoinStatusReply.class);
+        map.put(BasicReply.class, MessageType.BASIC_REPLY);
+        map.put(ConnectRequest.class, MessageType.CONNECT_REQUEST);
+        map.put(PlayRequestRequest.class, MessageType.PLAY_REQUEST_REQUEST);
+        map.put(SendVoteRequest.class, MessageType.SEND_VOTE_REQUEST);
+        map.put(VotableSongsRequest.class, MessageType.VOTABLE_SONGS_REQUEST);
+        map.put(VotableSongsReply.class, MessageType.VOTABLE_SONGS_REPLY);
+        map.put(BrowseSongsRequest.class, MessageType.BROWSE_SONGS_REQUEST);
+        map.put(BrowseSongsReply.class, MessageType.BROWSE_SONGS_REPLY);
+        map.put(CoinStatusRequest.class, MessageType.COIN_STATUS_REQUEST);
+        map.put(CoinStatusReply.class, MessageType.COIN_STATUS_REPLY);
 
-        messageTypeMap = Maps.unmodifiableBiMap(map);
+        messageTypeMap = Collections.unmodifiableMap(map);
     }
 
-    public BiMap<MessageType, Class> getMessageTypeMap() {
+    public ProtoEnvelopeFactory(Base64Encoder encoder) {
+        this.encoder = encoder;
+    }
+
+    public Map<Class, MessageType> getMessageTypeMap() {
         return messageTypeMap;
     }
 
@@ -71,7 +74,7 @@ public class ProtoEnvelopeFactory {
 
     public Envelope createEnvelopeVersion0(MessageLite body) {
         Header header = Header.newBuilder()
-                .setType(messageTypeMap.inverse().get(body.getClass()))
+                .setType(messageTypeMap.get(body.getClass()))
                 .setVersion(0)
                 .build();
         Envelope envelope = Envelope.newBuilder()
@@ -84,7 +87,7 @@ public class ProtoEnvelopeFactory {
 
     public Envelope envelopeFromBase64(String base64) {
         try {
-            byte[] bytes = BaseEncoding.base64().decode(base64.trim());
+            byte[] bytes = encoder.base64ToBytes(base64);
             return Envelope.parseFrom(bytes);
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,6 +96,6 @@ public class ProtoEnvelopeFactory {
     }
 
     public String envelopeToBase64(Envelope message) {
-        return BaseEncoding.base64().encode(message.toByteArray()) + '\n';
+        return encoder.bytesToBase64(message.toByteArray());
     }
 }

@@ -1,7 +1,5 @@
 package com.musicocracy.fpgk.mvp.presenter;
 
-import android.content.Context;
-
 import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.mvp.model.PartyConfigModel;
 import com.musicocracy.fpgk.domain.net.NetworkUtils;
@@ -24,7 +22,7 @@ public class PartyConfigPresenter implements Presenter<PartyConfigView> {
     }
 
     public void onCreate() {
-        globalIpSub = Observable.defer(new Func0<Observable<String>>() {
+        globalIpSub = Observable.defer(new Func0<Observable<String>>() {    // TODO: Is defer needed here?
             @Override
             public Observable<String> call() {
                 return Observable.just(NetworkUtils.getPublicIpAddress());
@@ -43,9 +41,9 @@ public class PartyConfigPresenter implements Presenter<PartyConfigView> {
     public void confirmSettings() {
         model.getSettings().setPartyCode(view.getPartyCode());
         model.getSettings().setPartyName(view.getPartyName());
-        model.getSettings().setTokens(view.getTokenCount());
+        model.getSettings().setCoinAllowance(view.getTokenCount());
         long refillMillis = (view.getTokenRefillMinutes() * 60 + view.getTokenRefillSeconds()) * 1000;
-        model.getSettings().setTokenRefillMillis(refillMillis);
+        model.getSettings().setCoinRefillMillis(refillMillis);
 
         model.startServer();
     }
