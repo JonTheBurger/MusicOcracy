@@ -136,6 +136,8 @@ public class DjAlgorithm {
     }
 
     public void voteFor(String uri, String requesterId) throws IllegalArgumentException, SQLException {
+        if (uri == null || requesterId == null) { throw new IllegalArgumentException("Arguments cannot be null"); }
+
         if (idsOfVoters.contains(requesterId)) { throw new IllegalArgumentException("You already voted during this song. Please wait until the next song."); }
         if (!getVotableSongUris().contains(uri)) { throw new IllegalArgumentException("The song you requested is not currently up for vote."); }
         Guest guest = getGuest(requesterId);
@@ -155,6 +157,8 @@ public class DjAlgorithm {
     }
 
     public void request(String uri, String requesterId) throws IllegalArgumentException, SQLException {
+        if (uri == null || requesterId == null) { throw new IllegalArgumentException("Arguments cannot be null"); }
+
         // Check if user is allowed to make requests
         Guest guest = getGuest(requesterId);
         List<PlayRequest> requests = playRequestRepository.getRequestsMadeByGuest(guest);
