@@ -1,10 +1,12 @@
 package com.musicocracy.fpgk.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.musicocracy.fpgk.CyberJukeboxApplication;
 import com.musicocracy.fpgk.mvp.presenter.Presenter;
@@ -68,6 +70,28 @@ public class SongSelectActivity extends ActivityBase<SongSelectView> implements 
             }
         };
         listView.setOnItemClickListener(listener);
+    }
+
+    @Override
+    public void onPlayRequestSuccess() {
+        onBackPressed();
+    }
+
+    @Override
+    public void onPlayRequestError(String error) {
+        CharSequence text = "Play Request Failed: " + error;
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onVoteRequestSuccess() {
+        onBackPressed();
+    }
+
+    @Override
+    public void onVoteRequestError(String error) {
+        CharSequence text = "Vote Request Failed: " + error;
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 
     @OnClick(R.id.selectBackButton)
