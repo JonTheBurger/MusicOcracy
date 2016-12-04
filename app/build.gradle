@@ -60,21 +60,13 @@ protobuf {
 }
 
 dependencies {
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
+
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.9.5'
-    androidTestCompile 'junit:junit:4.12'
-    androidTestCompile 'org.mockito:mockito-core:1.9.5'
-//    testCompile "com.crittercism.dexmaker:dexmaker:1.4"
-//    testCompile "com.crittercism.dexmaker:dexmaker-dx:1.4"
-//    testCompile "com.crittercism.dexmaker:dexmaker-mockito:1.4"
-
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
 
     // Dagger 2 - Dependency Injection Framework
     compile 'com.google.dagger:dagger:2.7'
@@ -107,4 +99,17 @@ dependencies {
     // Spotify web API wrapper
     compile 'com.github.kaaes:spotify-web-api-android:0.4.1'
     compile 'org.slf4j:slf4j-simple:1.7.21'
+
+    // Unit testing
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.9.5'
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile 'org.mockito:mockito-core:1.9.5'
+    androidTestCompile "com.crittercism.dexmaker:dexmaker:1.4"
+    androidTestCompile "com.crittercism.dexmaker:dexmaker-dx:1.4"
+    androidTestCompile "com.crittercism.dexmaker:dexmaker-mockito:1.4"
+    androidTestCompile 'com.android.support:support-annotations:24.2.1'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
 }

@@ -1,6 +1,13 @@
 package domain.dj;
 
+import android.app.Instrumentation;
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.test.ActivityInstrumentationTestCase2;
+import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
+import android.test.mock.MockContext;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
@@ -16,13 +23,13 @@ import com.musicocracy.fpgk.domain.query_layer.SongFilterRepository;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.PartySettings;
 import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
+import com.musicocracy.fpgk.ui.R;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.mock;
@@ -30,7 +37,10 @@ import static org.mockito.Mockito.when;
 
 @RunWith(AndroidJUnit4.class)
 public class DjAlgorithmTests {
-    private static final Timestamp nowMinus(long offsetMillis) {
+    //private final Instrumentation instrumentation = this.getCCgetInstrumentation();
+    private final Context context = InstrumentationRegistry.getTargetContext();
+
+    private static Timestamp nowMinus(long offsetMillis) {
         return new Timestamp((int)System.currentTimeMillis() - offsetMillis);
     }
 
@@ -169,8 +179,7 @@ public class DjAlgorithmTests {
     // region request
     @Test
     public void DjAlgorithm_request_validArgs_inserts() throws SQLException {
-        Database db = mockDb(new ArrayList<Party>(), new ArrayList<Guest>(), new ArrayList<PlayRequest>());
-        //DjAlgorithm dj = new DjAlgorithm(db, playRepo, filterRepo, settings, browser);
+        DjAlgorithm dj = new DjAlgorithm(Database.InMemory(context), mockPlayRequestRepo(), mockFilterRepo(), mockSettings(3, 1000), mockBrowser());
     }
 
     @Test
