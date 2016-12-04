@@ -113,7 +113,7 @@ public class DjAlgorithmTests {
 
     // region Factories
     private static Timestamp nowMinus(long offsetMillis) {
-        return new Timestamp((int)System.currentTimeMillis() - offsetMillis);
+        return new Timestamp(System.currentTimeMillis() - offsetMillis);
     }
 
     private Track trackWith(String uri) {
@@ -122,8 +122,12 @@ public class DjAlgorithmTests {
         return track;
     }
 
-    private ReadOnlyPartySettings createPartySettings(int coins, long refillMillis) {
-        return new PartySettings().setPartyName("name").setPartyCode("code").setSpotifyToken("token").setCoinAllowance(coins).setCoinRefillMillis(refillMillis);
+    private PartySettings createPartySettings(Database db, int coins, long refillMillis) throws SQLException {
+        return createPartySettings(db.getPartyDao().queryForAll(), coins, refillMillis);
+    }
+
+    private PartySettings createPartySettings(List<Party> parties, int coins, long refillMillis) throws SQLException {
+        return new PartySettings(mockDao(parties)).setPartyName("name").setPartyCode("code").setSpotifyToken("token").setCoinAllowance(coins).setCoinRefillMillis(refillMillis);
     }
 
     private static Guest guestFromExisting(Guest guest, Party dbParty) {
@@ -146,23 +150,23 @@ public class DjAlgorithmTests {
         } else if (currentFilter == FilterMode.WHITE_LIST) {
             party = currentWhiteListParty;
         }
-        party = db.getPartyDao().createIfNotExists(party);
+        db.getPartyDao().create(party);
         db.getGuestDao().create(Arrays.asList(
                 guestFromExisting(validGuest, party),
                 guestFromExisting(bannedGuest, party)
         ));
-        Guest guest = db.getGuestDao().createIfNotExists(guestFromExisting(voteLimitedGuest, party));
+        db.getGuestDao().create(guestFromExisting(voteLimitedGuest, party));
         db.getPlayRequestDao().create(Arrays.asList(
-                playRequestFromExisting(newRequest1Song3, party, guest),
-                playRequestFromExisting(newRequest2Song3, party, guest),
-                playRequestFromExisting(newRequest3Song4, party, guest),
-                playRequestFromExisting(newRequest4Song4, party, guest),
-                playRequestFromExisting(newRequest5Song4, party, guest),
-                playRequestFromExisting(newRequest6Song5, party, guest),
-                playRequestFromExisting(newRequest7Song6, party, guest),
-                playRequestFromExisting(newRequest8Song7, party, guest),
-                playRequestFromExisting(newRequest9Song6, party, guest),
-                playRequestFromExisting(newRequest10Song7, party, guest)
+                playRequestFromExisting(newRequest1Song3, party, voteLimitedGuest),
+                playRequestFromExisting(newRequest2Song3, party, voteLimitedGuest),
+                playRequestFromExisting(newRequest3Song4, party, voteLimitedGuest),
+                playRequestFromExisting(newRequest4Song4, party, voteLimitedGuest),
+                playRequestFromExisting(newRequest5Song4, party, voteLimitedGuest),
+                playRequestFromExisting(newRequest6Song5, party, voteLimitedGuest),
+                playRequestFromExisting(newRequest7Song6, party, voteLimitedGuest),
+                playRequestFromExisting(newRequest8Song7, party, voteLimitedGuest),
+                playRequestFromExisting(newRequest9Song6, party, voteLimitedGuest),
+                playRequestFromExisting(newRequest10Song7, party, voteLimitedGuest)
         ));
         db.getSongFilterDao().create(Arrays.asList(
                 songFilterFromExisting(song6BlackFilter, party),
@@ -178,12 +182,12 @@ public class DjAlgorithmTests {
                 oldBlackListParty,
                 oldWhiteListParty
         ));
-        Party party = db.getPartyDao().createIfNotExists(oldParty1);
-        Guest guest = db.getGuestDao().createIfNotExists(guestFromExisting(oldGuest, party));
+        db.getPartyDao().create(oldParty1);
+        db.getGuestDao().create(guestFromExisting(oldGuest, oldParty1));
         db.getPlayRequestDao().create(Arrays.asList(
-                playRequestFromExisting(oldRequest1Song1, party, guest),
-                playRequestFromExisting(oldRequest1Song2, party, guest),
-                playRequestFromExisting(oldRequest2Song1, party, guest)
+                playRequestFromExisting(oldRequest1Song1, oldParty1, oldGuest),
+                playRequestFromExisting(oldRequest1Song2, oldParty1, oldGuest),
+                playRequestFromExisting(oldRequest2Song1, oldParty1, oldGuest)
         ));
         return db;
     }
@@ -193,7 +197,7 @@ public class DjAlgorithmTests {
     @Test
     public void DjAlgorithm_dequeueNextSongUri_emptyDb_returnsBackupTrack() throws InterruptedException, SQLException {
         Database db = Database.InMemory(context);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         assertEquals(SPOTIFY_URI_1, dj.dequeueNextSongUri());
     }
@@ -201,7 +205,7 @@ public class DjAlgorithmTests {
     @Test
     public void DjAlgorithm_dequeueNextSongUri_dequeueTwo_givesTopTwo() throws SQLException {
         Database db = Database.InMemory(context);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.dequeueNextSongUri();
         assertEquals(SPOTIFY_URI_2, dj.dequeueNextSongUri());
@@ -210,7 +214,7 @@ public class DjAlgorithmTests {
     @Test
     public void DjAlgorithm_dequeueNextSongUri_emptyDbMultipleTries_returnsBackupTrackQueue() throws SQLException {
         Database db = Database.InMemory(context);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.dequeueNextSongUri();
         dj.dequeueNextSongUri();
@@ -221,18 +225,18 @@ public class DjAlgorithmTests {
     @Test
     public void DjAlgorithm_dequeueNextSongUri_emptyDb_backupTrackQueueContainsPreviouslyRequestedUri() throws SQLException {
         Database db = dbWithCurrentAndOldData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.dequeueNextSongUri();
         dj.dequeueNextSongUri();
         dj.dequeueNextSongUri();
-        assertEquals(oldRequest1Song1, dj.dequeueNextSongUri());
+        assertEquals(oldRequest1Song1.getSongId(), dj.dequeueNextSongUri());
     }
 
     @Test
     public void DjAlgorithm_dequeueNextSongUri_voteBeforeAndAfter_reEnablesVoting() throws SQLException {
         Database db = dbWithCurrentAndOldData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.voteFor(newRequest1Song3.getSongId(), validGuest.getUniqueId());
         dj.dequeueNextSongUri();
@@ -243,7 +247,7 @@ public class DjAlgorithmTests {
     @Test
     public void DjAlgorithm_dequeueNextSongUri_returnsMaxVotes() throws SQLException {
         Database db = dbWithCurrentAndOldData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         String uri = dj.dequeueNextSongUri();
 
@@ -255,7 +259,7 @@ public class DjAlgorithmTests {
     @Test
     public void DjAlgorithm_getVotableSongUris_returnsCorrect() throws SQLException {
         Database db = dbWithCurrentAndOldData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
         List<String> unexpected = Arrays.asList("1", "2", "5");
 
         List<String> votableSongs = dj.getVotableSongUris();
@@ -268,7 +272,7 @@ public class DjAlgorithmTests {
     @Test
     public void DjAlgorithm_getVotableSongUris_emptyDb_returnsEmptyList() throws SQLException {
         Database db = Database.InMemory(context);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         assertEquals(0, dj.getVotableSongUris().size());
     }
@@ -278,7 +282,7 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_voteFor_nullUri_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.voteFor(null, validGuest.getUniqueId());
     }
@@ -286,7 +290,7 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_voteFor_nullRequesterId_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.voteFor(newRequest1Song3.getSongId(), null);
     }
@@ -294,7 +298,7 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_voteFor_requesterAlreadyVoted_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         try {
             dj.voteFor(newRequest1Song3.getSongId(), validGuest.getUniqueId());
@@ -307,7 +311,7 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_voteFor_uriNotVotable_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.voteFor("56456465", validGuest.getUniqueId());
     }
@@ -315,7 +319,7 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_voteFor_requesterNotFound_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.voteFor(newRequest1Song3.getSongId(), "68451313");
     }
@@ -323,7 +327,7 @@ public class DjAlgorithmTests {
     @Test
     public void DjAlgorithm_voteFor_validArgs_inserts() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
         long count = db.getPlayRequestDao().countOf();
 
         dj.voteFor(newRequest1Song3.getSongId(), validGuest.getUniqueId());
@@ -336,7 +340,7 @@ public class DjAlgorithmTests {
     @Test
     public void DjAlgorithm_request_validArgs_inserts() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
         long count = db.getPlayRequestDao().countOf();
 
         dj.request(newRequest1Song3.getSongId(), validGuest.getUniqueId());
@@ -347,7 +351,7 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_request_nullUri_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.request(null, validGuest.getUniqueId());
     }
@@ -355,7 +359,7 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_request_nullRequester_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.request(newRequest1Song3.getSongId(), null);
     }
@@ -363,7 +367,7 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_request_blacklistedSongRequest_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.BLACK_LIST);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.request(song6BlackFilter.getSongId(), validGuest.getUniqueId());
     }
@@ -371,7 +375,7 @@ public class DjAlgorithmTests {
     @Test
     public void DjAlgorithm_request_blacklistValidRequest_inserted() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.BLACK_LIST);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
         long count = db.getPlayRequestDao().countOf();
 
         dj.request(song7WhiteFilter.getSongId(), validGuest.getUniqueId());
@@ -382,7 +386,7 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_request_whitelistedSongRequest_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.WHITE_LIST);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.request(song6BlackFilter.getSongId(), validGuest.getUniqueId());
     }
@@ -390,7 +394,7 @@ public class DjAlgorithmTests {
     @Test
     public void DjAlgorithm_request_whitelistValidRequest_inserted() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.WHITE_LIST);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
         long count = db.getPlayRequestDao().countOf();
 
         dj.request(song7WhiteFilter.getSongId(), validGuest.getUniqueId());
@@ -401,7 +405,7 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_request_requesterAtRequestLimit_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.request(newRequest1Song3.getSongId(), voteLimitedGuest.getUniqueId());
     }
@@ -409,7 +413,7 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_request_bannedGuest_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.request(newRequest1Song3.getSongId(), bannedGuest.getUniqueId());
     }
@@ -417,7 +421,7 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_request_requesterNotFound_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(3, 1000), mockBrowser());
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000), mockBrowser());
 
         dj.request(newRequest1Song3.getSongId(),"89456");
     }
