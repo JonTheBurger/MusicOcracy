@@ -213,28 +213,32 @@ public class ServerHandler {
                     }
 
                     BasicReply reply;
+                    BasicReply.Builder builder = BasicReply.newBuilder();
                     if (request != PlayRequestRequest.getDefaultInstance()) {
                         try {
                             djAlgorithm.request(request.getUri(), request.getRequesterId());
                             newPlayRequest.onNext(request.getUri());
+
+                            builder.setSuccess(true)
+                                    .setMessage("");
                         } catch (SQLException e) {
                             log.error(TAG, e.toString());
+                            builder.setSuccess(false)
+                                    .setMessage(e.toString());
+                        } catch (IllegalArgumentException e) {
+                            log.error(TAG, e.toString());
+                            builder.setSuccess(false)
+                                    .setMessage(e.toString());
                         }
                         spotifyPlayerHandler.play();
-
-                        reply = BasicReply.newBuilder()
-                                .setSuccess(true)
-                                .setMessage("")
-                                .setReplyingTo(msgBySender.message.getHeader().getType())
-                                .build();
-
                     } else {
-                        reply = BasicReply.newBuilder()
-                                .setSuccess(false)
-                                .setMessage("Invalid Play Request")
-                                .setReplyingTo(msgBySender.message.getHeader().getType())
-                                .build();
+                        builder.setSuccess(false)
+                                .setMessage("Invalid Play Request");
                     }
+
+                    reply = builder.setReplyingTo(msgBySender.message.getHeader().getType())
+                            .build();
+
                     log.verbose(TAG, "Sent: " + reply);
                     msgBySender.replyWith(reply);
                 }
@@ -255,6 +259,7 @@ public class ServerHandler {
                         }
 
                         BasicReply reply;
+                        BasicReply.Builder builder = BasicReply.newBuilder();
                         if (request != SendVoteRequest.getDefaultInstance()) {
                             List<String> votableSongURIs = getVotableURIs();
                             try {
@@ -262,23 +267,25 @@ public class ServerHandler {
 
                                 djAlgorithm.voteFor(voteURI, request.getRequesterId());
 
+                                builder.setSuccess(true)
+                                        .setMessage("");
                             } catch (SQLException e) {
                                 log.error(TAG, e.toString());
+                                builder.setSuccess(false)
+                                        .setMessage(e.toString());
+                            } catch (IllegalArgumentException e) {
+                                log.error(TAG, e.toString());
+                                builder.setSuccess(false)
+                                        .setMessage(e.toString());
                             }
-
-                            reply = BasicReply.newBuilder()
-                                    .setSuccess(true)
-                                    .setMessage("")
-                                    .setReplyingTo(msgBySender.message.getHeader().getType())
-                                    .build();
-
                         } else {
-                            reply = BasicReply.newBuilder()
-                                    .setSuccess(false)
-                                    .setMessage("Invalid Vote Request")
-                                    .setReplyingTo(msgBySender.message.getHeader().getType())
-                                    .build();
+                            builder.setSuccess(false)
+                                    .setMessage("Invalid Vote Request");
                         }
+
+                       reply = builder.setReplyingTo(msgBySender.message.getHeader().getType())
+                                .build();
+
                         log.verbose(TAG, "Sent: " + reply);
                         msgBySender.replyWith(reply);
                     }
