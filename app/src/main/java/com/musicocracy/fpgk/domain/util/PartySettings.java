@@ -20,6 +20,10 @@ public class PartySettings implements ReadOnlyPartySettings {
     private int coins;
     private long coinRefillMillis;
 
+    public PartySettings() {
+        this(null); // Disable persistent database storage
+    }
+
     public PartySettings(final Dao<Party, Integer> dao) {
         this.dao = dao;
         if (dao != null) {
@@ -57,9 +61,10 @@ public class PartySettings implements ReadOnlyPartySettings {
         return persistent;
     }
 
-    AtomicBoolean isUpdating = new AtomicBoolean(false);
-    AtomicBoolean updateRequested = new AtomicBoolean(false);
+    private AtomicBoolean isUpdating = new AtomicBoolean(false);
+    private AtomicBoolean updateRequested = new AtomicBoolean(false);
     private void updateAsync() {
+        if (dao == null) { return; }
         if (!isUpdating.getAndSet(true)) {
             do {
                 Observable.just(persistent)
@@ -69,9 +74,7 @@ public class PartySettings implements ReadOnlyPartySettings {
                             @Override
                             public void call(Party party) {
                                 try {
-                                    if (dao != null) {
-                                        dao.update(party);
-                                    }
+                                    dao.update(party);
                                 } catch (SQLException e) {
                                     e.printStackTrace();
                                 }
