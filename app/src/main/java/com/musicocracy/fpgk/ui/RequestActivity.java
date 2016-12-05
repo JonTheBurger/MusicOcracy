@@ -26,8 +26,8 @@ public class RequestActivity extends ActivityBase<RequestView> implements Reques
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         presenter.stopClient();
+        super.onBackPressed();
     }
 
     @OnClick(R.id.requestButton)

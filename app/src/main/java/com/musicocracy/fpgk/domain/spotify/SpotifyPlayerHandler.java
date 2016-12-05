@@ -84,6 +84,7 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
                         } else {
                             // If player is not currently playing something, play now
                             player.playUri(null, nextURI, 0, 0);
+                            player.resume(null);
                         }
                         log.info(TAG, "Song Queued(URI): " + nextURI);
                     } else {

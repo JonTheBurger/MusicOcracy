@@ -134,17 +134,21 @@ public class RxTcpClient {
      */
     public void stop() {
         if (client != null) {
-            logStream.onNext("Disconnecting client...");
-            isRunningStream.onNext(false);
-            RxUtils.safeUnsubscribe(clientSubscription);
-            if (connection != null) {
-                connection.getChannel().close();
-                connection.close();
+            try {
+                logStream.onNext("Disconnecting client...");
+                RxClient<String, String> temp = client;
+                client = null;
+                isRunningStream.onNext(false);
+                RxUtils.safeUnsubscribe(clientSubscription);
+                if (connection != null) {
+                    connection.getChannel().close();
+                    connection.close();
+                }
+                temp.shutdown();
+                logStream.onNext("Client stopped.");
+            } catch (Exception e) {
+                logStream.onNext(e.toString());
             }
-            RxClient<String, String> temp = client;
-            client = null;
-            temp.shutdown();
-            logStream.onNext("Client stopped.");
         }
     }
 

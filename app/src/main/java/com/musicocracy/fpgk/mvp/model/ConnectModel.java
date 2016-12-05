@@ -13,7 +13,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import rx.Observable;
+import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class ConnectModel {
     private final ClientEventBus client;
@@ -29,8 +31,12 @@ public class ConnectModel {
     }
 
     public void connect(String host) throws UnsupportedOperationException, TimeoutException {
+        client.stop();
         client.start(host, defaultPort);
-        boolean timeoutOccurred = client.awaitNextIsRunningChanged(2500, TimeUnit.MILLISECONDS);
+        boolean timeoutOccurred = false;
+        if (!client.isRunning()) {
+            timeoutOccurred = client.awaitNextIsRunningChanged(2500, TimeUnit.MILLISECONDS);
+        }
         if (timeoutOccurred) {
             throw new TimeoutException("Connection timed out");
         }
@@ -45,11 +51,20 @@ public class ConnectModel {
     }
 
     public void joinParty(String partyName) {
-        ConnectRequest message = ConnectRequest.newBuilder()
+        final ConnectRequest message = ConnectRequest.newBuilder()
                 .setRequesterId(uniqueAndroidId)
                 .setPartyName(partyName)
                 .build();
         client.send(message);
+        Observable.timer(2000, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+                        client.send(message);
+                    }
+                });
     }
 
     public Observable<BasicReply> getJoinResultObservable() {

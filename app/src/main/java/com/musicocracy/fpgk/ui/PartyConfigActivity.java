@@ -55,12 +55,12 @@ public class PartyConfigActivity extends ActivityBase<PartyConfigView> implement
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         try {
             presenter.onBack();
         } catch (InterruptedException e) {
             Log.e(TAG, e.toString());
         }
+        super.onBackPressed();
     }
 
     @OnClick(R.id.config_backward_btn)

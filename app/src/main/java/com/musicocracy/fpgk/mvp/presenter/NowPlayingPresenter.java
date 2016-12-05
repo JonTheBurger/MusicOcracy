@@ -10,6 +10,7 @@ import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Track;
 import rx.Observable;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -58,9 +59,18 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
-                .subscribe(new Action1<List<String>>() {
+                .subscribe(new Subscriber<List<String>>() {
                     @Override
-                    public void call(List<String> votableSongs) {
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(List<String> votableSongs) {
                         view.updateVotableSongs(votableSongs);
                     }
                 });
@@ -77,12 +87,21 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .unsubscribeOn(Schedulers.io())
-                    .subscribe(new Action1<List<String>>() {
-                    @Override
-                    public void call(List<String> votableSongs) {
-                        view.updateVotableSongs(votableSongs);
-                    }
-                });
+                    .subscribe(new Subscriber<List<String>>() {
+                        @Override
+                        public void onCompleted() {
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            e.printStackTrace();
+                        }
+
+                        @Override
+                        public void onNext(List<String> votableSongs) {
+                            view.updateVotableSongs(votableSongs);
+                        }
+                    });
     }
 
     private List<String> getVotableTrackStrings() {
@@ -129,9 +148,18 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
-                .subscribe(new Action1<List<String>>() {
+                .subscribe(new Subscriber<List<String>>() {
                     @Override
-                    public void call(List<String> votableSongs) {
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(List<String> votableSongs) {
                         view.updateVotableSongs(votableSongs);
                     }
                 });

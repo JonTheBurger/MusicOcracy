@@ -34,8 +34,8 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         presenter.onDestroy();
+        super.onDestroy();
     }
 
     @OnTextChanged(value = {R.id.party_code_edit_text, R.id.party_name_edit_text}, callback = OnTextChanged.Callback.TEXT_CHANGED)
@@ -49,9 +49,14 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
 
     @OnClick(R.id.connect_back_btn)
     public void backClick() {
-        super.onBackPressed();
+        onBackPressed();
+    }
+
+    @Override
+    public void onBackPressed() {
         presenter.leaveParty();
         presenter.onDestroy();
+        super.onBackPressed();
     }
 
     @OnClick(R.id.connect_forward_btn)
