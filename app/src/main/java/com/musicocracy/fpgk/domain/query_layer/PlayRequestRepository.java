@@ -5,11 +5,9 @@ import com.musicocracy.fpgk.domain.dal.FilterMode;
 import com.musicocracy.fpgk.domain.dal.Guest;
 import com.musicocracy.fpgk.domain.dal.PlayRequest;
 import com.musicocracy.fpgk.domain.dal.Database;
-import com.musicocracy.fpgk.domain.dal.PlayedVote;
 import com.musicocracy.fpgk.domain.util.ValueComparator;
 
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +22,8 @@ public class PlayRequestRepository {
     private Dao<PlayRequest, Integer> dao;
     private SongFilterRepository songFilterRepository;
     private PlayedVoteRepository playedVoteRepository;
+    private long delayMillis;
+    private final long DEFAULT_DELAY = 3600000;
     private final Random random;
 
     public PlayRequestRepository(Database database) {
@@ -31,6 +31,7 @@ public class PlayRequestRepository {
         songFilterRepository = new SongFilterRepository(database);
         playedVoteRepository = new PlayedVoteRepository(database);
         random = new Random();
+        delayMillis = DEFAULT_DELAY;
     }
 
     public PlayRequestRepository(Database database, SongFilterRepository songFilterRepository, PlayedVoteRepository playedVoteRepository) {
@@ -38,14 +39,19 @@ public class PlayRequestRepository {
         this.songFilterRepository = songFilterRepository;
         this.playedVoteRepository = playedVoteRepository;
         random = new Random();
+        delayMillis = DEFAULT_DELAY;
     }
 
-    public PlayedVoteRepository getPlayedVoteRepository() {
-        return playedVoteRepository;
+    public PlayRequestRepository(Database database, SongFilterRepository songFilterRepository, PlayedVoteRepository playedVoteRepository, long delayMillis) {
+        this.database = database;
+        this.songFilterRepository = songFilterRepository;
+        this.playedVoteRepository = playedVoteRepository;
+        random = new Random();
+        this.delayMillis = delayMillis;
     }
 
     public void add(PlayRequest playRequest) {
-        addWithFilterAndDelay(playRequest, FilterMode.NONE, 0);
+        addWithFilterAndDelay(playRequest, FilterMode.NONE, delayMillis);
     }
 
     public void addWithDelay(PlayRequest playRequest, long delayMillis) {
@@ -53,7 +59,7 @@ public class PlayRequestRepository {
     }
 
     public void addWithFilter(PlayRequest playRequest, FilterMode filterMode) {
-        addWithFilterAndDelay(playRequest, filterMode, 0);
+        addWithFilterAndDelay(playRequest, filterMode, delayMillis);
     }
 
     public void addWithFilterAndDelay(PlayRequest playRequest, FilterMode filterMode, long delayMillis) {
