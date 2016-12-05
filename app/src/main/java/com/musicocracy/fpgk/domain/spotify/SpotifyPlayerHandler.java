@@ -16,6 +16,7 @@ import rx.functions.Action1;
 public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback {
     private static final String TAG = "SpotifyPlayerHandler";
     private static final int TIME_BEFORE_NEXT_SONG = 10000; //ms
+    private static final int DEFAULT_WAIT = 10000; // ms
     private final Logger log;
     private final DjAlgorithm djAlgorithm;
     private SpotifyPlayer player;
@@ -55,7 +56,10 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
     }
 
     private void scheduleTimer() {
-        long timerDelay = player.getMetadata().currentTrack.durationMs - TIME_BEFORE_NEXT_SONG;
+        long timerDelay = DEFAULT_WAIT;
+        if (player.getPlaybackState().isPlaying) {
+             timerDelay = player.getMetadata().currentTrack.durationMs - TIME_BEFORE_NEXT_SONG;
+        }
 
         // If timer delay is negative, start the timer now
         if (timerDelay < 0) {
@@ -72,11 +76,16 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
                     } catch (SQLException e) {
                         log.error(TAG, e.toString());
                     }
-                    if (nextURI != null) {
-                        player.queue(null, nextURI);
+                    if (nextURI != null && !nextURI.equals("")) {
+                        if (player.getPlaybackState().isPlaying) {
+                            player.queue(null, nextURI);
+                        } else {
+                            // If player is not currently playing something, play now
+                            player.playUri(null, nextURI, 0, 0);
+                        }
                         log.info(TAG, "Song Queued(URI): " + nextURI);
                     } else {
-                        log.error(TAG, "Next song from DJ algorithm is null.");
+                        log.error(TAG, "Next song from DJ algorithm is null or empty.");
                         scheduleTimer();
                     }
                 }
