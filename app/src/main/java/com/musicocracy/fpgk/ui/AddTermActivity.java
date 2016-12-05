@@ -11,6 +11,9 @@ import com.musicocracy.fpgk.mvp.presenter.AddTermPresenter;
 import com.musicocracy.fpgk.mvp.presenter.Presenter;
 import com.musicocracy.fpgk.mvp.view.AddTermView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -30,7 +33,17 @@ public class AddTermActivity extends ActivityBase<AddTermView> implements AddTer
 
     @OnClick(R.id.use_list_button)
     public void useListClick() {
-        // TODO: Create base list
+        Intent intent = new Intent(this, BlacklistActivity.class);
+        List<String> defaultBlacklistedSongIds = new ArrayList<>();
+        defaultBlacklistedSongIds.add("Never Gonna Give You Up");
+        defaultBlacklistedSongIds.add("Call Me Maybe");
+        defaultBlacklistedSongIds.add("Gangnam Style");
+
+        for(String songId : defaultBlacklistedSongIds) {
+            addSongFilter(songId);
+        }
+
+        AddTermActivity.this.startActivity(intent);
     }
 
     @OnClick(R.id.add_term_back_button)

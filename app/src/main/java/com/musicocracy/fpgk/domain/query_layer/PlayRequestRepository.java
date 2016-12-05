@@ -21,31 +21,82 @@ public class PlayRequestRepository {
     private Database database;
     private Dao<PlayRequest, Integer> dao;
     private SongFilterRepository songFilterRepository;
-    private List<String> lastVotableSongIds;
+    private PlayedVoteRepository playedVoteRepository;
+    private long delayMillis;
+    private final long DEFAULT_DELAY = 3600000;
     private final Random random;
 
     public PlayRequestRepository(Database database) {
         this.database = database;
         songFilterRepository = new SongFilterRepository(database);
-        lastVotableSongIds = new ArrayList<>();
+        playedVoteRepository = new PlayedVoteRepository(database);
         random = new Random();
+        delayMillis = DEFAULT_DELAY;
+    }
+
+    public PlayRequestRepository(Database database, SongFilterRepository songFilterRepository, PlayedVoteRepository playedVoteRepository) {
+        this.database = database;
+        this.songFilterRepository = songFilterRepository;
+        this.playedVoteRepository = playedVoteRepository;
+        random = new Random();
+        delayMillis = DEFAULT_DELAY;
+    }
+
+    public PlayRequestRepository(Database database, SongFilterRepository songFilterRepository, PlayedVoteRepository playedVoteRepository, long delayMillis) {
+        this.database = database;
+        this.songFilterRepository = songFilterRepository;
+        this.playedVoteRepository = playedVoteRepository;
+        random = new Random();
+        this.delayMillis = delayMillis;
+    }
+
+    public void add(PlayRequest playRequest) {
+        addWithFilterAndDelay(playRequest, FilterMode.NONE, delayMillis);
+    }
+
+    public void addWithDelay(PlayRequest playRequest, long delayMillis) {
+        addWithFilterAndDelay(playRequest, FilterMode.NONE, delayMillis);
     }
 
     public void addWithFilter(PlayRequest playRequest, FilterMode filterMode) {
+        addWithFilterAndDelay(playRequest, filterMode, delayMillis);
+    }
+
+    public void addWithFilterAndDelay(PlayRequest playRequest, FilterMode filterMode, long delayMillis) {
         try {
-            if(songFilterRepository.isValidPlayRequest(playRequest, filterMode)){
-                dao = database.getPlayRequestDao();
-                dao.createOrUpdate(playRequest);
+
+            String songId = playRequest.getSongId();
+            long differenceMillis = playedVoteRepository.getMillisSincePlayedVoteSongId(songId);
+
+            if(differenceMillis < delayMillis) {
+                throw new IllegalArgumentException("The requested song has been played too recently.");
             } else {
-                System.out.println("ERROR: Song is blacklisted by party host!");
+                if(songFilterRepository.isValidPlayRequest(playRequest, filterMode)){
+                    dao = database.getPlayRequestDao();
+                    dao.createOrUpdate(playRequest);
+                } else {
+                    throw new IllegalArgumentException("The party's filter has rejected your song request.");
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void add(PlayRequest playRequest) {
-        addWithFilter(playRequest, FilterMode.NONE);
+    public List<String> getAllRequestedSongIds() {
+        List<String> returnList = new ArrayList<>();
+        try {
+            dao = database.getPlayRequestDao();
+            List<PlayRequest> playRequestList = dao.queryForAll();
+            for(PlayRequest playRequest : playRequestList) {
+                returnList.add(playRequest.getSongId());
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            return returnList;
+        }
     }
 
     public List<String> getVotableSongIds(int count) {
@@ -57,11 +108,10 @@ public class PlayRequestRepository {
             List<String> mostRequestedSongIdsList = getMostRequestedSongIds(count);
             List<String> leastRequestedSongIdsList = getLeastRequestedSongIds(count);
 
-            int addCount = 0;
-            do {
+            for(int i = 0; i < count; i++) {
                 int listId = random.nextInt(4) + 1;
                 int index = random.nextInt(count);
-                String nextId = new String();
+                String nextId = "";
                 switch(listId) {
                     case 1:
                         nextId = newestRequestedSongIdsList.get(index);
@@ -76,15 +126,11 @@ public class PlayRequestRepository {
                         nextId = leastRequestedSongIdsList.get(index);
                         break;
                 }
-                if(!lastVotableSongIds.contains(nextId)) {
-                    addCount++;
-                    returnList.add(nextId);
-                }
-            } while(addCount < count);
+                returnList.add(nextId);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            lastVotableSongIds = new ArrayList<>(returnList);
             return returnList;
         }
     }
