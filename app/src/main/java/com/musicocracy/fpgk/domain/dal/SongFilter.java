@@ -37,6 +37,9 @@ public class SongFilter {
 
     @DatabaseField private MusicService service;
     @DatabaseField private String songId;
-    @DatabaseField(foreign = true) private Party party;
-    @DatabaseField private FilterMode filterMode;
+    @DatabaseField(foreign = true, columnName = PARTY_COLUMN) private Party party;
+    @DatabaseField(columnName = FILTER_MODE_COLUMN) private FilterMode filterMode;
+
+    public static final String PARTY_COLUMN = "party_id";
+    public static final String FILTER_MODE_COLUMN = "filterMode";
 }

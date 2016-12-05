@@ -7,6 +7,7 @@ import com.musicocracy.fpgk.domain.dal.FilterMode;
 import com.musicocracy.fpgk.domain.dal.Guest;
 import com.musicocracy.fpgk.domain.dal.MusicService;
 import com.musicocracy.fpgk.domain.dal.PlayRequest;
+import com.musicocracy.fpgk.domain.dal.SongFilter;
 import com.musicocracy.fpgk.domain.query_layer.PlayRequestRepository;
 import com.musicocracy.fpgk.domain.query_layer.SongFilterRepository;
 import com.musicocracy.fpgk.domain.util.CircularQueue;
@@ -33,16 +34,12 @@ public class DjAlgorithm {
     private final CircularQueue<String> backupSongs = new CircularQueue<>(BACKUP_SONG_COUNT);
     private final Set<String> idsOfVoters = new HashSet<>();  // uniqueIds of guests that have voted for a song this iteration (you can vote for a new song once per song)
     private final Database database;
-    private final PlayRequestRepository playRequestRepository;
-    private final SongFilterRepository songFilterRepository;
     private final PartySettings partySettings;
     private final Observable<String> mostRequestedObservable;
 
-    public DjAlgorithm(Database database, PlayRequestRepository playRequestRepository, SongFilterRepository songFilterRepository, PartySettings partySettings) {
-        if (database == null || playRequestRepository == null || songFilterRepository == null || partySettings == null) { throw new IllegalArgumentException("No dependencies may be null"); }
+    public DjAlgorithm(Database database, PartySettings partySettings) {
+        if (database == null || partySettings == null) { throw new IllegalArgumentException("No dependencies may be null"); }
         this.database = database;
-        this.playRequestRepository = playRequestRepository;
-        this.songFilterRepository = songFilterRepository;
         this.partySettings = partySettings;
         this.mostRequestedObservable = getTopObservable()
                 .take(BACKUP_SONG_COUNT)
@@ -144,7 +141,7 @@ public class DjAlgorithm {
         if (!getVotableSongUris().contains(uri)) { throw new IllegalArgumentException("The song you requested is not currently up for vote."); }
         Guest guest = getGuest(requesterId);
         idsOfVoters.add(requesterId);
-        playRequestRepository.add(new PlayRequest(partySettings.raw(), guest, MusicService.SPOTIFY, uri, now()));
+        database.getPlayRequestDao().create(new PlayRequest(partySettings.raw(), guest, MusicService.SPOTIFY, uri, now()));
     }
 
     private Guest getGuest(String uniqueId) throws IllegalArgumentException, SQLException {
@@ -176,10 +173,34 @@ public class DjAlgorithm {
         if (requestCount >= partySettings.getCoinAllowance()) { throw new IllegalArgumentException("You have run out of requests. Please wait for more."); }
 
         // Check blacklist
-        FilterMode filter = partySettings.getFilterMode() == null ? FilterMode.NONE : partySettings.getFilterMode();
-        if (!songFilterRepository.isValidSongId(uri, filter)) { throw new IllegalArgumentException("The party's filter has rejected your song request."); }
+        if (!isValidSong(uri)) { throw new IllegalArgumentException("The party's filter has rejected your song request."); }
 
         // Make request
-        playRequestRepository.add(new PlayRequest(partySettings.raw(), guest, MusicService.SPOTIFY, uri, now()));
+        database.getPlayRequestDao().create(new PlayRequest(partySettings.raw(), guest, MusicService.SPOTIFY, uri, now()));
+    }
+
+    private boolean isValidSong(String uri) throws SQLException {
+        FilterMode filter = partySettings.getFilterMode() == null ? FilterMode.NONE : partySettings.getFilterMode();
+        if (filter == FilterMode.NONE) { return true; }
+        List<String> filterList = Observable    // AKA Blacklist/Whitelist
+                .from(database.getSongFilterDao().queryBuilder()
+                    .where().eq(SongFilter.PARTY_COLUMN, partySettings.raw())
+                    .and().eq(SongFilter.FILTER_MODE_COLUMN, partySettings.getFilterMode())
+                    .query())
+                .map(new Func1<SongFilter, String>() {
+                    @Override
+                    public String call(SongFilter songFilter) {
+                        return songFilter.getSongId();
+                    }
+                })
+                .toList()
+                .toBlocking()
+                .first();
+        if (filterList.contains(uri)) {
+            if (filter == FilterMode.BLACK_LIST) { return false; }
+        } else {
+            if (filter == FilterMode.WHITE_LIST) { return false; }
+        }
+        return true;
     }
 }
