@@ -117,8 +117,6 @@ public class DjAlgorithmTests {
 
             partySettings.setFilterMode(filterMode);
 
-            List<PlayRequest> list2 = db.getPlayRequestDao().queryForAll();
-            List<SongFilter> list = db.getSongFilterDao().queryForAll();
             if (filterMode == FilterMode.BLACK_LIST) {
                 db.getSongFilterDao().create(new SongFilter(MusicService.SPOTIFY, "URI_777", party, FilterMode.BLACK_LIST));
             } else if (filterMode == FilterMode.WHITE_LIST) {
