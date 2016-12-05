@@ -6,23 +6,26 @@ import com.musicocracy.fpgk.domain.dal.Database;
 import com.musicocracy.fpgk.domain.dal.FilterMode;
 import com.musicocracy.fpgk.domain.dal.Guest;
 import com.musicocracy.fpgk.domain.dal.MusicService;
-import com.musicocracy.fpgk.domain.dal.Party;
 import com.musicocracy.fpgk.domain.dal.PlayRequest;
 import com.musicocracy.fpgk.domain.query_layer.PlayRequestRepository;
 import com.musicocracy.fpgk.domain.query_layer.SongFilterRepository;
 import com.musicocracy.fpgk.domain.util.CircularQueue;
 import com.musicocracy.fpgk.domain.util.PartySettings;
+import com.musicocracy.fpgk.domain.util.Tuple;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 public class DjAlgorithm {
@@ -41,8 +44,7 @@ public class DjAlgorithm {
         this.playRequestRepository = playRequestRepository;
         this.songFilterRepository = songFilterRepository;
         this.partySettings = partySettings;
-        this.mostRequestedObservable = Observable
-                .from(DjAlgorithm.this.playRequestRepository.getMostRequestedSongIds(BACKUP_SONG_COUNT))
+        this.mostRequestedObservable = getTopObservable()
                 .take(BACKUP_SONG_COUNT)
                 .subscribeOn(Schedulers.io());
         mostRequestedObservable.subscribe(new Action1<String>() {
@@ -53,6 +55,36 @@ public class DjAlgorithm {
         });
     }
 
+    public Observable<String> getTopObservable() {
+        List<PlayRequest> all;
+        try {
+            all = database.getPlayRequestDao().queryForAll();
+        } catch (SQLException e) {
+            return Observable.empty();
+        }
+        Map<String, Integer> uriByRequests = new HashMap<>();
+        for (PlayRequest request : all) {
+            String uri = request.getSongId();
+            int requests = 1;
+            if (uriByRequests.containsKey(uri)) {
+                requests = uriByRequests.get(uri) + 1;
+            }
+            uriByRequests.put(uri, requests);
+        }
+        return Observable.from(uriByRequests.entrySet())
+                .sorted(new Func2<Map.Entry<String, Integer>, Map.Entry<String, Integer>, Integer>() {
+                    @Override
+                    public Integer call(Map.Entry<String, Integer> lhs, Map.Entry<String, Integer> rhs) {
+                        return rhs.getValue().compareTo(lhs.getValue());
+                    }
+                })
+                .map(new Func1<Map.Entry<String, Integer>, String>() {
+                    @Override
+                    public String call(Map.Entry<String, Integer> entry) {
+                        return entry.getKey();
+                    }
+                });
+    }
 
     private static Timestamp now() {
         return new Timestamp(System.currentTimeMillis());
@@ -60,12 +92,13 @@ public class DjAlgorithm {
 
     public String dequeueNextSongUri() throws SQLException {
         // Get top voted song in database
-        List<String> topUriList = playRequestRepository.getMostRequestedSongIds(1);
+        List<String> topUriList = getTopObservable().toList().toBlocking().first();
         if (topUriList.size() < 1) {
             mostRequestedObservable.toBlocking().firstOrDefault(null);
             return backupSongs.size() > 0 ? backupSongs.dequeue() : "";
         }
         String topUri = topUriList.get(0);
+        backupSongs.enqueue(topUri);
 
         // Delete requests for top voted song from database
         Dao<PlayRequest, Integer> dao = database.getPlayRequestDao();
@@ -79,8 +112,7 @@ public class DjAlgorithm {
     }
 
     public List<String> getVotableSongUris() throws SQLException {
-        long a = database.getPlayRequestDao().countOf();
-        List<String> raw = playRequestRepository.getMostRequestedSongIds((int)a);
+        List<String> raw = getTopObservable().toList().toBlocking().first();
         List<String> valid = Observable
                 .from(database.getPlayRequestDao()
                     .queryBuilder()
