@@ -6,6 +6,7 @@ import com.musicocracy.fpgk.domain.util.Logger;
 import com.spotify.sdk.android.player.Error;
 import com.spotify.sdk.android.player.Metadata;
 import com.spotify.sdk.android.player.PlayerEvent;
+import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.sql.SQLException;
@@ -72,6 +73,7 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
                 public void call(Long aLong) {
                     String nextURI = null;
                     try {
+                        log.info(TAG, "Getting Song from DJ Algorithm...");
                         nextURI = djAlgorithm.dequeueNextSongUri();
                     } catch (SQLException e) {
                         log.error(TAG, e.toString());
@@ -104,5 +106,6 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
         newTrackPlayingSubject.onCompleted();
         player.removeNotificationCallback(this);
         playerStarted = false;
+        Spotify.destroyPlayer(player);
     }
 }
