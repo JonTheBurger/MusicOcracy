@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class PartySettings implements ReadOnlyPartySettings {
     private final Dao<Party, Integer> dao;
+    private Observable<Party> insertObservable;
     private final Party persistent = new Party("", "", new Timestamp(System.currentTimeMillis()), null, FilterMode.NONE, true);
     private String SpotifyToken = "";
     private int coins;
@@ -27,7 +29,7 @@ public class PartySettings implements ReadOnlyPartySettings {
     public PartySettings(final Dao<Party, Integer> dao) {
         this.dao = dao;
         if (dao != null) {
-            Observable.just(persistent)
+            this.insertObservable = Observable.just(persistent)
                     .doOnNext(new Action1<Party>() {
                         @Override
                         public void call(Party party) {
@@ -37,27 +39,21 @@ public class PartySettings implements ReadOnlyPartySettings {
                                     p.setEndTime(party.getStartTime()); // End it now.
                                     dao.update(p);
                                 }
+                                dao.createOrUpdate(party);
                             } catch (SQLException e) {
-                                e.printStackTrace();
+                                e.printStackTrace();    // TODO: Handle
                             }
                         }
                     })
                     .subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.io())
-                    .subscribe(new Action1<Party>() {
-                        @Override
-                        public void call(Party party) { // Insert our new party in the database.
-                            try {
-                                dao.create(party);
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
+                    .observeOn(Schedulers.io());
         }
     }
 
     public Party raw() {
+        if (dao != null) {
+            insertObservable.toBlocking().firstOrDefault(null);
+        }
         return persistent;
     }
 
@@ -81,6 +77,7 @@ public class PartySettings implements ReadOnlyPartySettings {
                             }
                         });
             } while(updateRequested.getAndSet(false));
+            isUpdating.set(false);
         } else {
             updateRequested.set(true);
         }

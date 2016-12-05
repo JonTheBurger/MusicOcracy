@@ -6,24 +6,22 @@ import com.musicocracy.fpgk.domain.dal.Database;
 import com.musicocracy.fpgk.domain.dal.FilterMode;
 import com.musicocracy.fpgk.domain.dal.Guest;
 import com.musicocracy.fpgk.domain.dal.MusicService;
+import com.musicocracy.fpgk.domain.dal.Party;
 import com.musicocracy.fpgk.domain.dal.PlayRequest;
 import com.musicocracy.fpgk.domain.query_layer.PlayRequestRepository;
 import com.musicocracy.fpgk.domain.query_layer.SongFilterRepository;
-import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.CircularQueue;
 import com.musicocracy.fpgk.domain.util.PartySettings;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import kaaes.spotify.webapi.android.models.Track;
 import rx.Observable;
-import rx.Subscription;
 import rx.functions.Action1;
-import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -55,23 +53,24 @@ public class DjAlgorithm {
         });
     }
 
+
     private static Timestamp now() {
-        return new Timestamp((int)System.currentTimeMillis());
+        return new Timestamp(System.currentTimeMillis());
     }
 
     public String dequeueNextSongUri() throws SQLException {
         // Get top voted song in database
         List<String> topUriList = playRequestRepository.getMostRequestedSongIds(1);
         if (topUriList.size() < 1) {
-            mostRequestedObservable.toBlocking().first();
-            return backupSongs.dequeue();
+            mostRequestedObservable.toBlocking().firstOrDefault(null);
+            return backupSongs.size() > 0 ? backupSongs.dequeue() : "";
         }
         String topUri = topUriList.get(0);
 
         // Delete requests for top voted song from database
         Dao<PlayRequest, Integer> dao = database.getPlayRequestDao();
         DeleteBuilder<PlayRequest, Integer> del = dao.deleteBuilder();
-        del.where().eq(PlayRequest.SONG_ID_COL_NAME, topUri);
+        del.where().eq(PlayRequest.SONG_ID_COLUMN, topUri);
         del.delete();
 
         // Re-enable voting rights
@@ -80,7 +79,30 @@ public class DjAlgorithm {
     }
 
     public List<String> getVotableSongUris() throws SQLException {
-        return playRequestRepository.getMostRequestedSongIds(4);
+        long a = database.getPlayRequestDao().countOf();
+        List<String> raw = playRequestRepository.getMostRequestedSongIds((int)a);
+        List<String> valid = Observable
+                .from(database.getPlayRequestDao()
+                    .queryBuilder()
+                    .where()
+                    .eq(PlayRequest.PARTY_COLUMN, partySettings.raw())
+                    .query())
+                .map(new Func1<PlayRequest, String>() {
+                    @Override
+                    public String call(PlayRequest playRequest) {
+                        return playRequest.getSongId();
+                    }
+                })
+                .toList()
+                .toBlocking()
+                .first();
+        List<String> votable = new ArrayList<>();
+        for (int i = 0; (votable.size() < 4 && i < raw.size()); i++) {
+            if (valid.contains(raw.get(i))) {
+                votable.add(raw.get(i));
+            }
+        }
+        return votable;
     }
 
     public void voteFor(String uri, String requesterId) throws IllegalArgumentException, SQLException {
@@ -97,7 +119,7 @@ public class DjAlgorithm {
         Dao<Guest, Integer> dao = database.getGuestDao();
         List<Guest> guests = dao.queryForAll();
         for (Guest guest : guests) {
-            if (guest.getUniqueId().equals(uniqueId)) {
+            if (guest.getUniqueId().equals(uniqueId) && !guest.isBanned()) {
                 return guest;
             }
         }
@@ -109,10 +131,13 @@ public class DjAlgorithm {
 
         // Check if user is allowed to make requests
         Guest guest = getGuest(requesterId);
-        List<PlayRequest> requests = playRequestRepository.getRequestsMadeByGuest(guest);
+        List<PlayRequest> requests = database.getPlayRequestDao().queryBuilder()
+                .where().eq(PlayRequest.REQUESTER_COLUMN, guest)
+                .and().eq(PlayRequest.PARTY_COLUMN, partySettings.raw())
+                .query();
         int requestCount = 0;
         for(PlayRequest request : requests) {
-            if (now().getTime() - partySettings.getCoinRefillMillis() >= request.getRequestTime().getTime()) {
+            if (now().getTime() - partySettings.getCoinRefillMillis() <= request.getRequestTime().getTime()) {
                 requestCount++;
             }
         }

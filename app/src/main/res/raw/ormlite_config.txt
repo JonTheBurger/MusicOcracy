@@ -1,5 +1,5 @@
 #
-# generated on 2016/12/03 11:13:13
+# generated on 2016/12/04 10:05:10
 #
 # --table-start--
 dataClass=com.musicocracy.fpgk.domain.dal.FilterMode
@@ -19,6 +19,7 @@ tableName=Guest
 # --field-start--
 fieldName=id
 generatedId=true
+allowGeneratedIdInsert=true
 # --field-end--
 # --field-start--
 fieldName=party
@@ -57,6 +58,7 @@ tableName=Party
 # --field-start--
 fieldName=id
 generatedId=true
+allowGeneratedIdInsert=true
 # --field-end--
 # --field-start--
 fieldName=name
@@ -69,6 +71,7 @@ fieldName=startTime
 # --field-end--
 # --field-start--
 fieldName=endTime
+columnName=endTime
 # --field-end--
 # --field-start--
 fieldName=filterMode
@@ -86,13 +89,16 @@ tableName=PlayRequest
 # --field-start--
 fieldName=id
 generatedId=true
+allowGeneratedIdInsert=true
 # --field-end--
 # --field-start--
 fieldName=party
+columnName=party_id
 foreign=true
 # --field-end--
 # --field-start--
 fieldName=requester
+columnName=requester_id
 foreign=true
 # --field-end--
 # --field-start--

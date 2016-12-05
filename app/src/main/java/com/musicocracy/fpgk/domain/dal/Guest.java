@@ -46,7 +46,7 @@ public class Guest {
         return getId() + ": " + getName() + ", Joined at "  + getJoinTime() + ", isBanned: " + isBanned();
     }
 
-    @DatabaseField(generatedId = true) private int id;
+    @DatabaseField(generatedId = true, allowGeneratedIdInsert = true) private int id;
     @DatabaseField(foreign = true) private Party party;
     @DatabaseField private String name;
     @DatabaseField private String uniqueId;

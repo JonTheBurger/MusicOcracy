@@ -46,12 +46,14 @@ public class PlayRequest {
         return getId() + ": " + getSongId() + " from "  + getRequester().getId() + " at " + getRequestTime().toString();
     }
 
-    @DatabaseField(generatedId = true) private int id;
-    @DatabaseField(foreign = true) private Party party;
-    @DatabaseField(foreign = true) private Guest requester;
+    @DatabaseField(generatedId = true, allowGeneratedIdInsert = true) private int id;
+    @DatabaseField(foreign = true, columnName = PARTY_COLUMN) private Party party;
+    @DatabaseField(foreign = true, columnName = REQUESTER_COLUMN) private Guest requester;
     @DatabaseField private MusicService service;
-    @DatabaseField(columnName = SONG_ID_COL_NAME) private String songId;
+    @DatabaseField(columnName = SONG_ID_COLUMN) private String songId;
     @DatabaseField private Timestamp requestTime;
 
-    public static final String SONG_ID_COL_NAME = "songId";
+    public static final String PARTY_COLUMN = "party_id";
+    public static final String REQUESTER_COLUMN = "requester_id";
+    public static final String SONG_ID_COLUMN = "songId";
 }

@@ -36,6 +36,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(AndroidJUnit4.class)
 public class DjAlgorithmTests {
+    // WARNING: Database values are generated with a stale party.
     private final Context context = InstrumentationRegistry.getTargetContext();
 
     // region Test objects
@@ -193,10 +194,9 @@ public class DjAlgorithmTests {
         Database db = dbWithCurrentAndOldData(FilterMode.NONE);
         DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000));
 
-        dj.dequeueNextSongUri();
-        dj.dequeueNextSongUri();
-        dj.dequeueNextSongUri();
-        assertEquals(oldRequest1Song1.getSongId(), dj.dequeueNextSongUri());
+        String uri = dj.dequeueNextSongUri();
+
+        assertEquals("4", uri);
     }
 
     @Test
@@ -226,9 +226,42 @@ public class DjAlgorithmTests {
     // region getVotableSongUris
     @Test
     public void DjAlgorithm_getVotableSongUris_returnsCorrect() throws SQLException {
-        Database db = dbWithCurrentAndOldData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000));
+        Database db = Database.InMemory(context);
+        PartySettings settings = createPartySettings(db, 3, 1000);
+        Party party = settings.raw();
+        db.getPartyDao().create(oldParty1);
+        Guest guest = new Guest(party, "", "", nowMinus(0), false);
+        db.getGuestDao().create(guest);
+        PlayRequest oldRequest1Song1 = new PlayRequest(oldParty1, guest, MusicService.SPOTIFY, "1", nowMinus(1200));
+        PlayRequest oldRequest2Song1 = new PlayRequest(oldParty1, guest, MusicService.SPOTIFY, "1", nowMinus(1100));
+        PlayRequest oldRequest1Song2 = new PlayRequest(oldParty1, guest, MusicService.SPOTIFY, "2", nowMinus(1200));
+        PlayRequest newRequest1Song3 = new PlayRequest(party, guest, MusicService.SPOTIFY, "3", nowMinus(120));
+        PlayRequest newRequest2Song3 = new PlayRequest(party, guest, MusicService.SPOTIFY, "3", nowMinus(110));
+        PlayRequest newRequest3Song4 = new PlayRequest(party, guest, MusicService.SPOTIFY, "4", nowMinus(100));
+        PlayRequest newRequest4Song4 = new PlayRequest(party, guest, MusicService.SPOTIFY, "4", nowMinus(90));
+        PlayRequest newRequest5Song4 = new PlayRequest(party, guest, MusicService.SPOTIFY, "4", nowMinus(80));
+        PlayRequest newRequest6Song5 = new PlayRequest(party, guest, MusicService.SPOTIFY, "5", nowMinus(70));
+        PlayRequest newRequest7Song6 = new PlayRequest(party, guest, MusicService.SPOTIFY, "6", nowMinus(60));
+        PlayRequest newRequest8Song7 = new PlayRequest(party, guest, MusicService.SPOTIFY, "7", nowMinus(50));
+        PlayRequest newRequest9Song6 = new PlayRequest(party, guest, MusicService.SPOTIFY, "6", nowMinus(40));
+        PlayRequest newRequest10Song7 = new PlayRequest(party, guest, MusicService.SPOTIFY, "7", nowMinus(30));
+        db.getPlayRequestDao().createOrUpdate(oldRequest1Song1);
+        db.getPlayRequestDao().createOrUpdate(oldRequest2Song1);
+        db.getPlayRequestDao().createOrUpdate(oldRequest1Song2);
+        db.getPlayRequestDao().createOrUpdate(newRequest1Song3);
+        db.getPlayRequestDao().createOrUpdate(newRequest2Song3);
+        db.getPlayRequestDao().createOrUpdate(newRequest3Song4);
+        db.getPlayRequestDao().createOrUpdate(newRequest4Song4);
+        db.getPlayRequestDao().createOrUpdate(newRequest5Song4);
+        db.getPlayRequestDao().createOrUpdate(newRequest6Song5);
+        db.getPlayRequestDao().createOrUpdate(newRequest7Song6);
+        db.getPlayRequestDao().createOrUpdate(newRequest8Song7);
+        db.getPlayRequestDao().createOrUpdate(newRequest9Song6);
+        db.getPlayRequestDao().createOrUpdate(newRequest10Song7);
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), settings);
         List<String> unexpected = Arrays.asList("1", "2", "5");
+
+        List<PlayRequest> all = db.getPlayRequestDao().queryForAll();
 
         List<String> votableSongs = dj.getVotableSongUris();
 
@@ -269,7 +302,7 @@ public class DjAlgorithmTests {
         DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000));
 
         try {
-            dj.voteFor(newRequest1Song3.getSongId(), validGuest.getUniqueId());
+            dj.voteFor(dj.getVotableSongUris().get(0), validGuest.getUniqueId());
         } catch (IllegalArgumentException e) {
             fail("Voting for a valid song once should not throw");
         }
@@ -298,7 +331,7 @@ public class DjAlgorithmTests {
         DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000));
         long count = db.getPlayRequestDao().countOf();
 
-        dj.voteFor(newRequest1Song3.getSongId(), validGuest.getUniqueId());
+        dj.voteFor(dj.getVotableSongUris().get(0), validGuest.getUniqueId());
 
         assertEquals(count + 1, db.getPlayRequestDao().countOf());
     }
@@ -373,9 +406,15 @@ public class DjAlgorithmTests {
     @Test(expected = IllegalArgumentException.class)
     public void DjAlgorithm_request_requesterAtRequestLimit_throwsIllegalArgument() throws SQLException {
         Database db = dbWithCurrentData(FilterMode.NONE);
-        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), createPartySettings(db, 3, 1000));
+        PartySettings settings = createPartySettings(db, 3, 1000000);
+        DjAlgorithm dj = new DjAlgorithm(db, new PlayRequestRepository(db), new SongFilterRepository(db), settings);
+        Guest guest = new Guest(settings.raw(), "a", "2435423", nowMinus(0), false);
+        db.getGuestDao().create(guest);
+        db.getPlayRequestDao().createOrUpdate(new PlayRequest(settings.raw(), guest, MusicService.SPOTIFY, "123", nowMinus(0)));
+        db.getPlayRequestDao().createOrUpdate(new PlayRequest(settings.raw(), guest, MusicService.SPOTIFY, "123", nowMinus(0)));
+        db.getPlayRequestDao().createOrUpdate(new PlayRequest(settings.raw(), guest, MusicService.SPOTIFY, "123", nowMinus(0)));
 
-        dj.request(newRequest1Song3.getSongId(), voteLimitedGuest.getUniqueId());
+        dj.request(newRequest1Song3.getSongId(), guest.getUniqueId());
     }
 
     @Test(expected = IllegalArgumentException.class)
