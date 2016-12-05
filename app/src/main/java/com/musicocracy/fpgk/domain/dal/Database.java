@@ -18,6 +18,7 @@ public class Database extends OrmLiteSqliteOpenHelper {
     private Dao<Party, Integer> partyDao;
     private Dao<Guest, Integer> guestDao;
     private Dao<PlayRequest, Integer> playRequestDao;
+    private Dao<PlayedVote, Integer> playedVoteDao;
     private Dao<SongFilter, Integer> songFilterDao;
 
     public Database(Context context) {
@@ -42,6 +43,7 @@ public class Database extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, Party.class);
             TableUtils.createTable(connectionSource, Guest.class);
             TableUtils.createTable(connectionSource, PlayRequest.class);
+            TableUtils.createTable(connectionSource, PlayedVote.class);
             TableUtils.createTable(connectionSource, SongFilter.class);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -53,6 +55,7 @@ public class Database extends OrmLiteSqliteOpenHelper {
         try {
             TableUtils.dropTable(connectionSource, SongFilter.class, false);
             TableUtils.dropTable(connectionSource, PlayRequest.class, false);
+            TableUtils.dropTable(connectionSource, PlayedVote.class, false);
             TableUtils.dropTable(connectionSource, Guest.class, false);
             TableUtils.dropTable(connectionSource, Party.class, false);
             onCreate(database, connectionSource);
@@ -80,6 +83,13 @@ public class Database extends OrmLiteSqliteOpenHelper {
             playRequestDao = getDao(PlayRequest.class);
         }
         return playRequestDao;
+    }
+
+    public Dao<PlayedVote, Integer> getPlayedVoteDao() throws SQLException {
+        if (playedVoteDao == null) {
+            playedVoteDao = getDao(PlayedVote.class);
+        }
+        return playedVoteDao;
     }
 
     public Dao<SongFilter, Integer> getSongFilterDao() throws SQLException {

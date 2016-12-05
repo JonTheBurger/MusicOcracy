@@ -117,10 +117,12 @@ public class DjAlgorithmTests {
 
             partySettings.setFilterMode(filterMode);
 
+            List<PlayRequest> list2 = db.getPlayRequestDao().queryForAll();
+            List<SongFilter> list = db.getSongFilterDao().queryForAll();
             if (filterMode == FilterMode.BLACK_LIST) {
-                db.getSongFilterDao().create(new SongFilter(MusicService.SPOTIFY, "URI_6", party, FilterMode.BLACK_LIST));
+                db.getSongFilterDao().create(new SongFilter(MusicService.SPOTIFY, "URI_777", party, FilterMode.BLACK_LIST));
             } else if (filterMode == FilterMode.WHITE_LIST) {
-                db.getSongFilterDao().create(new SongFilter(MusicService.SPOTIFY, "URI_7", party, FilterMode.WHITE_LIST));
+                db.getSongFilterDao().create(new SongFilter(MusicService.SPOTIFY, "URI_777", party, FilterMode.WHITE_LIST));
             }
 
             return this;
@@ -274,7 +276,7 @@ public class DjAlgorithmTests {
     public void DjAlgorithm_request_blacklistedSongRequest_throwsIllegalArgument() throws SQLException {
         newTest().withDatabase().withOldData().startNewParty().withNewData().addFilter(FilterMode.BLACK_LIST).build();
 
-        dj.request("URI_6", validGuest.getUniqueId());
+        dj.request("URI_777", validGuest.getUniqueId());
     }
 
     @Test
@@ -299,7 +301,7 @@ public class DjAlgorithmTests {
         newTest().withDatabase().withOldData().startNewParty().withNewData().addFilter(FilterMode.WHITE_LIST).build();
         long count = db.getPlayRequestDao().countOf();
 
-        dj.request("URI_7", validGuest.getUniqueId());
+        dj.request("URI_777", validGuest.getUniqueId());
 
         assertEquals(count + 1, db.getPlayRequestDao().countOf());
     }

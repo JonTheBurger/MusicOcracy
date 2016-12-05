@@ -1,5 +1,5 @@
 #
-# generated on 2016/12/04 10:05:10
+# generated on 2016/12/05 01:08:30
 #
 # --table-start--
 dataClass=com.musicocracy.fpgk.domain.dal.FilterMode
@@ -83,6 +83,31 @@ fieldName=isHosting
 # --table-end--
 #################################
 # --table-start--
+dataClass=com.musicocracy.fpgk.domain.dal.PlayedVote
+tableName=PlayedVote
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=party
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=service
+# --field-end--
+# --field-start--
+fieldName=songId
+columnName=songId
+# --field-end--
+# --field-start--
+fieldName=voteTime
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
 dataClass=com.musicocracy.fpgk.domain.dal.PlayRequest
 tableName=PlayRequest
 # --table-fields-start--
@@ -126,10 +151,12 @@ fieldName=songId
 # --field-end--
 # --field-start--
 fieldName=party
+columnName=party_id
 foreign=true
 # --field-end--
 # --field-start--
 fieldName=filterMode
+columnName=filterMode
 # --field-end--
 # --table-fields-end--
 # --table-end--

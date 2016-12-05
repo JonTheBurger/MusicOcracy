@@ -108,6 +108,9 @@ public class SongFilterRepository {
 
     public boolean isValidSongId(String songId, FilterMode filterMode) {
         try {
+            if(filterMode == FilterMode.NONE) {
+                return true;
+            }
             dao = database.getSongFilterDao();
             List<SongFilter> filterList = dao.queryForAll();
             String lowerId = songId.toLowerCase();
@@ -120,13 +123,15 @@ public class SongFilterRepository {
                     return true;
                 }
             }
-            if(filterMode == FilterMode.BLACK_LIST || filterMode == FilterMode.NONE) {
+            if(filterMode == FilterMode.BLACK_LIST) {
                 return true;
             } else if(filterMode == FilterMode.WHITE_LIST) {
                 return false;
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
         }
         return false;
     }
