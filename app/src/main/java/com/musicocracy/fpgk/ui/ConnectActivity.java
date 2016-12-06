@@ -33,9 +33,31 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
     }
 
     @Override
-    protected void onDestroy() {
-        presenter.onDestroy();
+    public void onResume() {
+        super.onResume();
+        presenter.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        presenter.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
         super.onDestroy();
+        presenter.leaveParty();
+    }
+
+    @OnClick(R.id.connect_back_btn)
+    public void backClick() {
+        onBackPressed();
+    }
+
+    @OnClick(R.id.connect_forward_btn)
+    public void forwardClick() {
+        presenter.joinParty();
     }
 
     @OnTextChanged(value = {R.id.party_code_edit_text, R.id.party_name_edit_text}, callback = OnTextChanged.Callback.TEXT_CHANGED)
@@ -45,23 +67,6 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
         } else {
             AndroidViewUtils.setImgBtnEnabled(forwardBtn, true);
         }
-    }
-
-    @OnClick(R.id.connect_back_btn)
-    public void backClick() {
-        onBackPressed();
-    }
-
-    @Override
-    public void onBackPressed() {
-        presenter.leaveParty();
-        presenter.onDestroy();
-        super.onBackPressed();
-    }
-
-    @OnClick(R.id.connect_forward_btn)
-    public void forwardClick() {
-        presenter.joinParty();
     }
 
     //region View Implementation
@@ -76,13 +81,13 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
     }
 
     @Override
-    public void onJoinSuccess() {
+    public void showJoinSuccess() {
         Intent intent = new Intent(ConnectActivity.this, RequestActivity.class);
         startActivity(intent);
     }
 
     @Override
-    public void onJoinError(String error) {
+    public void showJoinError(String error) {
         CharSequence text = "Connection Failed: " + error;
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }

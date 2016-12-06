@@ -2,6 +2,7 @@ package com.musicocracy.fpgk.ioc.activity;
 
 import com.musicocracy.fpgk.domain.net.ClientEventBus;
 import com.musicocracy.fpgk.domain.net.ClientHandler;
+import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.ioc.ApplicationModule;
 import com.musicocracy.fpgk.ioc.NetworkingModule;
 import com.musicocracy.fpgk.mvp.model.ConnectModel;
@@ -20,7 +21,7 @@ public class ConnectModule {
     }
 
     @Provides
-    public ConnectPresenter provideConnectPresenter(ConnectModel model) {
-        return new ConnectPresenter(model);
+    public ConnectPresenter provideConnectPresenter(ConnectModel model, Logger log) {
+        return new ConnectPresenter(model, log);
     }
 }

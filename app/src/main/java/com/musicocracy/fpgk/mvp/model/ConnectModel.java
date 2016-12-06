@@ -11,8 +11,10 @@ import com.musicocracy.fpgk.net.proto.MessageType;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -22,6 +24,7 @@ public class ConnectModel {
     private final ClientHandler clientHandler;
     private final String uniqueAndroidId;
     private final int defaultPort;
+    private boolean joinAccepted = false;
 
     public ConnectModel(ClientEventBus client, ClientHandler clientHandler, String uniqueAndroidId, int defaultPort) {
         this.client = client;
@@ -30,24 +33,31 @@ public class ConnectModel {
         this.defaultPort = defaultPort;
     }
 
+    private final AtomicBoolean connectLock = new AtomicBoolean(false);
     public void connect(String host) throws UnsupportedOperationException, TimeoutException {
-        client.stop();
-        client.start(host, defaultPort);
-        boolean timeoutOccurred = false;
-        if (!client.isRunning()) {
-            timeoutOccurred = client.awaitNextIsRunningChanged(2500, TimeUnit.MILLISECONDS);
-        }
-        if (timeoutOccurred) {
-            throw new TimeoutException("Connection timed out");
-        }
-        if (!client.isRunning()) {
-            throw new UnsupportedOperationException("Could not connect to host");
-        }
-        clientHandler.onCreate();
-    }
+        if (!connectLock.getAndSet(true)) { // Client connection is extremely sensitive. We're going to ensure single entrance from button clicks here.
+            try {
+                if (client.isRunning()) {
+                    client.stop();
+                }
+                client.start(host, defaultPort);
 
-    public Observable<Boolean> getIsRunningObservable() {
-        return client.getIsRunningObservable();
+                if (!client.isRunning()) {  // If client hasn't connected yet, we'll wait for 1500ms.
+                    boolean timeoutOccurred = client.awaitNextIsRunningChanged(1500, TimeUnit.MILLISECONDS);
+                    if (timeoutOccurred) {
+                        throw new TimeoutException("Connection timed out");
+                    }
+
+                    if (!client.isRunning()) {  // If we're still not running when a running status change has occurred, we have a networking error, e.g. we've been refused.
+                        throw new UnsupportedOperationException("Could not connect to host");
+                    }
+                }
+
+                clientHandler.onCreate();
+            } finally {
+                connectLock.set(false);
+            }
+        }
     }
 
     public void joinParty(String partyName) {
@@ -56,15 +66,6 @@ public class ConnectModel {
                 .setPartyName(partyName)
                 .build();
         client.send(message);
-        Observable.timer(2000, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(new Action1<Long>() {
-                    @Override
-                    public void call(Long aLong) {
-                        client.send(message);
-                    }
-                });
     }
 
     public Observable<BasicReply> getJoinResultObservable() {
