@@ -19,14 +19,14 @@ import dagger.Provides;
 public class UtilityModule {
     @Provides
     @Singleton
-    public PartySettings providePartySettings(Database database) {
+    public PartySettings providePartySettings(Database database, Logger log) {
         Dao<Party, Integer> dao = null;
         try {
             dao = database.getPartyDao();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return new PartySettings(dao);
+        return new PartySettings(dao, log);
     }
 
     @Provides

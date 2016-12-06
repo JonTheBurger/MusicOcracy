@@ -24,7 +24,7 @@ public class BlacklistActivity extends ActivityBase<BlacklistView> implements Bl
     private static final String TAG = "BlacklistActivity";
     @Inject BlacklistPresenter presenter;
 
-    @BindView(R.id.add_term_text) ListView filterListView;
+    @BindView(R.id.filter_list_view) ListView filterListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

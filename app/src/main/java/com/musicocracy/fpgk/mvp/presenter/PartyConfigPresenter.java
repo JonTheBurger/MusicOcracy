@@ -1,11 +1,13 @@
 package com.musicocracy.fpgk.mvp.presenter;
 
+import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.mvp.model.PartyConfigModel;
 import com.musicocracy.fpgk.domain.net.NetworkUtils;
 import com.musicocracy.fpgk.mvp.view.PartyConfigView;
 
 import rx.Observable;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -13,12 +15,15 @@ import rx.functions.Func0;
 import rx.schedulers.Schedulers;
 
 public class PartyConfigPresenter implements Presenter<PartyConfigView> {
+    private static final String TAG = "PartyConfigPresenter";
     private final PartyConfigModel model;
+    private final Logger log;
     private PartyConfigView view;
     private Subscription globalIpSub;
 
-    public PartyConfigPresenter(PartyConfigModel model) {
+    public PartyConfigPresenter(PartyConfigModel model, Logger log) {
         this.model = model;
+        this.log = log;
     }
 
     public void onCreate() {
@@ -30,9 +35,18 @@ public class PartyConfigPresenter implements Presenter<PartyConfigView> {
         })
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Action1<String>() {
+        .subscribe(new Subscriber<String>() {
             @Override
-            public void call(String address) {
+            public void onCompleted() {
+                log.warning(TAG, "Unexpected createClientConnectSub: onCompleted");
+            }
+            @Override
+            public void onError(Throwable e) {
+                log.error(TAG, "Unexpected createClientConnectSub: onError " + e.toString());
+            }
+
+            @Override
+            public void onNext(String address) {
                 view.setPartyCode(NetworkUtils.ipAddressToBase36(address).toUpperCase());
             }
         });

@@ -6,7 +6,7 @@ import com.musicocracy.fpgk.domain.dal.Guest;
 import com.musicocracy.fpgk.domain.dj.DjAlgorithm;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
-import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
+import com.musicocracy.fpgk.domain.util.PartySettings;
 import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.domain.spotify.SpotifyPlayerHandler;
 import com.musicocracy.fpgk.net.proto.BasicReply;
@@ -18,9 +18,9 @@ import com.musicocracy.fpgk.net.proto.PlayRequestRequest;
 import com.musicocracy.fpgk.net.proto.SendVoteRequest;
 import com.musicocracy.fpgk.net.proto.VotableSongsReply;
 import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
-import com.spotify.sdk.android.player.Metadata;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +28,7 @@ import kaaes.spotify.webapi.android.SpotifyApi;
 
 import kaaes.spotify.webapi.android.models.Track;
 import rx.Observable;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Action1;
 
@@ -36,7 +37,7 @@ public class ServerHandler {
     private static final String TAG = "ServerHandler";
     private static final int NUM_BROWSE_RESULTS = 10;
     private final ServerEventBus eventBus;
-    private final ReadOnlyPartySettings partySettings;
+    private final PartySettings partySettings;
     private final Browser browser;
     private final SpotifyApi api;
     private final Logger log;
@@ -46,7 +47,7 @@ public class ServerHandler {
     private SpotifyPlayerHandler spotifyPlayerHandler;
     private Subscription[] subscriptions = emptySubs;
 
-    public ServerHandler(ServerEventBus eventBus, ReadOnlyPartySettings partySettings,
+    public ServerHandler(ServerEventBus eventBus, PartySettings partySettings,
                          Browser browser, SpotifyApi api, Logger log,
                          SpotifyPlayerHandler spotifyPlayerHandler, DjAlgorithm djAlgorithm,
                          Database database) {
@@ -86,9 +87,18 @@ public class ServerHandler {
 
     private Subscription createClientConnectSub() {
         return eventBus.getObservable(MessageType.CONNECT_REQUEST)
-                .subscribe(new Action1<ProtoMessageBySender>() {
+                .subscribe(new Subscriber<ProtoMessageBySender>() {
                     @Override
-                    public void call(ProtoMessageBySender msgBySender) {
+                    public void onCompleted() {
+                        log.warning(TAG, "Unexpected createClientConnectSub: onCompleted");
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                        log.error(TAG, "Unexpected createClientConnectSub: onError " + e.toString());
+                    }
+
+                    @Override
+                    public void onNext(ProtoMessageBySender msgBySender) {
                         ConnectRequest request;
                         try {
                             request = ConnectRequest.parseFrom(msgBySender.message.getBody());
@@ -98,26 +108,15 @@ public class ServerHandler {
                         }
 
                         BasicReply reply;
-                        if (request != ConnectRequest.getDefaultInstance() &&
-                                request.getPartyName().equals(partySettings.getPartyName())) {
-                            reply = BasicReply.newBuilder()
-                                .setSuccess(true)
-                                .setMessage("")
-                                .setReplyingTo(msgBySender.message.getHeader().getType())
-                                .build();
-
-                            // TODO Fill in party name and join time.
+                        if (request != ConnectRequest.getDefaultInstance() && request.getPartyName().equals(partySettings.getPartyName())) {
+                            reply = BasicReply.newBuilder().setSuccess(true).setMessage("").setReplyingTo(msgBySender.message.getHeader().getType()).build();
                             try {
-                                database.getGuestDao().createOrUpdate(new Guest(null, "guest", request.getRequesterId(), null, false));
+                                database.getGuestDao().createOrUpdate(new Guest(partySettings.raw(), "g", request.getRequesterId(), new Timestamp(System.currentTimeMillis()), false));
                             } catch (SQLException e) {
                                 log.error(TAG, e.toString());
                             }
                         } else {
-                            reply = BasicReply.newBuilder()
-                                .setSuccess(false)
-                                .setMessage("Invalid party credentials")
-                                .setReplyingTo(msgBySender.message.getHeader().getType())
-                                .build();
+                            reply = BasicReply.newBuilder().setSuccess(false).setMessage("Invalid party credentials").setReplyingTo(msgBySender.message.getHeader().getType()).build();
                         }
                         log.verbose(TAG, "Sent: " + reply);
                         msgBySender.replyWith(reply);
@@ -127,27 +126,35 @@ public class ServerHandler {
 
     private Subscription createBrowseRequestSub() {
         return eventBus.getObservable(MessageType.BROWSE_SONGS_REQUEST)
-                .subscribe(new Action1<ProtoMessageBySender>() {
+                .subscribe(new Subscriber<ProtoMessageBySender>() {
                     @Override
-                    public void call(ProtoMessageBySender msgBySender) {
+                    public void onCompleted() {
+                        log.warning(TAG, "Unexpected createBrowseRequestSub: onCompleted");
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                        log.error(TAG, "Unexpected createBrowseRequestSub: onError " + e.toString());
+                    }
+
+                    @Override
+                    public void onNext(ProtoMessageBySender msgBySender) {
                         BrowseSongsRequest request;
                         try {
                             request = BrowseSongsRequest.parseFrom(msgBySender.message.getBody());
                             log.verbose(TAG, "Successful parse");
                         } catch (InvalidProtocolBufferException e) {
                             log.error(TAG, e.toString());
-                            request = BrowseSongsRequest.getDefaultInstance();
                             e.printStackTrace();
+                            request = BrowseSongsRequest.getDefaultInstance();
                         }
 
                         List<Track> browseTracks = browser.browseTracks(request.getSongTitle());
                         log.verbose(TAG, browseTracks.size() + " songs found");
-                        BrowseSongsReply.Builder builder = BrowseSongsReply.newBuilder();
 
+                        BrowseSongsReply.Builder builder = BrowseSongsReply.newBuilder();
                         for (int i = 0; i < browseTracks.size() && i < NUM_BROWSE_RESULTS; i++) {
                             builder .addSongs(BrowseSongsReply.BrowsableSong.newBuilder()
                                     .setTitle(browseTracks.get(i).name)
-                                    // Gets the name of the first artist
                                     .setArtist(browseTracks.get(i).artists.get(0).name)
                                     .setUri(browseTracks.get(i).uri)
                                     .setMusicService("Spotify")
@@ -163,21 +170,22 @@ public class ServerHandler {
 
     private Subscription createVotableSongsRequestSub() {
         return eventBus.getObservable(MessageType.VOTABLE_SONGS_REQUEST)
-                .subscribe(new Action1<ProtoMessageBySender>() {
+                .subscribe(new Subscriber<ProtoMessageBySender>() {
                     @Override
-                    public void call(ProtoMessageBySender msgBySender) {
-                        VotableSongsRequest request;
-                        try {
-                            request = VotableSongsRequest.parseFrom(msgBySender.message.getBody());
-                        } catch (InvalidProtocolBufferException e) {
-                            request = VotableSongsRequest.getDefaultInstance();
-                            e.printStackTrace();
-                        }
+                    public void onCompleted() {
+                        log.warning(TAG, "Unexpected createVotableSongsRequestSub: onCompleted");
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                        log.error(TAG, "Unexpected createVotableSongsRequestSub: onError " + e.toString());
+                    }
 
-                        VotableSongsReply.Builder builder = VotableSongsReply.newBuilder();
-
+                    @Override
+                    public void onNext(ProtoMessageBySender msgBySender) {
                         List<String> votableURIs = getVotableURIs();
                         List<Track> votableTracks = getVotableTracks(votableURIs);
+
+                        VotableSongsReply.Builder builder = VotableSongsReply.newBuilder();
                         for (int i = 0; i < votableTracks.size(); i++) {
                             Track track = votableTracks.get(i);
                             builder .addSongs(VotableSongsReply.VotableSong.newBuilder()
@@ -186,59 +194,53 @@ public class ServerHandler {
                                     .setChoiceId(i)
                                     .build());
                         }
-
                         VotableSongsReply reply = builder.build();
 
                         log.verbose(TAG, "Sending msg " + reply);
                         msgBySender.replyWith(reply);
                         log.verbose(TAG, "Send complete. ~" + reply.toByteArray().length + " byte body");
-
                     }
                 });
     }
 
     private Subscription createPlayRequestSub() {
         return eventBus.getObservable(MessageType.PLAY_REQUEST_REQUEST)
-            .subscribe(new Action1<ProtoMessageBySender>() {
+            .subscribe(new Subscriber<ProtoMessageBySender>() {
                 @Override
-                public void call(ProtoMessageBySender msgBySender) {
+                public void onCompleted() {
+                    log.warning(TAG, "Unexpected createPlayRequestSub: onCompleted");
+                }
+                @Override
+                public void onError(Throwable e) {
+                    log.error(TAG, "Unexpected createPlayRequestSub: onError " + e.toString());
+                }
+
+                @Override
+                public void onNext(ProtoMessageBySender msgBySender) {
                     PlayRequestRequest request;
                     try {
-                        request = PlayRequestRequest.parseFrom(msgBySender.message.getBody());
                         log.verbose(TAG, "Successful parse");
+                        request = PlayRequestRequest.parseFrom(msgBySender.message.getBody());
                     } catch (InvalidProtocolBufferException e) {
                         log.error(TAG, e.toString());
                         request = PlayRequestRequest.getDefaultInstance();
-                        e.printStackTrace();
                     }
 
-                    BasicReply reply;
-                    BasicReply.Builder builder = BasicReply.newBuilder();
-                    if (request != PlayRequestRequest.getDefaultInstance()) {
-                        try {
-                            djAlgorithm.request(request.getUri(), request.getRequesterId());
-                            newPlayRequest.onNext(request.getUri());
+                    BasicReply.Builder builder = BasicReply.newBuilder().setReplyingTo(msgBySender.message.getHeader().getType());
+                    try {
+                        if (request == PlayRequestRequest.getDefaultInstance()) { throw new InvalidProtocolBufferException("Invalid Play Request"); }
 
-                            builder.setSuccess(true)
-                                    .setMessage("");
-                        } catch (SQLException e) {
-                            log.error(TAG, e.toString());
-                            builder.setSuccess(false)
-                                    .setMessage(e.toString());
-                        } catch (IllegalArgumentException e) {
-                            log.error(TAG, e.toString());
-                            builder.setSuccess(false)
-                                    .setMessage(e.toString());
-                        }
+                        djAlgorithm.request(request.getUri(), request.getRequesterId());
+                        newPlayRequest.onNext(request.getUri());
+
+                        builder.setSuccess(true).setMessage("");
                         spotifyPlayerHandler.play();
-                    } else {
-                        builder.setSuccess(false)
-                                .setMessage("Invalid Play Request");
+                    } catch (SQLException | IllegalArgumentException | InvalidProtocolBufferException e) {
+                        log.error(TAG, e.toString());
+                        builder.setSuccess(false).setMessage(e.getMessage());
                     }
 
-                    reply = builder.setReplyingTo(msgBySender.message.getHeader().getType())
-                            .build();
-
+                    BasicReply reply = builder.build();
                     log.verbose(TAG, "Sent: " + reply);
                     msgBySender.replyWith(reply);
                 }
@@ -247,9 +249,18 @@ public class ServerHandler {
 
     private Subscription createVoteRequestSub() {
         return eventBus.getObservable(MessageType.SEND_VOTE_REQUEST)
-                .subscribe(new Action1<ProtoMessageBySender>() {
+                .subscribe(new Subscriber<ProtoMessageBySender>() {
                     @Override
-                    public void call(ProtoMessageBySender msgBySender) {
+                    public void onCompleted() {
+                        log.warning(TAG, "Unexpected createVoteRequestSub: onCompleted");
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                        log.error(TAG, "Unexpected createVoteRequestSub: onError " + e.toString());
+                    }
+
+                    @Override
+                    public void onNext(ProtoMessageBySender msgBySender) {
                         SendVoteRequest request;
                         try {
                             request = SendVoteRequest.parseFrom(msgBySender.message.getBody());
@@ -258,34 +269,22 @@ public class ServerHandler {
                             e.printStackTrace();
                         }
 
-                        BasicReply reply;
-                        BasicReply.Builder builder = BasicReply.newBuilder();
-                        if (request != SendVoteRequest.getDefaultInstance()) {
+                        BasicReply.Builder builder = BasicReply.newBuilder().setReplyingTo(msgBySender.message.getHeader().getType());
+                        try {
+                            if (request == SendVoteRequest.getDefaultInstance()) { throw new InvalidProtocolBufferException("Invalid Vote Request"); }
+
                             List<String> votableSongURIs = getVotableURIs();
-                            try {
-                                String voteURI = votableSongURIs.get(request.getChoiceId());
+                            String voteURI = votableSongURIs.get(request.getChoiceId());
 
-                                djAlgorithm.voteFor(voteURI, request.getRequesterId());
+                            djAlgorithm.voteFor(voteURI, request.getRequesterId());
 
-                                builder.setSuccess(true)
-                                        .setMessage("");
-                            } catch (SQLException e) {
-                                log.error(TAG, e.toString());
-                                builder.setSuccess(false)
-                                        .setMessage(e.toString());
-                            } catch (IllegalArgumentException e) {
-                                log.error(TAG, e.toString());
-                                builder.setSuccess(false)
-                                        .setMessage(e.toString());
-                            }
-                        } else {
-                            builder.setSuccess(false)
-                                    .setMessage("Invalid Vote Request");
+                            builder.setSuccess(true).setMessage("");
+                        } catch (SQLException | IllegalArgumentException | InvalidProtocolBufferException e) {
+                            log.error(TAG, e.toString());
+                            builder.setSuccess(false).setMessage(e.getMessage());
                         }
 
-                       reply = builder.setReplyingTo(msgBySender.message.getHeader().getType())
-                                .build();
-
+                        BasicReply reply = builder.build();
                         log.verbose(TAG, "Sent: " + reply);
                         msgBySender.replyWith(reply);
                     }
@@ -297,7 +296,7 @@ public class ServerHandler {
         try {
             votableSongURIs = djAlgorithm.getVotableSongUris();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(TAG, e.toString());
         }
         return votableSongURIs;
     }
@@ -318,8 +317,8 @@ public class ServerHandler {
     public void onDestroy() {
         spotifyPlayerHandler.onDestroy();
 
-        for (int i = 0; i < subscriptions.length; i++) {
-            RxUtils.safeUnsubscribe(subscriptions[i]);
+        for (Subscription subscription : subscriptions) {
+            RxUtils.safeUnsubscribe(subscription);
         }
         subscriptions = emptySubs;
     }

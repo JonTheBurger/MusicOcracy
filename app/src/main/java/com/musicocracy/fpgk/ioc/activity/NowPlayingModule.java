@@ -2,6 +2,7 @@ package com.musicocracy.fpgk.ioc.activity;
 
 import com.musicocracy.fpgk.domain.net.ServerHandler;
 import com.musicocracy.fpgk.domain.spotify.SpotifyPlayerHandler;
+import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
 import com.musicocracy.fpgk.mvp.model.NowPlayingModel;
 import com.musicocracy.fpgk.mvp.presenter.NowPlayingPresenter;
@@ -19,7 +20,7 @@ public class NowPlayingModule {
     }
 
     @Provides
-    public NowPlayingPresenter provideNowPlayingPresenter(NowPlayingModel model) {
-        return new NowPlayingPresenter(model);
+    public NowPlayingPresenter provideNowPlayingPresenter(NowPlayingModel model, Logger log) {
+        return new NowPlayingPresenter(model, log);
     }
 }

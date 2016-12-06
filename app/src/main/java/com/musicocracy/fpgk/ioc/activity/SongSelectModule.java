@@ -19,7 +19,7 @@ public class SongSelectModule {
     }
 
     @Provides
-    public SongSelectPresenter provideSongSelectPresenter(SongSelectModel model, @Named(ApplicationModule.UNIQUE_ANDROID_ID)String uniqueAndroidId) {
-        return new SongSelectPresenter(model, uniqueAndroidId);
+    public SongSelectPresenter provideSongSelectPresenter(SongSelectModel model, Logger log, @Named(ApplicationModule.UNIQUE_ANDROID_ID)String uniqueAndroidId) {
+        return new SongSelectPresenter(model, log, uniqueAndroidId);
     }
 }

@@ -12,7 +12,7 @@ import com.musicocracy.fpgk.domain.net.ServerEventBus;
 import com.musicocracy.fpgk.domain.net.ServerHandler;
 import com.musicocracy.fpgk.domain.spotify.Browser;
 import com.musicocracy.fpgk.domain.util.Logger;
-import com.musicocracy.fpgk.domain.util.ReadOnlyPartySettings;
+import com.musicocracy.fpgk.domain.util.PartySettings;
 import com.musicocracy.fpgk.domain.spotify.SpotifyPlayerHandler;
 
 import javax.inject.Named;
@@ -71,7 +71,7 @@ public class NetworkingModule {
     @Provides
     @Singleton
     public ServerHandler provideServerHandler(ServerEventBus eventBus,
-                                              ReadOnlyPartySettings partySettings, Browser browser,
+                                              PartySettings partySettings, Browser browser,
                                               SpotifyApi api, Logger log,
                                               SpotifyPlayerHandler playerHandler,
                                               DjAlgorithm djAlgorithm, Database database) {
