@@ -1,4 +1,4 @@
-# Cyber Jukebox ![Icon](app/src/main/res/mipmap-mdpi/launcher_icon.png)
+# ![Icon](app/src/main/res/mipmap-mdpi/launcher_icon.png) Cyber Jukebox
 A democratic DJ app for Android created for the ECE-1896 (Senior Design) at University of Pittsburgh.
 Cyber Jukebox allows a group of friends to all contribute to a music playlist democratically. Request tracks provided by Spotify from the virtual DJ, and vote on suggestions made by your friends. The highest number of votes wins! In order to leverage Spotify's services, the host needs a Spotify Premium account. Because we can't afford server hosting, parties must be held over LAN.
 ## Architecture
