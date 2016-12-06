@@ -45,7 +45,9 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
 
     @Override
     public void onPlaybackEvent(PlayerEvent playerEvent) {
+        log.verbose(TAG, "PlayerEvent: " + playerEvent.toString());
         if (playerEvent == PlayerEvent.kSpPlaybackNotifyTrackChanged) {
+            log.verbose(TAG, "Track Changed Event.");
             newTrackPlayingSubject.onNext(player.getMetadata().currentTrack);
             scheduleTimer();
         }
@@ -67,7 +69,8 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
             timerDelay = 0;
         }
 
-        Observable.timer(timerDelay , TimeUnit.MILLISECONDS)
+        log.verbose(TAG, "Set play observable for: " + timerDelay + "ms");
+        Observable.timer(timerDelay, TimeUnit.MILLISECONDS)
             .subscribe(new Action1<Long>() {
                 @Override
                 public void call(Long aLong) {
@@ -79,13 +82,7 @@ public class SpotifyPlayerHandler implements SpotifyPlayer.NotificationCallback 
                         log.error(TAG, e.toString());
                     }
                     if (nextURI != null && !nextURI.equals("")) {
-                        if (player.getPlaybackState().isPlaying) {
-                            player.queue(null, nextURI);
-                        } else {
-                            // If player is not currently playing something, play now
-                            player.playUri(null, nextURI, 0, 0);
-                            player.resume(null);
-                        }
+                        player.queue(null, nextURI);
                         log.info(TAG, "Song Queued(URI): " + nextURI);
                     } else {
                         log.error(TAG, "Next song from DJ algorithm is null or empty.");
