@@ -15,7 +15,9 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class PartySettings implements ReadOnlyPartySettings {
+    private static final String TAG = "PartySettings";
     private final Dao<Party, Integer> dao;
+    private final Logger log;
     private Observable<Party> insertObservable;
     private final Party persistent = new Party("", "", new Timestamp(System.currentTimeMillis()), null, FilterMode.NONE, true);
     private String SpotifyToken = "";
@@ -23,11 +25,12 @@ public class PartySettings implements ReadOnlyPartySettings {
     private long coinRefillMillis;
 
     public PartySettings() {
-        this(null); // Disable persistent database storage
+        this(null, new NullLogger()); // Disable persistent database storage
     }
 
-    public PartySettings(final Dao<Party, Integer> dao) {
+    public PartySettings(final Dao<Party, Integer> dao, Logger log) {
         this.dao = dao;
+        this.log = log;
         if (dao != null) {
             this.insertObservable = Observable.just(persistent)
                     .doOnNext(new Action1<Party>() {
@@ -72,7 +75,7 @@ public class PartySettings implements ReadOnlyPartySettings {
                                 try {
                                     dao.update(party);
                                 } catch (SQLException e) {
-                                    e.printStackTrace();
+                                    log.warning(TAG, e.toString());
                                 }
                             }
                         });

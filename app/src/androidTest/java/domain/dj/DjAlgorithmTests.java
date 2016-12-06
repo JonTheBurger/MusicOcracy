@@ -12,6 +12,8 @@ import com.musicocracy.fpgk.domain.dal.Party;
 import com.musicocracy.fpgk.domain.dal.PlayRequest;
 import com.musicocracy.fpgk.domain.dal.SongFilter;
 import com.musicocracy.fpgk.domain.dj.DjAlgorithm;
+import com.musicocracy.fpgk.domain.util.Logger;
+import com.musicocracy.fpgk.domain.util.NullLogger;
 import com.musicocracy.fpgk.domain.util.PartySettings;
 
 import org.junit.Test;
@@ -29,6 +31,7 @@ import static junit.framework.Assert.fail;
 @RunWith(AndroidJUnit4.class)
 public class DjAlgorithmTests {
     private final Context context = InstrumentationRegistry.getTargetContext();
+    private final Logger log = new NullLogger();
 
     private Database db;
     private PartySettings partySettings;
@@ -79,7 +82,7 @@ public class DjAlgorithmTests {
         }
 
         TestConfigurator startNewParty() throws SQLException {
-            partySettings = new PartySettings(db.getPartyDao()).setPartyName("P0").setPartyCode("PC0").setCoinAllowance(3).setCoinRefillMillis(1000000);
+            partySettings = new PartySettings(db.getPartyDao(), log).setPartyName("P0").setPartyCode("PC0").setCoinAllowance(3).setCoinRefillMillis(1000000);
             party = partySettings.raw();
 
             validGuest = new Guest(party, "G0", "G0_ID", nowMinus(0), false);

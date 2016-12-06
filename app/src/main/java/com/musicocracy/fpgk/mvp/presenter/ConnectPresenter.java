@@ -45,7 +45,7 @@ public class ConnectPresenter implements Presenter<ConnectView> {
 
                     @Override
                     public void onError(Throwable e) {
-                        log.warning(TAG, "Client join Observable in unexpected state: onError " + e.getMessage());
+                        log.warning(TAG, "Client join Observable in unexpected state: onError " + e.toString());
                         view.showJoinError(e.getMessage());
                         joinSubscription = createJoinSubscription();
                     }
