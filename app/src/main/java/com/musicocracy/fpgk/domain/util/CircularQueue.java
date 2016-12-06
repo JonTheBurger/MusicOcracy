@@ -6,6 +6,7 @@ public class CircularQueue<T> implements SimpleQueue<T>{
     private int head = 0;
     private int tail = 0;
     private boolean isEmpty = true;
+    private int size = 0;
 
     public CircularQueue(int maxSize) {
         if (maxSize <= 0) {
@@ -18,52 +19,42 @@ public class CircularQueue<T> implements SimpleQueue<T>{
 
     @Override
     public void enqueue(T item) {
-        if (tail != maxSize) {
-            if (head == tail && !isEmpty) {
-                head++;
-            }
-            queue[tail++] = item;
-            isEmpty = false;
-        } else {
-            if (head == 0 && maxSize != 1 && !isEmpty) {
-                head++;
-            }
-            queue[0] = item;
-            tail = 1;
+        queue[tail] = item;
+        if (size != maxSize) {
+            size++;
         }
+        // The place to add is the oldest item in the queue
+        if (size != 0 && head == tail) {
+            head = (head + 1) % size();
+        }
+        tail = ((tail + 1) % maxSize);
     }
 
     @Override
     public T dequeue() {
-        if (isEmpty) {
+        if (size == 0) {
             throw new IllegalStateException("Dequeue performed on empty circular queue.");
-        } else if(head == maxSize - 1) {
-            head = 0;
-            if (head == tail) {
-                isEmpty = true;
-            }
-            return queue[maxSize - 1];
         } else {
-            head++;
-            if (head == tail) {
-                isEmpty = true;
-            }
-            return queue[head - 1];
+            T item = queue[head];
+            head = (head + 1) % size();
+            return item;
         }
     }
 
     @Override
+    public boolean contains(T itemToCheck) {
+        if (size() != 0) {
+            for (T item : queue) {
+                if (item.equals(itemToCheck)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
     public int size() {
-        if (isEmpty) {
-            return 0;
-        }
-        else if (tail > head) {
-            return tail - head;
-        }
-        else if (tail == head) {
-            return maxSize;
-        } else {
-            return (maxSize - (head - tail)) - 1;
-        }
+        return size;
     }
 }

@@ -5,6 +5,8 @@ import com.musicocracy.fpgk.domain.util.CircularQueue;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 
 public class CircularQueueTests {
     @Test(expected = IllegalArgumentException.class)
@@ -88,22 +90,22 @@ public class CircularQueueTests {
     }
 
     @Test
-    public void CircularQueue_enqueuePastMax_dequeueAll_sizeZero() {
+    public void CircularQueue_enqueuePastMax_dequeueAll_sizeDoesNotChange() {
         String[] inputStrings = new String[]{"A", "B", "C", "D", "E", "F"};
 
         int queueSize = 5;
 
         CircularQueue<String> cq = new CircularQueue<>(queueSize);
 
-        for (int i = 0; i < inputStrings.length; i++) {
-            cq.enqueue(inputStrings[i]);
+        for (String inputString : inputStrings) {
+            cq.enqueue(inputString);
         }
 
         for (int i = 0; i < queueSize; i++) {
             cq.dequeue();
         }
 
-        assertEquals(0, cq.size());
+        assertEquals(5, cq.size());
     }
 
     @Test
@@ -115,11 +117,29 @@ public class CircularQueueTests {
 
         CircularQueue<String> cq = new CircularQueue<>(queueSize);
 
-        for (int i = 0; i < inputStrings.length; i++) {
-            cq.enqueue(inputStrings[i]);
+        for (String inputString : inputStrings) {
+            cq.enqueue(inputString);
         }
 
         for (int i = 0; i < queueSize; i++) {
+            assertEquals(expectedStrings[i], cq.dequeue());
+        }
+    }
+
+    @Test
+    public void CircularQueue_enqueuePastMax_dequeuePastAll() {
+        String[] inputStrings = new String[]{"A", "B", "C", "D", "E", "F"};
+        String[] expectedStrings = new String[]{"B", "C", "D", "E", "F", "B", "C"};
+
+        int queueSize = 5;
+
+        CircularQueue<String> cq = new CircularQueue<>(queueSize);
+
+        for (String inputString : inputStrings) {
+            cq.enqueue(inputString);
+        }
+
+        for (int i = 0; i < 7; i++) {
             assertEquals(expectedStrings[i], cq.dequeue());
         }
     }
@@ -132,21 +152,23 @@ public class CircularQueueTests {
 
         CircularQueue<String> cq = new CircularQueue<>(queueSize);
 
-        for (int i = 0; i < inputStrings.length; i++) {
-            cq.enqueue(inputStrings[i]);
+        for (String inputString : inputStrings) {
+            cq.enqueue(inputString);
         }
 
-        for (int i = 0; i < inputStrings.length; i++) {
+        for (String ignored : inputStrings) {
             cq.dequeue();
         }
 
         cq.enqueue("D");
-        assertEquals("D", cq.dequeue());
+        assertEquals("A", cq.dequeue());
     }
 
     @Test
-    public void CircularQueue_enqueuePastMax_dequeueAll_enqueuePartial_dequeAll_zeroSize() {
-        CircularQueue<String> cq = new CircularQueue<>(5);
+    public void CircularQueue_enqueuePastMax_dequeueAll_enqueuePartial_dequeAll_sizeIsMax() {
+        int queueSize = 5;
+
+        CircularQueue<String> cq = new CircularQueue<>(queueSize);
 
         for (int i = 0; i < 6; i++) {
             cq.enqueue("A");
@@ -162,7 +184,7 @@ public class CircularQueueTests {
         cq.dequeue();
         cq.dequeue();
 
-        assertEquals(0, cq.size());
+        assertEquals(queueSize, cq.size());
     }
 
     @Test
@@ -178,14 +200,14 @@ public class CircularQueueTests {
         }
 
         String[] inputStrings = new String[]{"B", "C", "D"};
-        String[] expectedStrings = new String[]{"B", "C", "D"};
+        String[] expectedStrings = new String[]{"A", "A", "B"};
 
-        for (int i = 0; i < inputStrings.length; i++) {
-            cq.enqueue(inputStrings[i]);
+        for (String inputString : inputStrings) {
+            cq.enqueue(inputString);
         }
 
-        for (int i = 0; i < expectedStrings.length; i++) {
-            assertEquals(expectedStrings[i], cq.dequeue());
+        for (String expectedString : expectedStrings) {
+            assertEquals(expectedString, cq.dequeue());
         }
     }
 
@@ -193,16 +215,50 @@ public class CircularQueueTests {
     public void CircularQueue_dequeueWhenEmpty_IllegalArguementException() {
         CircularQueue<String> cq = new CircularQueue<>(5);
 
-        String returnedString = cq.dequeue();
+        cq.dequeue();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void CircularQueue_dequeueWhenEmpty_oneEnqueueTwoDequeues_IllegalArguementException() {
+    @Test
+    public void CircularQueue_contains_empty_false() {
+        CircularQueue<String> cq = new CircularQueue<>(5);
+
+        assertFalse(cq.contains("A"));
+    }
+
+    @Test
+    public void CircularQueue_contains_oneEnqueue_true() {
         CircularQueue<String> cq = new CircularQueue<>(5);
 
         cq.enqueue("A");
 
-        String returnedString = cq.dequeue();
-        cq.dequeue();
+        assertTrue(cq.contains("A"));
+    }
+
+    @Test
+    public void CircularQueue_contains_enqueueWrapAroundOverwrite_false() {
+        CircularQueue<String> cq = new CircularQueue<>(5);
+
+        String[] inputStrings = new String[]{"A", "B", "C", "D", "E", "F"};
+
+        for (String inputString : inputStrings) {
+            cq.enqueue(inputString);
+        }
+
+        assertFalse(cq.contains("A"));
+    }
+
+    @Test
+    public void CircularQueue_containsAllButOverwritten_enqueueWrapAroundOverwrite_true() {
+        CircularQueue<String> cq = new CircularQueue<>(5);
+
+        String[] inputStrings = new String[]{"A", "B", "C", "D", "E", "F"};
+
+        for (String inputString : inputStrings) {
+            cq.enqueue(inputString);
+        }
+
+        for (int i = 1; i < inputStrings.length; i++) {
+            assertTrue(cq.contains(inputStrings[i]));
+        }
     }
 }
