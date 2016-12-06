@@ -96,6 +96,7 @@ public class ServerHandler {
                     public void onError(Throwable e) {
                         log.error(TAG, "Unexpected createClientConnectSub: onError " + e.toString());
                     }
+
                     @Override
                     public void onNext(ProtoMessageBySender msgBySender) {
                         ConnectRequest request;

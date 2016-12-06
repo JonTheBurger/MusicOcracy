@@ -1,5 +1,6 @@
 package com.musicocracy.fpgk.mvp.presenter;
 
+import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.mvp.model.NowPlayingModel;
 import com.musicocracy.fpgk.mvp.view.NowPlayingView;
@@ -13,19 +14,21 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class NowPlayingPresenter implements Presenter<NowPlayingView> {
+    private static final String TAG = "NowPlayingPresenter";
     private final NowPlayingModel model;
+    private final Logger log;
     private final Subscription newNowPlayingUpdate;
     private final Subscription newVotableUpdate;
     private final Subscription newPlayRequest;
     private NowPlayingView view;
 
-    public NowPlayingPresenter(NowPlayingModel model) {
+    public NowPlayingPresenter(NowPlayingModel model, Logger log) {
         this.model = model;
+        this.log = log;
         newNowPlayingUpdate = createPlayEventNowPlayingSub();
         newVotableUpdate = createPlayEventVotableSongsSub();
         newPlayRequest = createPlayRequestSub();
@@ -36,19 +39,28 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
         this.view = view;
     }
 
-    public Subscription createPlayEventNowPlayingSub() {
+    private Subscription createPlayEventNowPlayingSub() {
         return model.getPlayerHandler().newSongPlaying()
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
-                .subscribe(new Action1<Metadata.Track>() {
+                .subscribe(new Subscriber<Metadata.Track>() {
                     @Override
-                    public void call(Metadata.Track track) {
+                    public void onCompleted() {
+                        log.warning(TAG, "Unexpected createPlayEventNowPlayingSub: onCompleted");
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                        log.error(TAG, "Unexpected createPlayEventNowPlayingSub: onError " + e.toString());
+                    }
+
+                    @Override
+                    public void onNext(Metadata.Track track) {
                         updateNowPlaying(track);
                     }
                 });
     }
 
-    public Subscription createPlayEventVotableSongsSub() {
+    private Subscription createPlayEventVotableSongsSub() {
         return model.getPlayerHandler().newSongPlaying()
                 .map(new Func1<Metadata.Track, List<String>>() {
                     @Override
@@ -62,11 +74,11 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                 .subscribe(new Subscriber<List<String>>() {
                     @Override
                     public void onCompleted() {
+                        log.warning(TAG, "Unexpected createPlayEventVotableSongsSub: onCompleted");
                     }
-
                     @Override
                     public void onError(Throwable e) {
-                        e.printStackTrace();
+                        log.error(TAG, "Unexpected createPlayEventVotableSongsSub: onError " + e.toString());
                     }
 
                     @Override
@@ -76,7 +88,7 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                 });
     }
 
-    public Subscription createPlayRequestSub() {
+    private Subscription createPlayRequestSub() {
         return model.getServerHandler().newPlayRequest()
                 .map(new Func1<String, List<String>>() {
                         @Override
@@ -90,11 +102,11 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                     .subscribe(new Subscriber<List<String>>() {
                         @Override
                         public void onCompleted() {
+                            log.warning(TAG, "Unexpected createPlayRequestSub: onCompleted");
                         }
-
                         @Override
                         public void onError(Throwable e) {
-                            e.printStackTrace();
+                            log.error(TAG, "Unexpected createPlayEventVotableSongsSub: onError " + e.toString());
                         }
 
                         @Override
@@ -151,11 +163,11 @@ public class NowPlayingPresenter implements Presenter<NowPlayingView> {
                 .subscribe(new Subscriber<List<String>>() {
                     @Override
                     public void onCompleted() {
+                        log.warning(TAG, "Unexpected updateVotableSongs: onCompleted");
                     }
-
                     @Override
                     public void onError(Throwable e) {
-                        e.printStackTrace();
+                        log.error(TAG, "Unexpected updateVotableSongs: onError " + e.toString());
                     }
 
                     @Override

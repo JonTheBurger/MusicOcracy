@@ -8,23 +8,18 @@ import com.musicocracy.fpgk.net.proto.ConnectRequest;
 import com.musicocracy.fpgk.net.proto.Envelope;
 import com.musicocracy.fpgk.net.proto.MessageType;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import rx.Observable;
-import rx.Subscription;
-import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 public class ConnectModel {
     private final ClientEventBus client;
     private final ClientHandler clientHandler;
     private final String uniqueAndroidId;
     private final int defaultPort;
-    private boolean joinAccepted = false;
 
     public ConnectModel(ClientEventBus client, ClientHandler clientHandler, String uniqueAndroidId, int defaultPort) {
         this.client = client;

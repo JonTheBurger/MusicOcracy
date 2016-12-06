@@ -26,10 +26,6 @@ public class PartyConfigModel {
         handler.onCreate();
     }
 
-    public boolean serverRunning() {
-        return server.isRunning();
-    }
-
     public void stopServer() throws InterruptedException {
         server.stop();
         handler.onDestroy();

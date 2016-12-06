@@ -2,6 +2,7 @@ package com.musicocracy.fpgk.ioc.activity;
 
 import com.musicocracy.fpgk.domain.net.ServerEventBus;
 import com.musicocracy.fpgk.domain.net.ServerHandler;
+import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.ioc.NetworkingModule;
 import com.musicocracy.fpgk.mvp.model.PartyConfigModel;
 import com.musicocracy.fpgk.domain.util.PartySettings;
@@ -20,7 +21,7 @@ public class PartyConfigModule {
     }
 
     @Provides
-    public PartyConfigPresenter providePartyConfigPresenter(PartyConfigModel model) {
-        return new PartyConfigPresenter(model);
+    public PartyConfigPresenter providePartyConfigPresenter(PartyConfigModel model, Logger log) {
+        return new PartyConfigPresenter(model, log);
     }
 }

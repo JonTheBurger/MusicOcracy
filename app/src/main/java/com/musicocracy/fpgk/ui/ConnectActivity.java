@@ -82,7 +82,7 @@ public class ConnectActivity extends ActivityBase<ConnectView> implements Connec
 
     @Override
     public void showJoinSuccess() {
-        Intent intent = new Intent(ConnectActivity.this, RequestActivity.class);
+        Intent intent = new Intent(this, RequestActivity.class);
         startActivity(intent);
     }
 

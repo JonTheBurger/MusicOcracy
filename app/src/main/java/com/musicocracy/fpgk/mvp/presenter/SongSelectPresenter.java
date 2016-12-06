@@ -1,5 +1,6 @@
 package com.musicocracy.fpgk.mvp.presenter;
 
+import com.musicocracy.fpgk.domain.util.Logger;
 import com.musicocracy.fpgk.domain.util.RxUtils;
 import com.musicocracy.fpgk.mvp.model.SongSelectModel;
 import com.musicocracy.fpgk.mvp.view.SongSelectView;
@@ -14,6 +15,7 @@ import com.musicocracy.fpgk.net.proto.VotableSongsRequest;
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -21,12 +23,14 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class SongSelectPresenter implements Presenter<SongSelectView> {
+    private static final String TAG = "SongSelectPresenter";
     private final SongSelectModel model;
+    private final Logger log;
+    private final String uniqueAndroidId;
     private final Subscription browseSubscription;
     private final Subscription voteSubscription;
     private final Subscription playRequestSub;
     private final Subscription voteRequestSub;
-    private final String uniqueAndroidId;
     private SongSelectView view;
     private BrowseSongsReply currentBrowseReply;
     private VotableSongsReply currentVotableReply;
@@ -34,8 +38,12 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
     private int browseRetries = 0;
     private static final int MAX_BROWSE_RETRY = 2;
     private String browseRequest = "";
-    public SongSelectPresenter(SongSelectModel model, String uniqueAndroidId) {
+
+    public SongSelectPresenter(SongSelectModel model, final Logger log, String uniqueAndroidId) {
         this.model = model;
+        this.log = log;
+        this.uniqueAndroidId = uniqueAndroidId;
+
         browseSubscription = model.getBrowseReply()
                 .map(new Func1<BrowseSongsReply, List<String>>() {
                     @Override
@@ -57,43 +65,79 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
-                .subscribe(new Action1<List<String>>() {
+                .subscribe(new Subscriber<List<String>>() {
                     @Override
-                    public void call(List<String> browseList) {
-                        view.updateBrowseSongs(browseList);
+                    public void onCompleted() {
+                        log.warning(TAG, "Unexpected browseSubscription: onCompleted");
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                        log.error(TAG, "Unexpected browseSubscription: onError " + e.toString());
+                    }
+
+                    @Override
+                    public void onNext(List<String> browseList) {
+                       view.updateBrowseSongs(browseList);
                     }
                 });
 
         voteSubscription = model.getVotableSongsReply()
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
-                .subscribe(new Action1<VotableSongsReply>() {
-                    @Override
-                    public void call(VotableSongsReply VotableSongsReply) {
-                        onVotableSongsReceived(VotableSongsReply);
-                    }
-                });
+                .subscribe(new Subscriber<VotableSongsReply>() {
+                               @Override
+                               public void onCompleted() {
+                                   log.warning(TAG, "Unexpected voteSubscription: onCompleted");
+                               }
+                               @Override
+                               public void onError(Throwable e) {
+                                   log.error(TAG, "Unexpected voteSubscription: onError " + e.toString());
+                               }
+
+                               @Override
+                               public void onNext(VotableSongsReply votableSongsReply) {
+                                   onVotableSongsReceived(votableSongsReply);
+                               }
+                           });
 
         playRequestSub = model.getPlayRequestReply()
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
-                .subscribe(new Action1<BasicReply>() {
+                .subscribe(new Subscriber<BasicReply>() {
                     @Override
-                    public void call(BasicReply basicReply) {
-                        if (basicReply != BasicReply.getDefaultInstance() && basicReply.getSuccess()) {
-                            view.onPlayRequestSuccess();
-                        } else {
-                            view.onPlayRequestError(basicReply.getMessage());
-                        }
+                    public void onCompleted() {
+                        log.warning(TAG, "Unexpected playRequestSub: onCompleted");
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                        log.error(TAG, "Unexpected playRequestSub: onError " + e.toString());
+                    }
+
+                    @Override
+                    public void onNext(BasicReply basicReply) {
+                       if (basicReply != BasicReply.getDefaultInstance() && basicReply.getSuccess()) {
+                           view.onPlayRequestSuccess();
+                       } else {
+                           view.onPlayRequestError(basicReply.getMessage());
+                       }
                     }
                 });
 
         voteRequestSub = model.getVoteRequestReply()
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
-                .subscribe(new Action1<BasicReply>() {
+                .subscribe(new Subscriber<BasicReply>() {
                     @Override
-                    public void call(BasicReply basicReply) {
+                    public void onCompleted() {
+                        log.warning(TAG, "Unexpected voteRequestSub: onCompleted");
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                        log.error(TAG, "Unexpected voteRequestSub: onError " + e.toString());
+                    }
+
+                    @Override
+                    public void onNext(BasicReply basicReply) {
                         if (basicReply != BasicReply.getDefaultInstance() && basicReply.getSuccess()) {
                             view.onVoteRequestSuccess();
                         } else {
@@ -101,8 +145,6 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
                         }
                     }
                 });
-
-        this.uniqueAndroidId = uniqueAndroidId;
     }
 
     public void populateBrowseSongs(String requestString) {
@@ -120,7 +162,7 @@ public class SongSelectPresenter implements Presenter<SongSelectView> {
         model.sendVotableSongsRequestMsg(msg);
     }
 
-    public void onVotableSongsReceived(VotableSongsReply msg) {
+    private void onVotableSongsReceived(VotableSongsReply msg) {
         currentVotableReply = msg;
 
         ArrayList<String> voteList = new ArrayList<>();
